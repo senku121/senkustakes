@@ -25,7 +25,7 @@ const closeUserModal = document.getElementById(
 );
 if(
     !currentUser ||
-    currentUser.role !== "SUPER_ADMIN"
+    currentUser.role !== "ADMIN"
 ){
 
     window.location.href = "admin-login.html";
