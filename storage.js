@@ -136,12 +136,49 @@ function initializeDatabase(){
 
 function getDB(){
 
+let db = JSON.parse(
+localStorage.getItem("senkuDB")
+);
 
-    return JSON.parse(
 
-        localStorage.getItem("senkuDB")
+if(!db){
 
-    );
+db = {
+
+admin:{
+    id:"ADMIN001",
+    username:"admin",
+    password:"admin123",
+    role:"ADMIN",
+    balance:0
+},
+
+
+users:[],
+
+
+agents:[],
+
+
+transactions:[],
+
+
+agentRequests:[]
+
+
+};
+
+
+localStorage.setItem(
+"senkuDB",
+JSON.stringify(db)
+);
+
+
+}
+
+
+return db;
 
 
 }
