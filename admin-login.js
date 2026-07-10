@@ -121,7 +121,7 @@ form.addEventListener("submit",(e)=>{
 
                 id:admin.id,
 
-                role:admin.role,
+                role:"SUPER_ADMIN"
 
                 username:admin.username,
 
