@@ -118,16 +118,10 @@ form.addEventListener("submit",(e)=>{
 
 
             setCurrentUser({
-
-                id:admin.id,
-
-                role:"SUPER_ADMIN"
-
-                username:admin.username,
-
-                name:admin.name
-
-            });
+id:admin.id,
+role:"SUPER_ADMIN",
+username:admin.username
+});
 
 
 
