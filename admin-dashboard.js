@@ -704,7 +704,7 @@ const depositsToday = db.transactions
 )
 .reduce((sum,t)=>sum+t.amount,0);
 
-const pendingWithdraw = db.withdrawals
+const pendingWithdraw = (db.withdrawals || [])
 .filter(w=>w.status==="Pending")
 .reduce((sum,w)=>sum+w.amount,0);
 
