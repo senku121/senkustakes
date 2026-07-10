@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>Settings | Senku Stakes</title>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+
+<link rel="stylesheet" href="settings.css">
+<link rel="stylesheet" href="popup.css">
+<link rel="stylesheet" href="responsive.css">
+
+
+</head>
+
+
+<body>
+
+
+<div class="settings-layout">
+
+
+
+<header class="settings-header">
+
+
+<a href="dashboard.html" class="back-btn">
+
+<i class="fa-solid fa-arrow-left"></i>
+
+Dashboard
+
+</a>
+
+
+
+
+<div class="logo">
+
+
+<div class="logo-box">
+
+S
+
+</div>
+
+
+<h2>
+
+Senku Stakes
+
+</h2>
+
+
+</div>
+
+
+
+</header>
+
+
+
+
+
+
+<main class="settings-container">
+
+
+
+
+
+<section class="settings-card profile-settings">
+
+
+<h2>
+
+<i class="fa-solid fa-user"></i>
+
+Profile Settings
+
+</h2>
+
+
+
+<div class="setting-input">
+
+
+<label>
+
+Username
+
+</label>
+
+
+<input type="text" id="settingsUsername">
+
+
+</div>
+
+
+
+
+<div class="setting-input">
+
+
+<label>
+
+Email
+
+</label>
+
+
+<input type="email" id="settingsEmail">
+
+
+</div>
+
+
+
+
+<div class="setting-input">
+
+
+<label>
+
+Phone
+
+</label>
+
+
+<input type="text" id="settingsPhone">
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+<section class="settings-card">
+
+
+<h2>
+
+<i class="fa-solid fa-shield-halved"></i>
+
+Security
+
+</h2>
+
+
+
+
+<div class="setting-row">
+
+
+<div>
+
+<h3>
+
+Change Password
+
+</h3>
+
+
+<p>
+
+Update your account password
+
+</p>
+
+
+</div>
+
+
+
+<button class="change-password">
+
+Change
+
+</button>
+
+
+</div>
+
+
+
+
+
+<div class="setting-row">
+
+
+<div>
+
+<h3>
+
+Two Factor Authentication
+
+</h3>
+
+
+<p>
+
+Secure your account
+
+</p>
+
+
+</div>
+
+
+<label class="switch">
+
+
+<input type="checkbox">
+
+
+<span></span>
+
+
+</label>
+
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+<section class="settings-card">
+
+
+<h2>
+
+<i class="fa-solid fa-bell"></i>
+
+Notifications
+
+</h2>
+
+
+
+<div class="setting-row">
+
+
+<div>
+
+<h3>
+
+Email Notifications
+
+</h3>
+
+
+<p>
+
+Receive account updates
+
+</p>
+
+
+</div>
+
+
+<label class="switch">
+
+<input type="checkbox" checked>
+
+<span></span>
+
+</label>
+
+
+</div>
+
+
+
+
+
+
+<div class="setting-row">
+
+
+<div>
+
+<h3>
+
+Game Notifications
+
+</h3>
+
+
+<p>
+
+Tournament and match alerts
+
+</p>
+
+
+</div>
+
+
+<label class="switch">
+
+<input type="checkbox" checked>
+
+<span></span>
+
+</label>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+<section class="settings-card">
+
+
+<h2>
+
+<i class="fa-solid fa-palette"></i>
+
+Appearance
+
+</h2>
+
+
+
+<div class="setting-row">
+
+
+<div>
+
+<h3>
+
+Dark Mode
+
+</h3>
+
+
+<p>
+
+Current theme
+
+</p>
+
+
+</div>
+
+
+<label class="switch">
+
+
+<input type="checkbox" checked>
+
+
+<span></span>
+
+
+</label>
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+<button class="logout-btn">
+
+
+<i class="fa-solid fa-right-from-bracket"></i>
+
+
+Logout
+
+
+</button>
+
+
+
+
+
+
+</main>
+
+
+
+
+</div>
+
+
+<script src="storage.js"></script>
+<script src="popup.js"></script>
+
+<script src="settings.js"></script>
+
+
+</body>
+
+</html>

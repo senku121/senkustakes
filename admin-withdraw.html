@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Withdraw Requests | Senku Stakes</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<link rel="stylesheet" href="admin-withdraw.css">
+
+<link rel="stylesheet" href="popup.css">
+<link rel="stylesheet" href="responsive.css">
+
+</head>
+
+<body>
+
+<div class="withdraw-admin-layout">
+
+<header class="withdraw-header">
+
+<a href="admin-dashboard.html" class="back-btn">
+
+<i class="fa-solid fa-arrow-left"></i>
+
+Dashboard
+
+</a>
+
+<h1>
+
+Withdraw Requests
+
+</h1>
+
+</header>
+
+<section class="summary-grid">
+
+<div class="summary-card">
+
+<i class="fa-solid fa-clock"></i>
+
+<div>
+
+<p>Pending Requests</p>
+
+<h2 id="pendingCount">
+
+0
+
+</h2>
+
+</div>
+
+</div>
+
+<div class="summary-card">
+
+<i class="fa-solid fa-money-bill-wave"></i>
+
+<div>
+
+<p>Total Pending</p>
+
+<h2 id="pendingAmount">
+
+$0.00
+
+</h2>
+
+</div>
+
+</div>
+
+</section>
+
+<section class="search-card">
+
+<input
+
+type="text"
+
+id="withdrawSearch"
+
+placeholder="Search username...">
+
+</section>
+
+<section class="requests-card">
+
+<div id="withdrawRequests">
+
+<div class="empty">
+
+<i class="fa-solid fa-wallet"></i>
+
+<h2>
+
+No Withdrawal Requests
+
+</h2>
+
+<p>
+
+Pending withdrawal requests will appear here.
+
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+</div>
+
+<script src="storage.js"></script>
+
+<script src="popup.js"></script>
+
+<script src="admin-withdraw.js"></script>
+
+</body>
+
+</html>

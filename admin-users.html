@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>User Management | Senku Stakes</title>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+
+<link rel="stylesheet" href="admin-users.css">
+<link rel="stylesheet" href="popup.css">
+
+
+</head>
+
+
+<body>
+
+
+
+<div class="users-layout">
+
+
+
+
+
+
+
+<!-- SIDEBAR -->
+
+<aside class="admin-sidebar">
+
+
+<div class="admin-brand">
+
+
+<div class="logo-box">
+
+S
+
+</div>
+
+
+<div>
+
+<h2>
+
+Senku Stakes
+
+</h2>
+
+
+<span>
+
+Admin Panel
+
+</span>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+<nav>
+
+
+<a href="admin-dashboard.html">
+
+
+<i class="fa-solid fa-chart-line"></i>
+
+Dashboard
+
+</a>
+
+
+
+
+<a href="admin-users.html" class="active">
+
+
+<i class="fa-solid fa-users"></i>
+
+Users
+
+</a>
+
+
+
+
+<a href="admin-transactions.html">
+
+
+<i class="fa-solid fa-money-bill-transfer"></i>
+
+Transactions
+
+</a>
+
+
+
+
+<a href="admin-withdraw.html">
+
+
+<i class="fa-solid fa-wallet"></i>
+
+Withdraw Requests
+
+
+</a>
+
+
+
+
+
+<a href="admin-agents.html">
+
+
+<i class="fa-solid fa-user-shield"></i>
+
+Agents
+
+
+</a>
+
+<a href="admin-agent-requests.html">
+    <i class="fa-solid fa-envelope-open-text"></i>
+    Agent Requests
+</a>
+
+
+
+<a href="#security">
+
+
+<i class="fa-solid fa-shield-halved"></i>
+
+Security
+
+
+</a>
+
+
+
+</nav>
+
+
+
+
+
+
+
+<button class="admin-logout">
+
+
+<i class="fa-solid fa-right-from-bracket"></i>
+
+Logout
+
+
+</button>
+
+
+
+</aside>
+
+
+
+
+
+
+
+
+
+<main class="users-main">
+
+
+
+
+
+<header class="page-header">
+
+
+<div>
+
+<h1>
+
+User Management
+
+</h1>
+
+
+<p>
+
+Manage all player accounts
+
+</p>
+
+
+</div>
+
+
+
+<button class="add-user" id="createUserBtn">
+
+<i class="fa-solid fa-user-plus"></i>
+
+Create User
+
+</button>
+
+
+</header>
+
+
+
+
+
+
+
+
+
+<section class="users-card">
+
+
+
+
+
+<div class="search-area">
+
+
+<i class="fa-solid fa-search"></i>
+
+
+<input 
+
+type="text"
+
+id="userSearch"
+
+placeholder="Search username or email"
+
+>
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="table-container">
+
+
+
+<table>
+
+
+<thead>
+
+
+<tr>
+
+
+<th>
+
+ID
+
+</th>
+
+
+<th>
+
+Username
+
+</th>
+
+
+<th>
+
+Email
+
+</th>
+
+
+<th>
+
+Balance
+
+</th>
+
+
+<th>
+
+Status
+
+</th>
+
+
+<th>
+
+Action
+
+</th>
+
+
+</tr>
+
+
+</thead>
+
+
+
+
+
+
+<tbody id="userTable">
+
+</tbody>
+
+
+</table>
+
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+</main>
+
+
+
+
+
+</div>
+
+
+
+
+
+<script src="storage.js"></script>
+<script src="popup.js"></script>
+
+<script src="admin-users.js"></script>
+
+
+</body>
+
+</html>

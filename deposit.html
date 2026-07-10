@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>Deposit | Senku Stakes</title>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+
+<link rel="stylesheet" href="deposit.css">
+<link rel="stylesheet" href="popup.css">
+<link rel="stylesheet" href="responsive.css">
+
+
+</head>
+
+
+<body>
+
+
+<div class="deposit-layout">
+
+
+
+<header class="deposit-header">
+
+
+<a href="dashboard.html" class="back-btn">
+
+<i class="fa-solid fa-arrow-left"></i>
+
+Dashboard
+
+</a>
+
+
+
+
+<div class="logo">
+
+<div class="logo-box">
+
+S
+
+</div>
+
+
+<h2>
+
+Senku Stakes
+
+</h2>
+
+
+</div>
+
+
+</header>
+
+
+
+
+
+
+
+<main class="deposit-container">
+
+
+
+<section class="deposit-card">
+
+
+<div>
+
+<p>
+
+Current Balance
+
+</p>
+
+
+<h1 id="depositBalance">
+
+--
+
+</h1>
+
+
+</div>
+
+
+
+<i class="fa-solid fa-coins"></i>
+
+
+</section>
+
+
+
+
+
+
+
+
+<section class="form-card">
+
+
+<h2>
+Deposit Amount
+</h2>
+
+
+
+<div class="amount-input">
+
+
+<span>
+$
+</span>
+
+
+<input 
+type="number" 
+id="depositAmount"
+placeholder="Enter amount">
+
+
+</div>
+
+
+
+</section>
+
+
+
+<!-- DEPOSIT ERROR MESSAGE -->
+
+<div class="deposit-error" id="depositError">
+
+<i class="fa-solid fa-circle-exclamation"></i>
+
+<span>
+Please enter a valid deposit amount.
+</span>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+<section class="payment-card">
+
+
+<h2>
+
+Payment Method
+
+</h2>
+
+
+
+<div class="payment-options">
+
+
+
+<div class="payment-option active" data-method="card">
+
+<i class="fa-solid fa-credit-card"></i>
+
+
+<span>
+
+Card
+
+</span>
+
+</div>
+
+
+
+
+
+<div class="payment-option" data-method="crypto">
+
+<i class="fa-brands fa-bitcoin"></i>
+
+
+<span>
+
+Crypto
+
+</span>
+
+</div>
+
+
+
+
+
+<div class="payment-option" data-method="bank">
+
+<i class="fa-solid fa-building-columns"></i>
+
+
+<span>
+
+Bank
+
+</span>
+
+</div>
+
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+<section class="payment-details">
+
+
+<h2>
+Payment Details
+</h2>
+
+
+<div class="gateway-loader">
+
+<i class="fa-solid fa-spinner fa-spin"></i>
+
+Loading gateway...
+
+</div>
+
+
+
+<div class="qr-box">
+
+<i class="fa-solid fa-wallet"></i>
+
+<h3>
+Payment Gateway
+</h3>
+
+<p>
+Payment gateway details will appear here after integration.
+</p>
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+<button class="confirm-deposit" id="confirmDeposit">
+
+
+<i class="fa-solid fa-check"></i>
+
+
+Confirm Deposit
+
+</button>
+
+
+
+
+
+
+
+
+<section class="deposit-history">
+
+
+<h2>
+
+Recent Deposits
+
+</h2>
+
+
+
+<div class="empty-deposit">
+
+
+<i class="fa-solid fa-clock-rotate-left"></i>
+
+
+<h3>
+
+No Deposit History
+
+</h3>
+
+
+<p>
+
+Your deposit records will appear here after payment.
+
+</p>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+</main>
+
+
+
+
+</div>
+
+
+
+<script src="storage.js"></script>
+<script src="popup.js"></script>
+
+<script src="deposit.js"></script>
+
+
+</body>
+
+</html>

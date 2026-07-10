@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>Wallet | Senku Stakes</title>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+
+<link rel="stylesheet" href="wallet.css">
+<link rel="stylesheet" href="popup.css">
+<link rel="stylesheet" href="responsive.css">
+
+</head>
+
+
+<body>
+
+
+<div class="wallet-layout">
+
+
+
+<header class="wallet-header">
+
+
+<a href="dashboard.html" class="back-btn">
+
+<i class="fa-solid fa-arrow-left"></i>
+
+Dashboard
+
+</a>
+
+
+
+<div class="logo">
+
+
+<div class="logo-box">
+
+S
+
+</div>
+
+
+<h2>
+
+Senku Stakes
+
+</h2>
+
+
+</div>
+
+
+
+</header>
+
+
+
+
+
+
+<main class="wallet-container">
+
+
+
+<section class="wallet-main-card">
+
+
+<div>
+
+<p>
+
+Available Balance
+
+</p>
+
+<h1 id="walletBalance">
+--
+</h1>
+
+<span class="wallet-status">
+
+Balance will update automatically after backend integration.
+
+</span>
+
+
+</div>
+
+
+
+<i class="fa-solid fa-wallet"></i>
+
+
+</section>
+
+
+
+
+
+
+<section class="wallet-stats">
+
+<div class="wallet-stat">
+
+<i class="fa-solid fa-circle-dollar-to-slot"></i>
+
+<div>
+
+<p>
+
+Total Deposited
+
+</p>
+
+<h2 id="totalDeposited">
+
+--
+
+</h2>
+
+</div>
+
+</div>
+
+
+
+<div class="wallet-stat">
+
+<i class="fa-solid fa-money-bill-transfer"></i>
+
+<div>
+
+<p>
+
+Total Withdrawn
+
+</p>
+
+<h2 id="totalWithdrawn">
+
+--
+
+</h2>
+
+</div>
+
+</div>
+
+
+
+<div class="wallet-stat">
+
+<i class="fa-solid fa-clock"></i>
+
+<div>
+
+<p>
+
+Pending Deposits
+
+</p>
+
+<h2 id="pendingDeposits">
+
+--
+
+</h2>
+
+</div>
+
+</div>
+
+
+
+<div class="wallet-stat">
+
+<i class="fa-solid fa-hourglass-half"></i>
+
+<div>
+
+<p>
+
+Pending Withdrawals
+
+</p>
+
+<h2 id="pendingWithdrawals">
+
+--
+
+</h2>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+
+
+
+
+<section class="wallet-actions">
+
+
+<button class="deposit-btn">
+
+<i class="fa-solid fa-plus"></i>
+
+Deposit
+
+</button>
+
+
+
+<button class="withdraw-btn">
+
+<i class="fa-solid fa-arrow-up"></i>
+
+Withdraw
+
+</button>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<section class="history-card">
+
+<h2>
+
+Wallet Activity
+
+</h2>
+
+<div class="empty-wallet">
+
+<i class="fa-solid fa-wallet"></i>
+
+<h3>
+
+No Wallet Activity
+
+</h3>
+
+<p>
+
+Your deposits, withdrawals and wallet transactions will appear here after backend integration.
+
+</p>
+
+</div>
+
+</section>
+
+
+
+<section class="wallet-footer">
+
+<a
+
+href="transactions.html"
+
+class="view-transactions"
+
+>
+
+<i class="fa-solid fa-clock-rotate-left"></i>
+
+View Full Transaction History
+
+</a>
+
+</section>
+
+
+
+
+
+
+</main>
+
+
+</div>
+
+
+
+
+<script src="storage.js"></script>
+<script src="popup.js"></script>
+
+<script src="wallet.js"></script>
+
+
+</body>
+
+</html>

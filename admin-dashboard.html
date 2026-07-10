@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>Admin Dashboard | Senku Stakes</title>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+
+<link rel="stylesheet" href="admin-dashboard.css">
+<link rel="stylesheet" href="popup.css">
+
+
+
+</head>
+
+
+<body>
+
+
+
+<div class="admin-layout">
+
+
+
+
+
+<!-- SIDEBAR -->
+
+<aside class="admin-sidebar">
+
+
+
+<div class="admin-brand">
+
+
+<div class="logo-box">
+
+S
+
+</div>
+
+
+<div>
+
+<h2>
+
+Senku Stakes
+
+</h2>
+
+
+<span>
+
+Admin Panel
+
+</span>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<nav>
+
+
+
+<a href="#" class="active">
+
+
+<i class="fa-solid fa-chart-line"></i>
+
+Dashboard
+
+
+</a>
+
+
+
+
+<a href="admin-users.html">
+
+
+<i class="fa-solid fa-users"></i>
+
+Users
+
+
+</a>
+
+
+
+
+
+<a href="admin-transactions.html">
+
+
+<i class="fa-solid fa-money-bill-transfer"></i>
+
+Transactions
+
+
+</a>
+
+
+
+
+
+<a href="admin-withdraw.html">
+
+
+<i class="fa-solid fa-wallet"></i>
+
+Withdraw Requests
+
+
+</a>
+
+<a href="admin-platform-withdraw.html">
+    <i class="fa-solid fa-building-columns"></i>
+    Platform Withdraw
+</a>
+
+
+
+<a href="admin-agents.html">
+
+
+<i class="fa-solid fa-user-shield"></i>
+
+Agents
+
+
+</a>
+
+<a href="admin-agent-requests.html">
+    <i class="fa-solid fa-envelope-open-text"></i>
+    Agent Requests
+</a>
+
+
+
+<a href="#security">
+
+
+<i class="fa-solid fa-shield-halved"></i>
+
+Security
+
+
+</a>
+
+
+
+</nav>
+
+
+
+
+
+
+
+<button class="admin-logout">
+
+
+<i class="fa-solid fa-right-from-bracket"></i>
+
+
+Logout
+
+
+</button>
+
+
+
+</aside>
+
+
+
+
+
+
+
+
+
+<!-- MAIN CONTENT -->
+
+
+<main class="admin-main">
+
+
+
+
+
+
+<header class="admin-topbar">
+
+
+<div>
+
+
+<h1>
+
+Dashboard
+
+</h1>
+
+
+<p>
+
+Welcome back, Administrator
+
+</p>
+
+
+</div>
+
+
+
+
+
+<div class="admin-profile">
+
+
+<i class="fa-solid fa-user-shield"></i>
+
+
+
+<div>
+
+
+<h3>
+
+Admin
+
+</h3>
+
+
+<span>
+
+Super Agent
+
+</span>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+</header>
+
+
+
+
+
+
+
+
+
+<!-- STATS -->
+
+
+<section class="stats-grid">
+
+
+
+<div class="stat-card">
+
+
+<i class="fa-solid fa-users"></i>
+
+
+<div>
+
+<p>
+
+Total Users
+
+</p>
+
+
+<h2 id="totalUsers">
+0
+</h2>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+<div class="stat-card">
+
+
+<i class="fa-solid fa-wallet"></i>
+
+
+<div>
+
+<p>
+
+Total Balance
+
+</p>
+
+
+<h2 id="totalBalance">
+$0.00
+</h2>
+
+
+</div>
+
+
+</div>
+
+
+
+<div class="stat-card">
+
+    <i class="fa-solid fa-building-columns"></i>
+
+    <div>
+
+        <p>
+
+            Admin Balance
+
+        </p>
+
+        <h2 id="adminBalance">
+
+            $0.00
+
+        </h2>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="stat-card">
+
+
+<i class="fa-solid fa-arrow-down"></i>
+
+
+<div>
+
+<p>
+
+Deposits Today
+
+</p>
+
+
+<h2 id="todayDeposits">
+$0.00
+</h2>
+
+
+</div>
+
+
+</div>
+
+
+<div class="stat-card">
+
+    <i class="fa-solid fa-user-shield"></i>
+
+    <div>
+
+        <p>Total Agents</p>
+
+        <h2 id="totalAgents">0</h2>
+
+    </div>
+
+</div>
+
+
+
+<div class="stat-card">
+
+
+<i class="fa-solid fa-arrow-up"></i>
+
+
+<div>
+
+<p>
+
+Pending Withdraw
+
+</p>
+
+
+<h2 id="pendingWithdraw">
+$0.00
+</h2>
+
+
+</div>
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<!-- USERS TABLE -->
+
+
+<section class="admin-card" id="users">
+
+
+
+<div class="card-header">
+
+
+<h2>
+
+User Management
+
+</h2>
+
+
+
+<button class="add-user">
+
+
+<i class="fa-solid fa-user-plus"></i>
+
+Add User
+
+</button>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="table-container">
+
+
+
+<table>
+
+
+<thead>
+
+<tr>
+
+<th>
+
+User
+
+</th>
+
+
+<th>
+
+Email
+
+</th>
+
+
+<th>
+
+Balance
+
+</th>
+
+
+<th>
+
+Status
+
+</th>
+
+
+<th>
+
+Action
+
+</th>
+
+
+</tr>
+
+
+</thead>
+
+
+
+
+<tbody id="usersTable">
+
+</tbody>
+
+
+
+</table>
+
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+</main>
+
+
+
+
+
+</div>
+
+<!-- ==========================================
+        USER MANAGEMENT MODAL
+========================================== -->
+
+<div class="user-modal-overlay" id="userModal">
+
+
+    <div class="user-modal">
+
+
+        <button class="modal-close" id="closeUserModal">
+
+            <i class="fa-solid fa-xmark"></i>
+
+        </button>
+
+
+
+        <div class="modal-header">
+
+
+            <div class="modal-user-icon">
+
+                <i class="fa-solid fa-user"></i>
+
+            </div>
+
+
+            <div>
+
+                <h2 id="modalUsername">
+                    Username
+                </h2>
+
+                <p id="modalEmail">
+                    email@example.com
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+
+
+
+        <div class="modal-info">
+
+
+            <div class="info-box">
+
+                <span>
+                    Balance
+                </span>
+
+                <strong id="modalBalance">
+                    $0.00
+                </strong>
+
+            </div>
+
+
+
+            <div class="info-box">
+
+                <span>
+                    Status
+                </span>
+
+                <strong id="modalStatus">
+                    ACTIVE
+                </strong>
+
+            </div>
+
+
+        </div>
+
+
+
+
+
+
+        <div class="modal-actions">
+
+
+            <button class="modal-btn add-balance">
+
+                <i class="fa-solid fa-plus"></i>
+
+                Add Balance
+
+            </button>
+
+
+
+
+            <button class="modal-btn deduct-balance">
+
+                <i class="fa-solid fa-minus"></i>
+
+                Deduct Balance
+
+            </button>
+
+
+
+
+
+            <button class="modal-btn freeze-user">
+
+                <i class="fa-solid fa-snowflake"></i>
+
+                Freeze User
+
+            </button>
+
+
+
+
+
+            <button class="modal-btn block-user">
+
+                <i class="fa-solid fa-ban"></i>
+
+                Block User
+
+            </button>
+
+
+
+
+
+            <button class="modal-btn reset-password">
+
+                <i class="fa-solid fa-key"></i>
+
+                Reset Password
+
+            </button>
+
+
+
+        </div>
+
+
+
+
+    </div>
+
+
+</div>
+
+<script src="storage.js"></script>
+<script src="popup.js"></script>
+
+<script src="admin-dashboard.js"></script>
+
+
+</body>
+
+</html>

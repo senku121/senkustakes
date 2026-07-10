@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Agent Requests | Senku Stakes Admin</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<link rel="stylesheet" href="admin-agent-requests.css">
+<link rel="stylesheet" href="popup.css">
+
+
+</head>
+
+<body>
+
+
+
+<div class="admin-layout">
+
+
+
+<!-- ===========================
+        SIDEBAR
+=========================== -->
+
+<aside class="admin-sidebar">
+
+
+
+<div class="admin-brand">
+
+<div class="logo-box">
+
+S
+
+</div>
+
+<div>
+
+<h2>
+
+Senku Stakes
+
+</h2>
+
+<span>
+
+Admin Panel
+
+</span>
+
+</div>
+
+</div>
+
+
+
+
+
+<nav>
+
+<a href="admin-dashboard.html">
+
+<i class="fa-solid fa-chart-line"></i>
+
+Dashboard
+
+</a>
+
+
+
+<a href="admin-users.html">
+
+<i class="fa-solid fa-users"></i>
+
+Users
+
+</a>
+
+
+
+<a href="admin-transactions.html">
+
+<i class="fa-solid fa-money-bill-transfer"></i>
+
+Transactions
+
+</a>
+
+
+
+<a href="admin-withdraw.html">
+
+<i class="fa-solid fa-wallet"></i>
+
+Withdraw
+
+</a>
+
+
+
+<a href="admin-agents.html">
+
+<i class="fa-solid fa-user-shield"></i>
+
+Agents
+
+</a>
+
+
+
+<a href="admin-agent-requests.html" class="active">
+
+<i class="fa-solid fa-envelope-open-text"></i>
+
+Agent Requests
+
+</a>
+
+</nav>
+
+
+
+
+
+<button class="admin-logout">
+
+<i class="fa-solid fa-right-from-bracket"></i>
+
+Logout
+
+</button>
+
+</aside>
+
+
+
+
+
+<!-- ===========================
+        MAIN CONTENT
+=========================== -->
+
+<main class="admin-main">
+
+
+
+<header class="page-header">
+
+<div>
+
+<h1>
+
+Agent Requests
+
+</h1>
+
+<p>
+
+Review and approve requests submitted by Sub Agents
+
+</p>
+
+</div>
+
+</header>
+
+
+
+
+
+<section class="stats-grid">
+
+
+
+<div class="stat-card">
+
+<div class="stat-icon">
+
+<i class="fa-solid fa-hourglass-half"></i>
+
+</div>
+
+<div>
+
+<p>
+
+Pending Requests
+
+</p>
+
+<h2 id="pendingCount">
+
+0
+
+</h2>
+
+</div>
+
+</div>
+
+
+
+
+
+<div class="stat-card">
+
+<div class="stat-icon approved">
+
+<i class="fa-solid fa-circle-check"></i>
+
+</div>
+
+<div>
+
+<p>
+
+Approved Today
+
+</p>
+
+<h2 id="approvedCount">
+
+0
+
+</h2>
+
+</div>
+
+</div>
+
+
+
+
+
+<div class="stat-card">
+
+<div class="stat-icon rejected">
+
+<i class="fa-solid fa-circle-xmark"></i>
+
+</div>
+
+<div>
+
+<p>
+
+Rejected
+
+</p>
+
+<h2 id="rejectedCount">
+
+0
+
+</h2>
+
+</div>
+
+</div>
+
+
+
+
+
+<div class="stat-card">
+
+<div class="stat-icon money">
+
+<i class="fa-solid fa-money-bill-wave"></i>
+
+</div>
+
+<div>
+
+<p>
+
+Total Requested
+
+</p>
+
+<h2 id="requestAmount">
+
+$0
+
+</h2>
+
+</div>
+
+</div>
+
+</section>
+<!-- ===========================
+        SEARCH & FILTER
+=========================== -->
+
+<section class="request-toolbar">
+
+<div class="search-box">
+
+<i class="fa-solid fa-search"></i>
+
+<input
+type="text"
+id="requestSearch"
+placeholder="Search Request ID, Agent ID or Agent Name">
+
+</div>
+
+
+
+<div class="toolbar-right">
+
+<select id="statusFilter">
+
+<option value="all">
+
+All Status
+
+</option>
+
+<option value="pending">
+
+Pending
+
+</option>
+
+<option value="approved">
+
+Approved
+
+</option>
+
+<option value="rejected">
+
+Rejected
+
+</option>
+
+</select>
+
+
+
+<button id="refreshRequests">
+
+<i class="fa-solid fa-rotate-right"></i>
+
+Refresh
+
+</button>
+
+</div>
+
+</section>
+
+
+
+
+
+<!-- ===========================
+        REQUEST TABLE
+=========================== -->
+
+<section class="request-card">
+
+<div class="table-wrapper">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>
+
+Request ID
+
+</th>
+
+<th>
+
+Agent ID
+
+</th>
+
+<th>
+
+Agent Name
+
+</th>
+
+<th>
+
+Type
+
+</th>
+
+<th>
+
+Amount
+
+</th>
+
+<th>
+
+Date
+
+</th>
+
+<th>
+
+Status
+
+</th>
+
+<th>
+
+Action
+
+</th>
+
+</tr>
+
+</thead>
+
+<tbody id="requestTable">
+
+
+
+<tr>
+
+<td>
+
+AR1001
+
+</td>
+
+<td>
+
+SA001
+
+</td>
+
+<td>
+
+Finance Agent
+
+</td>
+
+<td>
+
+Transfer
+
+</td>
+
+<td>
+
+$500
+
+</td>
+
+<td>
+
+08 Jul 2026
+
+</td>
+
+<td>
+
+<span class="status pending">
+
+Pending
+
+</span>
+
+</td>
+
+<td>
+
+<button class="view-request">
+
+View
+
+</button>
+
+<button class="approve-request">
+
+Approve
+
+</button>
+
+<button class="reject-request">
+
+Reject
+
+</button>
+
+</td>
+
+</tr>
+
+
+
+
+
+<tr>
+
+<td>
+
+AR1002
+
+</td>
+
+<td>
+
+SA002
+
+</td>
+
+<td>
+
+Support Agent
+
+</td>
+
+<td>
+
+Transfer
+
+</td>
+
+<td>
+
+$1200
+
+</td>
+
+<td>
+
+08 Jul 2026
+
+</td>
+
+<td>
+
+<span class="status approved">
+
+Approved
+
+</span>
+
+</td>
+
+<td>
+
+<button class="view-request">
+
+View
+
+</button>
+
+</td>
+
+</tr>
+
+
+
+
+
+<tr>
+
+<td>
+
+AR1003
+
+</td>
+
+<td>
+
+SA005
+
+</td>
+
+<td>
+
+Payment Agent
+
+</td>
+
+<td>
+
+Transfer
+
+</td>
+
+<td>
+
+$250
+
+</td>
+
+<td>
+
+08 Jul 2026
+
+</td>
+
+<td>
+
+<span class="status rejected">
+
+Rejected
+
+</span>
+
+</td>
+
+<td>
+
+<button class="view-request">
+
+View
+
+</button>
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</section>
+
+
+
+
+
+<!-- ===========================
+        REQUEST DETAILS MODAL
+=========================== -->
+
+<div class="request-modal" id="requestModal">
+
+<div class="modal-card">
+
+<div class="modal-header">
+
+<h2>
+
+Request Details
+
+</h2>
+
+<button id="closeModal">
+
+<i class="fa-solid fa-xmark"></i>
+
+</button>
+
+</div>
+
+
+
+<div class="modal-content">
+
+<div class="detail-row">
+
+<span>
+
+Request ID
+
+</span>
+
+<strong id="detailRequestId">
+
+AR1001
+
+</strong>
+
+</div>
+
+<div class="detail-row">
+
+<span>
+
+Agent ID
+
+</span>
+
+<strong id="detailAgentId">
+
+SA001
+
+</strong>
+
+</div>
+
+<div class="detail-row">
+
+<span>
+
+Agent Name
+
+</span>
+
+<strong id="detailAgentName">
+
+Finance Agent
+
+</strong>
+
+</div>
+
+<div class="detail-row">
+
+<span>
+
+Request Type
+
+</span>
+
+<strong id="detailType">
+
+Transfer
+
+</strong>
+
+</div>
+
+<div class="detail-row">
+
+<span>
+
+Amount
+
+</span>
+
+<strong id="detailAmount">
+
+$500
+
+</strong>
+
+</div>
+
+<div class="detail-row">
+
+<span>
+
+Status
+
+</span>
+
+<strong id="detailStatus">
+
+Pending
+
+</strong>
+
+</div>
+
+<div class="detail-row">
+
+<span>
+
+Created
+
+</span>
+
+<strong id="detailDate">
+
+08 Jul 2026 15:40
+
+</strong>
+
+</div>
+
+</div>
+<div class="modal-actions">
+
+<button id="approveModalBtn" class="approve-btn">
+
+<i class="fa-solid fa-circle-check"></i>
+
+Approve Request
+
+</button>
+
+
+
+<button id="rejectModalBtn" class="reject-btn">
+
+<i class="fa-solid fa-circle-xmark"></i>
+
+Reject Request
+
+</button>
+
+
+
+<button id="closeDetailsBtn" class="close-btn">
+
+Close
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+
+
+</main>
+
+
+
+
+
+</div>
+
+
+
+
+
+<script src="storage.js"></script>
+<script src="popup.js"></script>
+
+<script src="admin-agent-requests.js"></script>
+
+
+</body>
+
+</html>

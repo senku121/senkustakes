@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>Transactions | Senku Stakes</title>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+
+<link rel="stylesheet" href="transactions.css">
+<link rel="stylesheet" href="popup.css">
+<link rel="stylesheet" href="responsive.css">
+
+</head>
+
+
+<body>
+
+
+
+<div class="transactions-layout">
+
+
+
+
+
+<header class="transactions-header">
+
+
+<a href="dashboard.html" class="back-btn">
+
+<i class="fa-solid fa-arrow-left"></i>
+
+Dashboard
+
+</a>
+
+
+
+
+<div class="logo">
+
+<div class="logo-box">
+
+S
+
+</div>
+
+
+<h2>
+
+Senku Stakes
+
+</h2>
+
+
+</div>
+
+
+
+</header>
+
+
+
+
+
+
+
+<main class="transactions-container">
+
+
+
+
+
+<section class="summary-grid">
+
+
+
+<div class="summary-card">
+
+
+<i class="fa-solid fa-list"></i>
+
+
+<div>
+
+<p>
+
+Total Transactions
+
+</p>
+
+
+<h2 id="totalTransactions">
+
+--
+
+</h2>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="summary-card">
+
+
+<i class="fa-solid fa-arrow-down"></i>
+
+
+<div>
+
+<p>
+
+Deposits
+
+</p>
+
+
+<h2 id="totalDeposits">
+
+--
+
+</h2>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="summary-card">
+
+
+<i class="fa-solid fa-arrow-up"></i>
+
+
+<div>
+
+<p>
+
+Withdrawals
+
+</p>
+
+
+<h2 id="totalWithdrawals">
+
+--
+
+</h2>
+
+
+</div>
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+<section class="filter-card">
+
+
+
+<div class="search-box">
+
+
+<i class="fa-solid fa-search"></i>
+
+
+<input type="text" placeholder="Search transactions">
+
+
+</div>
+
+
+
+
+
+<div class="filters">
+
+
+<button class="filter active">
+
+All
+
+</button>
+
+
+<button class="filter">
+
+Deposit
+
+</button>
+
+
+<button class="filter">
+
+Withdraw
+
+</button>
+
+
+<button class="filter">
+
+Game
+
+</button>
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+<section class="transaction-card">
+
+
+
+<h2>
+
+Transaction History
+
+</h2>
+
+
+
+<div class="transaction-list" id="transactionList">
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+</main>
+
+
+
+</div>
+
+
+
+<script src="storage.js"></script>
+<script src="popup.js"></script>
+
+<script src="transactions.js"></script>
+
+
+</body>
+
+</html>

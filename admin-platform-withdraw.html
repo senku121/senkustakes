@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Platform Withdraw | Senku Stakes Admin</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+<link rel="stylesheet" href="admin-platform-withdraw.css">
+
+<link rel="stylesheet" href="popup.css">
+
+
+</head>
+
+<body>
+
+
+
+<div class="platform-layout">
+
+
+
+<!-- ==========================================
+            SIDEBAR
+========================================== -->
+
+<aside class="admin-sidebar">
+
+
+
+<div class="admin-brand">
+
+<div class="logo-box">
+
+S
+
+</div>
+
+<div>
+
+<h2>
+
+Senku Stakes
+
+</h2>
+
+<span>
+
+Admin Panel
+
+</span>
+
+</div>
+
+</div>
+
+
+
+<nav>
+
+<a href="admin-dashboard.html">
+
+<i class="fa-solid fa-chart-line"></i>
+
+Dashboard
+
+</a>
+
+
+
+<a href="admin-users.html">
+
+<i class="fa-solid fa-users"></i>
+
+Users
+
+</a>
+
+
+
+<a href="admin-transactions.html">
+
+<i class="fa-solid fa-money-bill-transfer"></i>
+
+Transactions
+
+</a>
+
+
+
+<a href="admin-platform-withdraw.html" class="active">
+
+<i class="fa-solid fa-building-columns"></i>
+
+Platform Withdraw
+
+</a>
+
+
+
+<a href="admin-withdraw.html">
+
+<i class="fa-solid fa-wallet"></i>
+
+Withdraw Requests
+
+</a>
+
+
+
+<a href="admin-agents.html">
+
+<i class="fa-solid fa-user-shield"></i>
+
+Agents
+
+</a>
+
+
+
+<a href="admin-agent-requests.html">
+
+<i class="fa-solid fa-envelope-open-text"></i>
+
+Agent Requests
+
+</a>
+
+
+
+<a href="#security">
+
+<i class="fa-solid fa-shield-halved"></i>
+
+Security
+
+</a>
+
+</nav>
+
+
+
+<button class="admin-logout">
+
+<i class="fa-solid fa-right-from-bracket"></i>
+
+Logout
+
+</button>
+
+</aside>
+
+
+
+<!-- ==========================================
+            MAIN
+========================================== -->
+
+<main class="platform-main">
+    <!-- ==========================================
+            PAGE HEADER
+========================================== -->
+
+<header class="page-header">
+
+<div>
+
+<h1>
+
+Platform Withdraw
+
+</h1>
+
+<p>
+
+Withdraw platform funds directly to your payment accounts.
+
+</p>
+
+</div>
+
+
+
+<div class="header-right">
+
+<div class="admin-profile">
+
+<div class="profile-icon">
+
+<i class="fa-solid fa-user-shield"></i>
+
+</div>
+
+<div>
+
+<h3>
+
+Super Admin
+
+</h3>
+
+<span>
+
+Treasury Access
+
+</span>
+
+</div>
+
+</div>
+
+</div>
+
+</header>
+
+
+
+
+
+<!-- ==========================================
+            PLATFORM BALANCE
+========================================== -->
+
+<section class="platform-balance-card">
+
+<div class="balance-left">
+
+<div class="balance-icon">
+
+<i class="fa-solid fa-building-columns"></i>
+
+</div>
+
+<div>
+
+<p>
+
+Available Platform Balance
+
+</p>
+
+<h2 id="platformBalance">
+
+$0.00
+
+</h2>
+
+</div>
+
+</div>
+
+
+
+<div class="balance-right">
+
+<div class="balance-mini">
+
+<span>
+
+Today's Withdrawals
+
+</span>
+
+<strong id="todayWithdraw">
+
+$0.00
+
+</strong>
+
+</div>
+
+
+
+<div class="balance-mini">
+
+<span>
+
+Total Withdrawals
+
+</span>
+
+<strong id="totalWithdraw">
+
+$0.00
+
+</strong>
+
+</div>
+
+</div>
+
+</section>
+<!-- ==========================================
+            PLATFORM WITHDRAW FORM
+========================================== -->
+
+<section class="platform-withdraw-card">
+
+<h2>
+
+Create Platform Withdrawal
+
+</h2>
+
+<p class="section-desc">
+
+Withdraw platform funds directly to your preferred payment method.
+
+</p>
+
+
+
+<div class="withdraw-grid">
+
+
+
+<!-- AMOUNT -->
+
+<div class="form-group">
+
+<label>
+
+Withdraw Amount
+
+</label>
+
+<input
+type="number"
+id="withdrawAmount"
+placeholder="Enter amount">
+
+</div>
+
+
+
+<!-- METHOD -->
+
+<div class="form-group">
+
+<label>
+
+Payment Method
+
+</label>
+
+<select id="withdrawMethod">
+
+<option value="cashapp">
+CashApp
+</option>
+
+<option value="paypal">
+PayPal
+</option>
+
+<option value="chime">
+Chime
+</option>
+
+<option value="applepay">
+Apple Pay
+</option>
+
+<option value="card">
+Debit / Credit Card
+</option>
+
+</select>
+
+</div>
+
+
+
+<!-- PAYMENT DETAILS -->
+
+<div 
+class="form-group full-width"
+id="paymentDetailsBox">
+
+
+<label id="accountLabel">
+
+CashApp Username
+
+</label>
+
+
+<input
+
+type="text"
+
+id="accountInput"
+
+placeholder="$Cashtag">
+
+
+</div>
+
+<div class="full-width">
+
+<button 
+type="button"
+id="addCardBtn"
+style="display:none;">
+
+<i class="fa-solid fa-credit-card"></i>
+
+Add Card
+
+</button>
+
+</div>
+
+<!-- NAME -->
+
+<div class="form-group">
+
+<label>
+
+Account Holder
+
+</label>
+
+<input
+type="text"
+id="holderName"
+placeholder="Full Name">
+
+</div>
+
+
+
+<!-- REFERENCE -->
+
+<div class="form-group">
+
+<label>
+
+Reference / Note
+
+</label>
+
+<input
+type="text"
+id="withdrawNote"
+placeholder="Optional">
+
+</div>
+
+
+
+<!-- BUTTON -->
+
+<div class="full-width">
+
+<button id="platformWithdrawBtn">
+
+<i class="fa-solid fa-paper-plane"></i>
+
+Withdraw Now
+
+</button>
+
+</div>
+
+
+
+</div>
+
+</section>
+<!-- ==========================================
+            WITHDRAWAL HISTORY
+========================================== -->
+
+<section class="withdraw-history-card">
+
+<div class="history-header">
+
+<div>
+
+<h2>
+
+Platform Withdrawal History
+
+</h2>
+
+<p>
+
+All completed platform withdrawals.
+
+</p>
+
+</div>
+
+
+
+<div class="history-search">
+
+<i class="fa-solid fa-magnifying-glass"></i>
+
+<input
+type="text"
+id="historySearch"
+placeholder="Search withdrawals...">
+
+</div>
+
+</div>
+
+
+
+<div class="table-container">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+
+<th>Amount</th>
+
+<th>Method</th>
+
+<th>Destination</th>
+
+<th>Status</th>
+
+<th>Date</th>
+
+</tr>
+
+</thead>
+
+
+
+<tbody id="withdrawHistory">
+
+<tr>
+
+<td colspan="6">
+
+<div class="empty-history">
+
+<i class="fa-solid fa-wallet"></i>
+
+<h3>
+
+No Withdrawals Yet
+
+</h3>
+
+<p>
+
+Completed platform withdrawals will appear here.
+
+</p>
+
+</div>
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</section>
+
+</main>
+</div>
+
+<script src="storage.js"></script>
+<script src="popup.js"></script>
+<script src="admin-platform-withdraw.js"></script>
+</body>
+</html>

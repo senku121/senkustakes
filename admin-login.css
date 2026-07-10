@@ -1,0 +1,2283 @@
+/*==================================================
+        SENKU STAKES
+        ADMIN LOGIN CSS
+        PART 1
+==================================================*/
+
+
+*{
+
+    margin:0;
+
+    padding:0;
+
+    box-sizing:border-box;
+
+}
+
+
+
+:root{
+
+    --bg:#050816;
+
+    --card:#111827;
+
+    --primary:#7b2cff;
+
+    --secondary:#00d4ff;
+
+    --text:#ffffff;
+
+    --muted:#9ca3af;
+
+    --border:rgba(255,255,255,.1);
+
+}
+
+
+
+
+
+
+body{
+
+
+    font-family:"Inter",sans-serif;
+
+
+    background:var(--bg);
+
+
+    color:var(--text);
+
+
+    min-height:100vh;
+
+
+    overflow:hidden;
+
+
+}
+
+
+
+
+
+
+
+/*==================================================
+            BACKGROUND EFFECT
+==================================================*/
+
+
+body::before{
+
+
+    content:"";
+
+
+    position:fixed;
+
+
+    inset:0;
+
+
+
+    background:
+
+
+    radial-gradient(
+
+        circle at top left,
+
+        rgba(123,44,255,.25),
+
+        transparent 35%
+
+    ),
+
+
+    radial-gradient(
+
+        circle at bottom right,
+
+        rgba(0,212,255,.18),
+
+        transparent 35%
+
+    );
+
+
+
+    z-index:-2;
+
+
+}
+
+
+
+
+
+body::after{
+
+
+    content:"";
+
+
+    position:fixed;
+
+
+    inset:0;
+
+
+
+    background-image:
+
+
+    linear-gradient(
+
+        rgba(255,255,255,.03) 1px,
+
+        transparent 1px
+
+    ),
+
+
+    linear-gradient(
+
+        90deg,
+
+        rgba(255,255,255,.03) 1px,
+
+        transparent 1px
+
+    );
+
+
+
+    background-size:55px 55px;
+
+
+    z-index:-1;
+
+
+}
+
+
+
+
+
+
+
+/*==================================================
+            MAIN WRAPPER
+==================================================*/
+
+
+.admin-login-page{
+
+
+    min-height:100vh;
+
+
+    display:flex;
+
+
+    justify-content:center;
+
+
+    align-items:center;
+
+
+    padding:20px;
+
+
+}
+
+
+
+
+
+
+
+
+/*==================================================
+            ADMIN CARD
+==================================================*/
+
+
+.admin-card{
+
+
+    width:430px;
+
+
+    padding:45px;
+
+
+    border-radius:30px;
+
+
+    background:
+
+
+    rgba(17,24,39,.85);
+
+
+
+    backdrop-filter:blur(25px);
+
+
+
+    border:
+
+
+    1px solid var(--border);
+
+
+
+    box-shadow:
+
+
+    0 30px 80px rgba(0,0,0,.45);
+
+
+
+    animation:
+
+
+    adminShow .8s ease;
+
+
+}
+
+
+
+
+
+
+
+/*==================================================
+            LOGO
+==================================================*/
+
+
+.admin-logo{
+
+
+    display:flex;
+
+
+    align-items:center;
+
+
+    justify-content:center;
+
+
+    gap:15px;
+
+
+    margin-bottom:25px;
+
+
+}
+
+
+
+.logo-box{
+
+
+    width:60px;
+
+
+    height:60px;
+
+
+    border-radius:20px;
+
+
+    display:flex;
+
+
+    align-items:center;
+
+
+    justify-content:center;
+
+
+    font-size:28px;
+
+
+    font-weight:900;
+
+
+    background:
+
+
+    linear-gradient(
+
+        135deg,
+
+        var(--primary),
+
+        var(--secondary)
+
+    );
+
+
+}
+
+
+
+.admin-logo h1{
+
+
+    font-size:26px;
+
+
+}
+
+
+
+
+
+
+
+/*==================================================
+            SECURITY BADGE
+==================================================*/
+
+
+.security-badge{
+
+
+    width:max-content;
+
+
+    margin:0 auto 25px;
+
+
+    padding:10px 20px;
+
+
+    border-radius:50px;
+
+
+    display:flex;
+
+
+    align-items:center;
+
+
+    gap:10px;
+
+
+    color:#fff;
+
+
+    font-size:13px;
+
+
+    font-weight:800;
+
+
+    background:
+
+
+    rgba(123,44,255,.2);
+
+
+
+    border:
+
+
+    1px solid rgba(123,44,255,.4);
+
+
+}
+
+
+
+.security-badge i{
+
+
+    color:#b794ff;
+
+
+}
+/*==================================================
+            HEADINGS
+==================================================*/
+
+
+.admin-card h2{
+
+
+    text-align:center;
+
+
+    font-size:28px;
+
+
+    margin-bottom:8px;
+
+
+}
+
+
+
+.subtitle{
+
+
+    text-align:center;
+
+
+    color:var(--muted);
+
+
+    margin-bottom:30px;
+
+
+}
+
+
+
+
+
+
+
+/*==================================================
+            INPUT BOX
+==================================================*/
+
+
+.input-box{
+
+
+    height:60px;
+
+
+    display:flex;
+
+
+    align-items:center;
+
+
+    gap:12px;
+
+
+    padding:0 18px;
+
+
+    margin-bottom:18px;
+
+
+    border-radius:18px;
+
+
+    background:
+
+
+    rgba(255,255,255,.05);
+
+
+
+    border:
+
+
+    1px solid var(--border);
+
+
+
+    transition:.35s;
+
+
+}
+
+
+
+.input-box:focus-within{
+
+
+    border-color:
+
+
+    var(--primary);
+
+
+
+    box-shadow:
+
+
+    0 0 0 4px rgba(123,44,255,.15);
+
+
+}
+
+
+
+.input-box i{
+
+
+    color:#b794ff;
+
+
+}
+
+
+
+.input-box input{
+
+
+    width:100%;
+
+
+    height:100%;
+
+
+    border:none;
+
+
+    outline:none;
+
+
+    background:none;
+
+
+    color:#fff;
+
+
+    font-size:16px;
+
+
+}
+
+
+
+.input-box input::placeholder{
+
+
+    color:#718096;
+
+
+}
+
+
+
+.toggle-password{
+
+
+    cursor:pointer;
+
+
+    transition:.3s;
+
+
+}
+
+
+
+.toggle-password:hover{
+
+
+    color:#fff;
+
+
+}
+
+
+
+
+
+
+
+/*==================================================
+            REMEMBER ROW
+==================================================*/
+
+
+.remember-row{
+
+
+    display:flex;
+
+
+    justify-content:space-between;
+
+
+    align-items:center;
+
+
+    margin:20px 0;
+
+
+    color:#cbd5e1;
+
+
+    font-size:14px;
+
+
+}
+
+
+
+.remember-row label{
+
+
+    display:flex;
+
+
+    align-items:center;
+
+
+    gap:8px;
+
+
+}
+
+
+
+.remember-row input{
+
+
+    accent-color:var(--primary);
+
+
+}
+
+
+
+.remember-row a{
+
+
+    color:#b794ff;
+
+
+    text-decoration:none;
+
+
+}
+
+
+
+
+
+
+
+
+/*==================================================
+            LOGIN BUTTON
+==================================================*/
+
+
+.admin-login-btn{
+
+
+    width:100%;
+
+
+    height:65px;
+
+
+    border:none;
+
+
+    border-radius:20px;
+
+
+    cursor:pointer;
+
+
+    color:#fff;
+
+
+    font-size:17px;
+
+
+    font-weight:800;
+
+
+    display:flex;
+
+
+    align-items:center;
+
+
+    justify-content:center;
+
+
+    gap:12px;
+
+
+    background:
+
+
+    linear-gradient(
+
+        135deg,
+
+        var(--primary),
+
+        var(--secondary)
+
+    );
+
+
+    box-shadow:
+
+
+    0 20px 45px rgba(123,44,255,.3);
+
+
+    transition:.35s;
+
+
+}
+
+
+
+.admin-login-btn:hover{
+
+
+    transform:translateY(-5px);
+
+
+}
+
+
+
+
+
+
+
+/*==================================================
+            USER LOGIN LINK
+==================================================*/
+
+
+.user-login{
+
+
+    margin-top:25px;
+
+
+    height:55px;
+
+
+    border-radius:18px;
+
+
+    display:flex;
+
+
+    justify-content:center;
+
+
+    align-items:center;
+
+
+    gap:10px;
+
+
+    text-decoration:none;
+
+
+    color:#cbd5e1;
+
+
+    border:
+
+
+    1px solid var(--border);
+
+
+    transition:.35s;
+
+
+}
+
+
+
+.user-login:hover{
+
+
+    color:#fff;
+
+
+    border-color:
+
+
+    var(--primary);
+
+
+}
+
+
+
+
+
+
+
+/*==================================================
+            ANIMATION
+==================================================*/
+
+
+@keyframes adminShow{
+
+
+    from{
+
+
+        opacity:0;
+
+
+        transform:translateY(40px) scale(.95);
+
+
+    }
+
+
+
+    to{
+
+
+        opacity:1;
+
+
+        transform:translateY(0) scale(1);
+
+
+    }
+
+
+}
+
+
+
+
+
+
+
+/*==================================================
+            RESPONSIVE
+==================================================*/
+
+/* Tablet */
+@media (max-width:768px){
+
+body{
+
+overflow-y:auto;
+
+overflow-x:hidden;
+
+}
+
+.admin-login-page{
+
+padding:40px 20px;
+
+min-height:100vh;
+
+align-items:center;
+
+}
+
+.admin-card{
+
+width:100%;
+max-width:500px;
+
+padding:35px 28px;
+
+}
+
+}
+
+/* Mobile */
+@media (max-width:500px){
+
+.admin-login-page{
+
+padding:25px 15px;
+
+}
+
+.admin-card{
+
+width:100%;
+
+padding:28px 20px;
+
+border-radius:22px;
+
+}
+
+.admin-logo{
+
+flex-direction:column;
+
+gap:12px;
+
+text-align:center;
+
+}
+
+.logo-box{
+
+width:55px;
+height:55px;
+font-size:24px;
+
+}
+
+.admin-logo h1{
+
+font-size:22px;
+
+}
+
+.admin-card h2{
+
+font-size:24px;
+
+}
+
+.subtitle{
+
+font-size:14px;
+
+margin-bottom:25px;
+
+}
+
+.input-box{
+
+height:56px;
+
+}
+
+.input-box input{
+
+font-size:15px;
+
+}
+
+.remember-row{
+
+flex-direction:column;
+
+align-items:flex-start;
+
+gap:12px;
+
+}
+
+.admin-login-btn{
+
+height:58px;
+
+font-size:16px;
+
+}
+
+.user-login{
+
+height:52px;
+
+font-size:14px;
+
+}
+
+}
+
+/* Small Phones */
+@media (max-width:360px){
+
+.admin-card{
+
+padding:22px 16px;
+
+}
+
+.security-badge{
+
+padding:8px 14px;
+
+font-size:12px;
+
+}
+
+.admin-card h2{
+
+font-size:22px;
+
+}
+
+.logo-box{
+
+width:50px;
+height:50px;
+
+}
+
+}
+/*================================
+        RESPONSIVE
+================================*/
+
+@media(max-width:1100px){
+
+.platform-balance-card{
+
+flex-direction:column;
+
+align-items:flex-start;
+
+gap:25px;
+
+}
+
+.balance-right{
+
+width:100%;
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+}
+
+}
+
+@media(max-width:850px){
+
+.withdraw-grid{
+
+grid-template-columns:1fr;
+
+}
+
+.history-header{
+
+flex-direction:column;
+
+align-items:flex-start;
+
+}
+
+.history-search{
+
+width:100%;
+
+}
+
+.platform-main{
+
+padding:20px;
+
+}
+
+.admin-sidebar{
+
+width:230px;
+
+}
+
+}
+
+@media(max-width:650px){
+
+.balance-right{
+
+grid-template-columns:1fr;
+
+}
+
+.page-header{
+
+flex-direction:column;
+
+align-items:flex-start;
+
+gap:20px;
+
+}
+
+.admin-profile{
+
+width:100%;
+
+}
+
+}
+/*================================
+        PAGE ANIMATION
+================================*/
+
+.platform-main > section,
+.page-header{
+
+opacity:0;
+
+animation:pageEnter .7s ease forwards;
+
+}
+
+
+.page-header{
+
+animation-delay:.1s;
+
+}
+
+
+.platform-balance-card{
+
+animation-delay:.2s;
+
+}
+
+
+.platform-withdraw-card{
+
+animation-delay:.35s;
+
+}
+
+
+.withdraw-history-card{
+
+animation-delay:.5s;
+
+}
+
+
+@keyframes pageEnter{
+
+
+from{
+
+opacity:0;
+
+transform:translateY(25px);
+
+}
+
+
+to{
+
+opacity:1;
+
+transform:translateY(0);
+
+}
+
+
+}
+
+
+
+/*================================
+        BALANCE GLOW EFFECT
+================================*/
+
+
+.platform-balance-card{
+
+position:relative;
+
+overflow:hidden;
+
+}
+
+
+.platform-balance-card::before{
+
+content:"";
+
+position:absolute;
+
+width:300px;
+
+height:300px;
+
+right:-120px;
+
+top:-120px;
+
+background:
+
+radial-gradient(
+
+circle,
+
+rgba(123,44,255,.35),
+
+transparent 70%
+
+);
+
+pointer-events:none;
+
+}
+
+
+
+.balance-icon{
+
+animation:
+
+balanceFloat 4s ease-in-out infinite;
+
+}
+
+
+
+@keyframes balanceFloat{
+
+
+0%,
+100%{
+
+transform:translateY(0);
+
+}
+
+
+50%{
+
+transform:translateY(-8px);
+
+}
+
+
+}
+
+
+
+/*================================
+        FORM CARD EFFECT
+================================*/
+
+
+.platform-withdraw-card{
+
+position:relative;
+
+overflow:hidden;
+
+}
+
+
+
+.platform-withdraw-card::after{
+
+content:"";
+
+position:absolute;
+
+width:250px;
+
+height:250px;
+
+bottom:-120px;
+
+right:-100px;
+
+background:
+
+radial-gradient(
+
+circle,
+
+rgba(0,212,255,.25),
+
+transparent 70%
+
+);
+
+}
+
+
+
+/*================================
+        INPUT HOVER
+================================*/
+
+
+.form-group input:hover,
+
+.form-group select:hover{
+
+
+border-color:rgba(123,44,255,.6);
+
+}
+
+
+
+.form-group input,
+
+.form-group select{
+
+transform:translateY(0);
+
+}
+
+
+.form-group input:focus,
+
+.form-group select:focus{
+
+
+transform:translateY(-2px);
+
+
+}
+
+
+
+/*================================
+        BUTTON SHINE EFFECT
+================================*/
+
+
+#platformWithdrawBtn{
+
+position:relative;
+
+overflow:hidden;
+
+}
+
+
+
+#platformWithdrawBtn::before{
+
+
+content:"";
+
+
+position:absolute;
+
+
+top:0;
+
+
+left:-100%;
+
+
+width:60%;
+
+
+height:100%;
+
+
+background:
+
+linear-gradient(
+
+120deg,
+
+transparent,
+
+rgba(255,255,255,.35),
+
+transparent
+
+);
+
+
+transition:.6s;
+
+
+}
+
+
+
+#platformWithdrawBtn:hover::before{
+
+
+left:120%;
+
+
+}
+
+
+
+/*================================
+        HISTORY TABLE ANIMATION
+================================*/
+
+
+.withdraw-history-card{
+
+
+animation:
+
+historyReveal .8s ease forwards;
+
+
+}
+
+
+@keyframes historyReveal{
+
+
+from{
+
+opacity:0;
+
+transform:translateY(40px);
+
+}
+
+
+to{
+
+opacity:1;
+
+transform:translateY(0);
+
+}
+
+
+}
+
+
+
+tbody tr{
+
+
+animation:
+
+rowEnter .4s ease forwards;
+
+
+}
+
+
+
+@keyframes rowEnter{
+
+
+from{
+
+opacity:0;
+
+transform:translateX(-20px);
+
+}
+
+
+to{
+
+opacity:1;
+
+transform:translateX(0);
+
+}
+
+
+}
+
+
+
+/*================================
+        SEARCH PREMIUM EFFECT
+================================*/
+
+
+.history-search{
+
+transition:.3s;
+
+}
+
+
+.history-search:hover{
+
+
+transform:translateY(-2px);
+
+
+}
+
+
+
+.history-search input{
+
+
+background:
+
+linear-gradient(
+
+135deg,
+
+#111b2e,
+
+#16233c
+
+);
+
+
+}
+
+
+
+/*================================
+        TABLE HEADER STYLE
+================================*/
+
+
+thead th:first-child{
+
+border-radius:14px 0 0 14px;
+
+}
+
+
+thead th:last-child{
+
+border-radius:0 14px 14px 0;
+
+}
+
+
+
+/*================================
+        CUSTOM SCROLLBAR
+================================*/
+
+
+::-webkit-scrollbar{
+
+width:8px;
+
+height:8px;
+
+}
+
+
+::-webkit-scrollbar-track{
+
+background:#08101d;
+
+}
+
+
+::-webkit-scrollbar-thumb{
+
+background:
+
+linear-gradient(
+
+180deg,
+
+#7b2cff,
+
+#00d4ff
+
+);
+
+
+border-radius:20px;
+
+}
+/*================================
+        WITHDRAW HISTORY PANEL
+================================*/
+
+
+.withdraw-history-card{
+
+padding:30px;
+
+border-radius:24px;
+
+background:rgba(255,255,255,.05);
+
+border:1px solid rgba(255,255,255,.08);
+
+backdrop-filter:blur(20px);
+
+box-shadow:
+
+0 20px 45px rgba(0,0,0,.25);
+
+overflow:hidden;
+
+}
+
+
+
+.history-header{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-bottom:25px;
+
+}
+
+
+
+.history-header h2{
+
+font-size:26px;
+
+font-weight:800;
+
+color:#fff;
+
+margin-bottom:6px;
+
+}
+
+
+
+.history-header p{
+
+font-size:14px;
+
+color:#8f98b5;
+
+}
+
+
+
+/*================================
+        SEARCH BOX
+================================*/
+
+
+.history-search{
+
+position:relative;
+
+width:300px;
+
+}
+
+
+
+.history-search i{
+
+position:absolute;
+
+left:18px;
+
+top:50%;
+
+transform:translateY(-50%);
+
+color:#7b2cff;
+
+font-size:15px;
+
+}
+
+
+
+.history-search input{
+
+height:50px;
+
+width:100%;
+
+padding-left:48px;
+
+padding-right:18px;
+
+border-radius:15px;
+
+border:1px solid rgba(255,255,255,.08);
+
+background:#111b2e;
+
+color:white;
+
+outline:none;
+
+transition:.3s;
+
+}
+
+
+
+.history-search input::placeholder{
+
+color:#68738f;
+
+}
+
+
+
+.history-search input:focus{
+
+border-color:#7b2cff;
+
+box-shadow:
+
+0 0 0 4px rgba(123,44,255,.15);
+
+transform:translateY(-2px);
+
+}
+
+
+
+/*================================
+        TABLE CONTAINER
+================================*/
+
+
+.withdraw-history-card .table-container{
+
+overflow-x:auto;
+
+border-radius:18px;
+
+}
+
+
+
+/*================================
+        TABLE
+================================*/
+
+
+.withdraw-history-card table{
+
+width:100%;
+
+border-collapse:collapse;
+
+min-width:850px;
+
+}
+
+
+
+.withdraw-history-card thead{
+
+background:#111b2e;
+
+}
+
+
+
+.withdraw-history-card th{
+
+padding:18px;
+
+text-align:left;
+
+font-size:13px;
+
+text-transform:uppercase;
+
+letter-spacing:.5px;
+
+color:#94a3b8;
+
+}
+
+
+
+.withdraw-history-card td{
+
+padding:18px;
+
+border-bottom:
+
+1px solid rgba(255,255,255,.06);
+
+font-size:14px;
+
+color:#e5e7eb;
+
+}
+
+
+
+.withdraw-history-card tbody tr{
+
+transition:.3s;
+
+}
+
+
+
+.withdraw-history-card tbody tr:hover{
+
+background:
+
+rgba(123,44,255,.08);
+
+transform:translateX(4px);
+
+}
+
+
+
+/*================================
+        STATUS BADGES
+================================*/
+
+
+.status{
+
+padding:7px 14px;
+
+border-radius:50px;
+
+font-size:12px;
+
+font-weight:700;
+
+display:inline-flex;
+
+align-items:center;
+
+gap:6px;
+
+}
+
+
+
+.status.completed{
+
+background:
+
+rgba(34,197,94,.15);
+
+color:#22c55e;
+
+}
+
+
+
+.status.pending{
+
+background:
+
+rgba(245,158,11,.15);
+
+color:#f59e0b;
+
+}
+
+
+
+.status.failed{
+
+background:
+
+rgba(239,68,68,.15);
+
+color:#ef4444;
+
+}
+
+
+
+/*================================
+        EMPTY HISTORY
+================================*/
+
+
+.empty-history{
+
+display:flex;
+
+flex-direction:column;
+
+align-items:center;
+
+justify-content:center;
+
+padding:70px 20px;
+
+}
+
+
+
+.empty-history i{
+
+font-size:55px;
+
+color:#7b2cff;
+
+margin-bottom:20px;
+
+animation:
+
+emptyFloat 3s ease-in-out infinite;
+
+}
+
+
+
+@keyframes emptyFloat{
+
+
+0%,
+100%{
+
+transform:translateY(0);
+
+}
+
+
+50%{
+
+transform:translateY(-10px);
+
+}
+
+
+}
+
+
+
+.empty-history h3{
+
+font-size:22px;
+
+font-weight:700;
+
+margin-bottom:10px;
+
+}
+
+
+
+.empty-history p{
+
+color:#8f98b5;
+
+font-size:14px;
+
+}
+
+
+
+/*================================
+        HISTORY RESPONSIVE
+================================*/
+
+
+@media(max-width:900px){
+
+
+.history-header{
+
+flex-direction:column;
+
+align-items:flex-start;
+
+gap:20px;
+
+}
+
+
+.history-search{
+
+width:100%;
+
+}
+
+
+}
+#addCardBtn{
+
+height:55px;
+
+padding:0 25px;
+
+border:none;
+
+border-radius:15px;
+
+background:
+linear-gradient(
+135deg,
+#7b2cff,
+#00d4ff
+);
+
+color:white;
+
+font-weight:700;
+
+cursor:pointer;
+
+align-items:center;
+
+justify-content:center;
+
+gap:10px;
+
+margin-top:15px;
+display:flex;
+
+}
+
+
+#addCardBtn:hover{
+
+transform:translateY(-2px);
+
+box-shadow:
+0 15px 35px rgba(123,44,255,.35);
+
+}
+ /*================================
+        MOBILE SIDEBAR TOP FIX
+================================*/
+
+
+@media(max-width:850px){
+
+
+.platform-layout{
+
+flex-direction:column;
+
+}
+
+
+/* Sidebar stays on top */
+
+.admin-sidebar{
+
+width:100%;
+
+min-height:auto;
+
+padding:18px;
+
+border-right:none;
+
+border-bottom:1px solid rgba(255,255,255,.08);
+
+}
+
+
+
+/* Brand center */
+
+.admin-brand{
+
+justify-content:center;
+
+margin-bottom:25px;
+
+}
+
+
+
+/* Navigation becomes horizontal */
+
+.admin-sidebar nav{
+
+flex-direction:row;
+
+overflow-x:auto;
+
+gap:8px;
+
+}
+
+
+
+.admin-sidebar nav a{
+
+white-space:nowrap;
+
+padding:12px 15px;
+
+}
+
+
+
+/* Logout stays below menu */
+
+.admin-logout{
+
+margin-top:20px;
+
+}
+
+
+
+.platform-main{
+
+padding:20px;
+
+width:100%;
+
+}
+
+}
+
+
+
+/*================================
+        SMALL MOBILE
+================================*/
+
+
+@media(max-width:600px){
+
+
+.page-header{
+
+flex-direction:column;
+
+align-items:flex-start;
+
+gap:18px;
+
+}
+
+
+
+.platform-balance-card{
+
+padding:22px;
+
+}
+
+
+
+.balance-left h2{
+
+font-size:30px;
+
+}
+
+
+
+.balance-icon{
+
+width:65px;
+
+height:65px;
+
+font-size:24px;
+
+}
+
+
+
+.balance-right{
+
+width:100%;
+
+grid-template-columns:1fr;
+
+}
+
+
+
+.balance-mini{
+
+width:100%;
+
+}
+
+
+
+.platform-withdraw-card,
+
+.withdraw-history-card{
+
+padding:20px;
+
+border-radius:20px;
+
+}
+
+
+
+.withdraw-grid{
+
+grid-template-columns:1fr;
+
+}
+
+
+
+#platformWithdrawBtn{
+
+height:55px;
+
+font-size:15px;
+
+}
+
+
+
+.history-search{
+
+width:100%;
+
+}
+
+
+}
+
+
+
+/*================================
+        EXTRA SMALL PHONE
+================================*/
+
+
+@media(max-width:400px){
+
+
+.admin-sidebar nav a{
+
+font-size:13px;
+
+padding:10px 12px;
+
+}
+
+
+
+.logo-box{
+
+width:48px;
+
+height:48px;
+
+}
+
+
+
+.admin-brand h2{
+
+font-size:18px;
+
+}
+
+
+
+.platform-main{
+
+padding:15px;
+
+}
+
+
+}

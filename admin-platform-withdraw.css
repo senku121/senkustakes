@@ -1,0 +1,1460 @@
+/*==================================================
+        PLATFORM WITHDRAW
+==================================================*/
+
+.platform-main{
+
+flex:1;
+
+padding:40px;
+
+display:flex;
+
+flex-direction:column;
+
+gap:30px;
+
+background:#0d111c;
+
+min-height:100vh;
+
+}
+
+.page-header h1{
+
+font-size:32px;
+
+font-weight:800;
+
+color:#fff;
+
+}
+
+.page-header p{
+
+margin-top:8px;
+
+color:#9aa6c1;
+
+font-size:15px;
+
+}
+
+.platform-balance{
+
+display:flex;
+
+align-items:center;
+
+gap:20px;
+
+padding:28px;
+
+border-radius:22px;
+
+background:rgba(255,255,255,.05);
+
+border:1px solid rgba(255,255,255,.08);
+
+backdrop-filter:blur(18px);
+
+}
+
+.balance-icon{
+
+width:72px;
+
+height:72px;
+
+border-radius:18px;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-size:28px;
+
+color:#fff;
+
+background:linear-gradient(135deg,#7b2cff,#00d4ff);
+
+}
+
+.platform-balance span{
+
+display:block;
+
+color:#94a3b8;
+
+margin-bottom:6px;
+
+}
+
+.platform-balance h2{
+
+font-size:34px;
+
+font-weight:800;
+
+color:#fff;
+
+}
+
+.withdraw-card,
+
+.history-card{
+
+background:rgba(255,255,255,.05);
+
+border:1px solid rgba(255,255,255,.08);
+
+border-radius:24px;
+
+padding:30px;
+
+backdrop-filter:blur(20px);
+
+}
+
+.withdraw-card h2,
+
+.history-card h2{
+
+color:#fff;
+
+font-size:24px;
+
+margin-bottom:25px;
+
+}
+/*==================================================
+        SENKU STAKES
+        PLATFORM WITHDRAW
+==================================================*/
+
+*{
+
+margin:0;
+
+padding:0;
+
+box-sizing:border-box;
+
+font-family:"Inter",sans-serif;
+
+}
+
+body{
+
+background:#08101d;
+
+color:#fff;
+
+overflow-x:hidden;
+
+}
+
+a{
+
+text-decoration:none;
+
+color:inherit;
+
+}
+
+button{
+
+font-family:inherit;
+
+}
+
+.platform-layout{
+
+display:flex;
+
+min-height:100vh;
+
+}
+
+/*================================
+        SIDEBAR
+================================*/
+
+.admin-sidebar{
+
+width:270px;
+
+background:#0d1628;
+
+border-right:1px solid rgba(255,255,255,.06);
+
+display:flex;
+
+flex-direction:column;
+
+padding:28px 22px;
+
+}
+
+.admin-brand{
+
+display:flex;
+
+align-items:center;
+
+gap:15px;
+
+margin-bottom:40px;
+
+}
+
+.logo-box{
+
+width:55px;
+
+height:55px;
+
+border-radius:16px;
+
+background:linear-gradient(135deg,#7b2cff,#00d4ff);
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-size:24px;
+
+font-weight:800;
+
+color:#fff;
+
+}
+
+.admin-brand h2{
+
+font-size:22px;
+
+font-weight:800;
+
+}
+
+.admin-brand span{
+
+font-size:13px;
+
+color:#94a3b8;
+
+}
+
+.admin-sidebar nav{
+
+display:flex;
+
+flex-direction:column;
+
+gap:10px;
+
+flex:1;
+
+}
+
+.admin-sidebar nav a{
+
+display:flex;
+
+align-items:center;
+
+gap:14px;
+
+padding:15px 18px;
+
+border-radius:14px;
+
+transition:.3s;
+
+font-weight:600;
+
+color:#d9e4ff;
+
+}
+
+.admin-sidebar nav a i{
+
+width:22px;
+
+text-align:center;
+
+}
+
+.admin-sidebar nav a:hover{
+
+background:rgba(123,44,255,.12);
+
+}
+
+.admin-sidebar nav a.active{
+
+background:linear-gradient(135deg,#7b2cff,#5b7cff);
+
+color:#fff;
+
+box-shadow:0 15px 30px rgba(123,44,255,.25);
+
+}
+
+.admin-logout{
+
+margin-top:25px;
+
+border:none;
+
+padding:16px;
+
+border-radius:14px;
+
+background:#ef4444;
+
+color:#fff;
+
+font-size:15px;
+
+font-weight:700;
+
+cursor:pointer;
+
+transition:.3s;
+
+}
+
+.admin-logout:hover{
+
+background:#dc2626;
+
+transform:translateY(-2px);
+
+}
+/*================================
+        MAIN CONTENT
+================================*/
+
+.platform-main{
+
+flex:1;
+
+padding:35px;
+
+display:flex;
+
+flex-direction:column;
+
+gap:28px;
+
+background:#08101d;
+
+overflow-y:auto;
+
+}
+
+/*================================
+        PAGE HEADER
+================================*/
+
+.page-header{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+}
+
+.page-header h1{
+
+font-size:34px;
+
+font-weight:800;
+
+color:#fff;
+
+}
+
+.page-header p{
+
+margin-top:6px;
+
+color:#8f98b5;
+
+font-size:15px;
+
+}
+
+.header-right{
+
+display:flex;
+
+align-items:center;
+
+}
+
+.admin-profile{
+
+display:flex;
+
+align-items:center;
+
+gap:15px;
+
+padding:14px 18px;
+
+border-radius:18px;
+
+background:rgba(255,255,255,.05);
+
+border:1px solid rgba(255,255,255,.08);
+
+backdrop-filter:blur(18px);
+
+}
+
+.profile-icon{
+
+width:55px;
+
+height:55px;
+
+border-radius:50%;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-size:22px;
+
+background:linear-gradient(135deg,#7b2cff,#00d4ff);
+
+color:#fff;
+
+}
+
+.admin-profile h3{
+
+font-size:17px;
+
+font-weight:700;
+
+color:#fff;
+
+}
+
+.admin-profile span{
+
+font-size:13px;
+
+color:#8f98b5;
+
+}
+
+/*================================
+        PLATFORM BALANCE CARD
+================================*/
+
+.platform-balance-card{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+padding:28px 30px;
+
+border-radius:24px;
+
+background:rgba(255,255,255,.05);
+
+border:1px solid rgba(255,255,255,.08);
+
+backdrop-filter:blur(20px);
+
+box-shadow:0 20px 45px rgba(0,0,0,.25);
+
+}
+
+.balance-left{
+
+display:flex;
+
+align-items:center;
+
+gap:22px;
+
+}
+
+.balance-icon{
+
+width:78px;
+
+height:78px;
+
+border-radius:20px;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-size:30px;
+
+background:linear-gradient(135deg,#7b2cff,#00d4ff);
+
+color:#fff;
+
+}
+
+.balance-left p{
+
+font-size:15px;
+
+color:#8f98b5;
+
+margin-bottom:6px;
+
+}
+
+.balance-left h2{
+
+font-size:38px;
+
+font-weight:800;
+
+color:#fff;
+
+}
+
+.balance-right{
+
+display:flex;
+
+gap:18px;
+
+}
+
+.balance-mini{
+
+min-width:190px;
+
+padding:18px;
+
+border-radius:18px;
+
+background:#121c30;
+
+border:1px solid rgba(255,255,255,.05);
+
+}
+
+.balance-mini span{
+
+display:block;
+
+font-size:13px;
+
+color:#8f98b5;
+
+margin-bottom:8px;
+
+}
+
+.balance-mini strong{
+
+font-size:22px;
+
+font-weight:800;
+
+color:#22c55e;
+
+}
+/*================================
+        WITHDRAW CARD
+================================*/
+
+.platform-withdraw-card{
+
+padding:30px;
+
+border-radius:24px;
+
+background:rgba(255,255,255,.05);
+
+border:1px solid rgba(255,255,255,.08);
+
+backdrop-filter:blur(20px);
+
+box-shadow:0 20px 45px rgba(0,0,0,.25);
+
+}
+
+.platform-withdraw-card h2{
+
+font-size:26px;
+
+font-weight:800;
+
+color:#fff;
+
+margin-bottom:8px;
+
+}
+
+.section-desc{
+
+font-size:14px;
+
+color:#8f98b5;
+
+margin-bottom:28px;
+
+}
+
+/*================================
+        FORM GRID
+================================*/
+
+.withdraw-grid{
+
+display:grid;
+
+grid-template-columns:repeat(2,1fr);
+
+gap:22px;
+
+}
+
+.full-width{
+
+grid-column:1/-1;
+
+}
+
+/*================================
+        INPUT GROUP
+================================*/
+
+.form-group{
+
+display:flex;
+
+flex-direction:column;
+
+gap:10px;
+
+}
+
+.form-group label{
+
+font-size:14px;
+
+font-weight:600;
+
+color:#d6def3;
+
+}
+
+.form-group input,
+
+.form-group select{
+
+width:100%;
+
+height:56px;
+
+padding:0 18px;
+
+border-radius:16px;
+
+border:1px solid rgba(255,255,255,.08);
+
+background:#111b2e;
+
+color:#fff;
+
+font-size:15px;
+
+outline:none;
+
+transition:.3s;
+
+}
+
+.form-group input::placeholder{
+
+color:#6b7694;
+
+}
+
+.form-group input:focus,
+
+.form-group select:focus{
+
+border-color:#7b2cff;
+
+box-shadow:
+
+0 0 0 4px rgba(123,44,255,.15);
+
+background:#16233c;
+
+}
+
+.form-group select{
+
+cursor:pointer;
+
+}
+
+/*================================
+        WITHDRAW BUTTON
+================================*/
+
+#platformWithdrawBtn{
+
+width:100%;
+
+height:60px;
+
+border:none;
+
+border-radius:18px;
+
+cursor:pointer;
+
+font-size:17px;
+
+font-weight:700;
+
+color:#fff;
+
+background:
+
+linear-gradient(
+
+135deg,
+
+#7b2cff,
+
+#00d4ff
+
+);
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+gap:12px;
+
+transition:.35s;
+
+margin-top:5px;
+
+}
+
+#platformWithdrawBtn:hover{
+
+transform:translateY(-3px);
+
+box-shadow:
+
+0 18px 40px
+
+rgba(123,44,255,.35);
+
+}
+
+#platformWithdrawBtn:active{
+
+transform:scale(.98);
+
+}
+
+#platformWithdrawBtn i{
+
+font-size:18px;
+
+}
+/*================================
+        EMPTY HISTORY
+================================*/
+
+.empty-history{
+
+padding:60px 20px;
+
+text-align:center;
+
+}
+
+.empty-history i{
+
+font-size:50px;
+
+color:#7b2cff;
+
+margin-bottom:18px;
+
+}
+
+.empty-history h3{
+
+font-size:22px;
+
+margin-bottom:10px;
+
+color:#fff;
+
+}
+
+.empty-history p{
+
+color:#8f98b5;
+
+font-size:14px;
+
+}
+
+/*==================================================
+        RESPONSIVE SYSTEM
+==================================================*/
+
+/* ---------- Large Laptop ---------- */
+@media (max-width:1400px){
+
+.platform-main{
+padding:30px;
+}
+
+.page-header h1{
+font-size:30px;
+}
+
+.balance-left h2{
+font-size:34px;
+}
+
+.balance-mini strong{
+font-size:20px;
+}
+
+.withdraw-grid{
+grid-template-columns:repeat(2,minmax(260px,1fr));
+}
+
+}
+
+/* ---------- Laptop ---------- */
+@media (max-width:1200px){
+
+.platform-balance-card{
+flex-direction:column;
+align-items:flex-start;
+gap:25px;
+}
+
+.balance-right{
+width:100%;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:18px;
+}
+
+.withdraw-grid{
+grid-template-columns:1fr 1fr;
+}
+
+.platform-main{
+padding:25px;
+}
+
+.history-search{
+max-width:320px;
+width:100%;
+}
+
+}
+
+/* ---------- Tablet Landscape ---------- */
+@media (max-width:992px){
+
+.platform-layout{
+flex-direction:column;
+}
+
+.admin-sidebar{
+width:100%;
+min-height:auto;
+padding:18px;
+border-right:none;
+border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.admin-brand{
+justify-content:center;
+margin-bottom:20px;
+}
+
+.admin-sidebar nav{
+display:flex;
+flex-direction:row;
+flex-wrap:nowrap;
+overflow-x:auto;
+gap:10px;
+padding-bottom:6px;
+scrollbar-width:none;
+}
+
+.admin-sidebar nav::-webkit-scrollbar{
+display:none;
+}
+
+.admin-sidebar nav a{
+flex-shrink:0;
+white-space:nowrap;
+padding:12px 16px;
+}
+
+.admin-logout{
+margin-top:18px;
+}
+
+.platform-main{
+width:100%;
+padding:22px;
+}
+
+.page-header{
+flex-wrap:wrap;
+gap:20px;
+}
+
+.admin-profile{
+max-width:100%;
+}
+
+.balance-left h2{
+font-size:32px;
+}
+
+.withdraw-grid{
+grid-template-columns:1fr;
+}
+
+.history-header{
+flex-direction:column;
+align-items:flex-start;
+gap:18px;
+}
+
+.history-search{
+width:100%;
+max-width:none;
+}
+
+}
+/*==================================================
+        MOBILE RESPONSIVE
+==================================================*/
+
+/* ---------- Tablets ---------- */
+@media (max-width:768px){
+
+.platform-main{
+padding:18px;
+gap:22px;
+}
+
+.page-header{
+display:flex;
+flex-direction:column;
+align-items:flex-start;
+gap:18px;
+}
+
+.page-header h1{
+font-size:28px;
+}
+
+.page-header p{
+font-size:14px;
+}
+
+.admin-profile{
+width:100%;
+justify-content:flex-start;
+padding:14px 16px;
+}
+
+.platform-balance-card{
+padding:22px;
+gap:22px;
+}
+
+.balance-left{
+width:100%;
+gap:16px;
+}
+
+.balance-icon{
+width:68px;
+height:68px;
+font-size:24px;
+}
+
+.balance-left h2{
+font-size:30px;
+line-height:1.2;
+word-break:break-word;
+}
+
+.balance-right{
+grid-template-columns:1fr;
+width:100%;
+}
+
+.balance-mini{
+width:100%;
+}
+
+.platform-withdraw-card,
+.withdraw-history-card{
+padding:22px;
+border-radius:20px;
+}
+
+.withdraw-grid{
+grid-template-columns:1fr;
+gap:18px;
+}
+
+.form-group input,
+.form-group select{
+height:54px;
+font-size:15px;
+}
+
+#platformWithdrawBtn{
+width:100%;
+height:56px;
+font-size:15px;
+}
+
+.table-container{
+overflow-x:auto;
+-webkit-overflow-scrolling:touch;
+}
+
+.withdraw-history-card table{
+min-width:850px;
+}
+
+}
+
+/* ---------- Large Phones ---------- */
+@media (max-width:600px){
+
+.platform-main{
+padding:16px;
+}
+
+.page-header h1{
+font-size:24px;
+}
+
+.platform-balance-card{
+padding:18px;
+}
+
+.balance-icon{
+width:60px;
+height:60px;
+font-size:22px;
+}
+
+.balance-left h2{
+font-size:26px;
+}
+
+.balance-mini{
+padding:16px;
+}
+
+.balance-mini strong{
+font-size:20px;
+}
+
+.platform-withdraw-card h2,
+.withdraw-history-card h2{
+font-size:22px;
+}
+
+.section-desc{
+font-size:13px;
+}
+
+.form-group label{
+font-size:13px;
+}
+
+.form-group input,
+.form-group select{
+height:52px;
+padding:0 15px;
+}
+
+.history-search{
+width:100%;
+}
+
+.history-search input{
+height:48px;
+}
+
+}
+
+/* ---------- Small Phones ---------- */
+@media (max-width:480px){
+
+.platform-main{
+padding:14px;
+}
+
+.admin-sidebar{
+padding:14px;
+}
+
+.logo-box{
+width:48px;
+height:48px;
+font-size:20px;
+}
+
+.admin-brand h2{
+font-size:18px;
+}
+
+.admin-brand span{
+font-size:12px;
+}
+
+.admin-sidebar nav a{
+padding:10px 14px;
+font-size:13px;
+}
+
+.profile-icon{
+width:48px;
+height:48px;
+font-size:18px;
+}
+
+.admin-profile h3{
+font-size:15px;
+}
+
+.admin-profile span{
+font-size:12px;
+}
+
+.balance-left{
+flex-direction:column;
+align-items:flex-start;
+}
+
+.balance-icon{
+margin-bottom:5px;
+}
+
+.balance-left h2{
+font-size:24px;
+}
+
+.platform-withdraw-card,
+.withdraw-history-card{
+padding:18px;
+}
+
+.form-group input,
+.form-group select{
+font-size:14px;
+}
+
+#platformWithdrawBtn{
+height:54px;
+font-size:14px;
+}
+
+.empty-history{
+padding:45px 15px;
+}
+
+.empty-history i{
+font-size:42px;
+}
+
+.empty-history h3{
+font-size:18px;
+}
+
+}
+
+/* ---------- Tiny Phones ---------- */
+@media (max-width:360px){
+
+.platform-main{
+padding:12px;
+}
+
+.page-header h1{
+font-size:21px;
+}
+
+.page-header p{
+font-size:13px;
+}
+
+.balance-left h2{
+font-size:22px;
+}
+
+.balance-mini strong{
+font-size:18px;
+}
+
+.platform-withdraw-card h2,
+.withdraw-history-card h2{
+font-size:20px;
+}
+
+.admin-sidebar nav a{
+padding:10px 12px;
+font-size:12px;
+}
+
+.form-group input,
+.form-group select{
+height:50px;
+font-size:13px;
+}
+
+#platformWithdrawBtn{
+height:52px;
+font-size:13px;
+}
+
+}
+/*==================================================
+        FINAL RESPONSIVE POLISH
+==================================================*/
+
+/* ---------- Fluid Typography ---------- */
+
+.page-header h1{
+font-size:clamp(24px,3vw,34px);
+}
+
+.platform-withdraw-card h2,
+.withdraw-history-card h2{
+font-size:clamp(20px,2vw,26px);
+}
+
+.balance-left h2{
+font-size:clamp(24px,4vw,38px);
+}
+
+.balance-mini strong{
+font-size:clamp(18px,2vw,22px);
+}
+
+/* ---------- Better Images ---------- */
+
+img{
+max-width:100%;
+height:auto;
+display:block;
+}
+
+/* ---------- Better Table Scrolling ---------- */
+
+.table-container{
+overflow-x:auto;
+-webkit-overflow-scrolling:touch;
+scrollbar-width:thin;
+}
+
+.table-container::-webkit-scrollbar{
+height:8px;
+}
+
+.table-container::-webkit-scrollbar-thumb{
+background:rgba(123,44,255,.45);
+border-radius:20px;
+}
+
+/* ---------- Prevent Overflow ---------- */
+
+.platform-main,
+.platform-balance-card,
+.platform-withdraw-card,
+.withdraw-history-card,
+.balance-left,
+.balance-right,
+.withdraw-grid{
+min-width:0;
+}
+
+.balance-left>*{
+min-width:0;
+}
+
+.balance-left h2{
+overflow-wrap:anywhere;
+}
+
+/* ---------- Inputs ---------- */
+
+input,
+select,
+button{
+max-width:100%;
+}
+
+/* ---------- Buttons ---------- */
+
+button{
+touch-action:manipulation;
+}
+
+#platformWithdrawBtn,
+#addCardBtn{
+min-height:54px;
+}
+
+/* ---------- Better Focus ---------- */
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+a:focus-visible{
+
+outline:2px solid #7b2cff;
+outline-offset:3px;
+
+}
+
+/* ---------- Landscape Phones ---------- */
+
+@media (max-height:500px) and (orientation:landscape){
+
+.platform-layout{
+display:block;
+}
+
+.admin-sidebar{
+
+position:relative;
+width:100%;
+min-height:auto;
+
+}
+
+.platform-main{
+
+padding:18px;
+
+}
+
+.platform-balance-card{
+
+flex-direction:row;
+align-items:center;
+
+}
+
+}
+
+/* ---------- Ultra Wide Screens ---------- */
+
+@media (min-width:1700px){
+
+.platform-main{
+
+max-width:1700px;
+margin:auto;
+padding:45px;
+
+}
+
+.withdraw-grid{
+
+grid-template-columns:
+repeat(2,minmax(380px,1fr));
+
+}
+
+}
+
+/* ---------- 4K Displays ---------- */
+
+@media (min-width:2200px){
+
+html{
+
+font-size:18px;
+
+}
+
+.platform-main{
+
+max-width:1900px;
+
+}
+
+}
+
+/* ---------- Safe Area Support ---------- */
+
+@supports (padding:max(0px)){
+
+.platform-main{
+
+padding-left:max(35px,env(safe-area-inset-left));
+padding-right:max(35px,env(safe-area-inset-right));
+padding-bottom:max(35px,env(safe-area-inset-bottom));
+
+}
+
+}
+
+/* ---------- Reduced Motion ---------- */
+
+@media (prefers-reduced-motion:reduce){
+
+*,
+*::before,
+*::after{
+
+animation:none !important;
+transition:none !important;
+scroll-behavior:auto !important;
+
+}
+
+}

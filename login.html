@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Login | Senku Stakes</title>
+
+    <link rel="preconnect"
+        href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <link rel="stylesheet"
+        href="login.css">
+<link rel="stylesheet" href="popup.css">
+<link rel="stylesheet" href="responsive.css">
+</head>
+
+<body>
+
+    <!-- Background -->
+
+    <div class="bg-grid"></div>
+
+    <div class="glow glow1"></div>
+
+    <div class="glow glow2"></div>
+
+    <div class="glow glow3"></div>
+
+    <!-- Header -->
+
+    <header>
+
+        <a href="index.html"
+            class="logo">
+
+            <div class="logo-box">
+
+                S
+
+            </div>
+
+            <div>
+
+                <h2>Senku Stakes</h2>
+
+                <small>Premium Sweepstakes</small>
+
+            </div>
+
+        </a>
+
+    </header>
+
+    <main>
+
+        <div class="login-card">
+
+            <div class="card-top">
+
+                <div class="login-icon">
+
+                    <i class="fa-solid fa-right-to-bracket"></i>
+
+                </div>
+
+                <h1>
+
+                    Welcome Back
+
+                </h1>
+
+                <p>
+
+                    Login to access your account dashboard.
+
+                </p>
+
+            </div>
+
+            <form>
+
+                <div class="input-group">
+
+                    <label>
+
+                        Email Address
+
+                    </label>
+
+                    <input type="text"
+                        placeholder="Username or Email">
+
+                </div>
+
+                <div class="input-group">
+
+                    <label>
+
+                        Password
+
+                    </label>
+
+                    <input
+                        type="password"
+                        placeholder="Password">
+
+                </div>
+
+                <div class="remember-row">
+
+                    <label class="remember">
+
+                        <input
+                            type="checkbox">
+
+                        Remember me
+
+                    </label>
+
+                    <a href="forgot-password.html">
+
+                        Forgot Password?
+
+                    </a>
+
+                </div>
+
+                <button
+                    class="login-btn"
+                    type="submit">
+
+                    <i class="fa-solid fa-right-to-bracket"></i>
+
+                    Login
+
+
+
+                </button>
+                <a href="admin-login.html" class="agent-login-btn">
+
+    <i class="fa-solid fa-user-shield"></i>
+
+    Login as Agent
+
+</a>
+<a href="sub-agent-login.html" class="sub-agent-login-btn">
+
+    <i class="fa-solid fa-user-shield"></i>
+
+    Login as Sub Agent
+
+</a>
+
+                <div class="divider">
+
+                    <span>
+
+                        OR
+
+                    </span>
+
+                </div>
+
+                <div class="social-buttons">
+
+                    <button
+                        type="button"
+                        class="social google">
+
+                        <i class="fa-brands fa-google"></i>
+
+                        Continue with Google
+
+                    </button>
+
+                    <button
+                        type="button"
+                        class="social discord">
+
+                        <i class="fa-brands fa-discord"></i>
+
+                        Continue with Discord
+
+                    </button>
+
+                </div>
+
+            </form>
+
+            <div class="bottom-text">
+
+                Don't have an account?
+
+                <a href="register.html">
+
+                    Create One
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <script src="storage.js"></script>
+<script src="login.js"></script>
+
+<!--=========================================
+            GLOBAL POPUP
+==========================================-->
+
+<div id="popupOverlay" class="popup-overlay">
+
+    <div class="popup-box">
+
+        <div id="popupIcon" class="popup-icon">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+
+        <h2 id="popupTitle">
+            Success
+        </h2>
+
+        <p id="popupMessage">
+            Popup Message
+        </p>
+
+        <div class="popup-buttons">
+
+            <button id="popupCancel" class="popup-btn cancel-btn">
+                Cancel
+            </button>
+
+            <button id="popupConfirm" class="popup-btn confirm-btn">
+                OK
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="popup.js"></script>
+
+<script src="login.js"></script>
+
+</body>
+
+</html>

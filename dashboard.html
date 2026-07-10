@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>Dashboard | Senku Stakes</title>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+
+<link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="popup.css">
+<link rel="stylesheet" href="responsive.css">
+
+</head>
+
+
+<body>
+
+
+<div class="dashboard-layout">
+
+
+
+<!-- SIDEBAR -->
+
+
+<aside class="sidebar">
+
+
+<div class="side-logo">
+
+
+<div class="logo-box">
+
+S
+
+</div>
+
+
+<div>
+
+<h2>Senku Stakes</h2>
+
+<small>Premium</small>
+
+</div>
+
+
+</div>
+
+
+
+<nav>
+
+
+<a class="active">
+
+<i class="fa-solid fa-house"></i>
+
+Dashboard
+
+</a>
+
+
+
+<a href="wallet.html">
+
+<i class="fa-solid fa-wallet"></i>
+
+Wallet
+
+</a>
+
+
+
+<a href="deposit.html">
+
+<i class="fa-solid fa-credit-card"></i>
+
+Deposit
+
+</a>
+
+
+
+<a href="withdraw.html">
+
+<i class="fa-solid fa-money-bill-transfer"></i>
+
+Withdraw
+
+</a>
+
+
+
+<a href="transactions.html">
+
+<i class="fa-solid fa-clock-rotate-left"></i>
+
+Transactions
+
+</a>
+
+
+
+<a href="profile.html">
+
+<i class="fa-solid fa-user"></i>
+
+Profile
+
+</a>
+
+
+
+<a href="settings.html">
+
+<i class="fa-solid fa-gear"></i>
+
+Settings
+
+</a>
+
+
+</nav>
+
+
+
+
+<div class="logout">
+
+
+<a href="login.html">
+
+<i class="fa-solid fa-right-from-bracket"></i>
+
+Logout
+
+</a>
+
+
+</div>
+
+
+
+</aside>
+
+
+
+
+
+<!-- MAIN AREA -->
+
+
+<section class="main-area">
+
+
+
+<header class="topbar">
+
+
+<div class="search">
+
+
+<i class="fa-solid fa-search"></i>
+
+
+<input placeholder="Search...">
+
+
+</div>
+
+
+
+
+<div class="top-actions">
+
+
+<button>
+
+<i class="fa-solid fa-bell"></i>
+
+</button>
+
+
+<div class="user">
+
+
+<div class="avatar">
+
+A
+
+</div>
+
+
+<div>
+
+<h4 id="dashboardUsername">
+
+Username
+
+</h4>
+
+<span>
+
+Player
+
+</span>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+</header>
+
+
+
+
+
+<main class="content">
+
+
+<div class="welcome">
+
+
+<div>
+
+<h1 id="dashboardWelcome">
+
+Welcome back 👋
+
+</h1>
+
+
+<p>
+
+Manage your balance, transactions and account activity.
+
+</p>
+
+
+</div>
+
+
+
+<button>
+
+<i class="fa-solid fa-plus"></i>
+
+Add Funds
+
+</button>
+
+
+</div>
+
+
+
+
+
+<div class="cards">
+
+
+<div class="balance-card">
+
+<div>
+
+<p>
+
+Available Balance
+
+</p>
+
+
+<h2 id="dashboardBalance">
+
+--
+
+</h2>
+
+
+</div>
+
+
+<i class="fa-solid fa-wallet"></i>
+
+
+</div>
+
+
+
+
+<div class="balance-card">
+
+
+<div>
+
+<p>
+
+Total Deposited
+
+</p>
+
+
+<h2 id="dashboardDeposited">
+
+--
+
+</h2>
+
+
+</div>
+
+
+<i class="fa-solid fa-arrow-down"></i>
+
+
+</div>
+
+
+
+
+<div class="balance-card">
+
+
+<div>
+
+<p>
+
+Total Withdrawn
+
+</p>
+
+
+<h2 id="dashboardWithdrawn">
+
+--
+
+</h2>
+
+
+</div>
+
+
+<i class="fa-solid fa-money-bill-transfer"></i>
+
+
+</div>
+
+
+
+</div>
+<!-- QUICK ACTIONS -->
+
+<section class="quick-section">
+
+
+<div class="section-title">
+
+<h2>
+
+Quick Actions
+
+</h2>
+
+</div>
+
+
+
+<div class="quick-grid">
+
+
+<div class="quick-card">
+
+<div class="quick-icon">
+
+<i class="fa-solid fa-plus"></i>
+
+</div>
+
+<div>
+
+<h3>
+
+Deposit
+
+</h3>
+
+<p>
+
+Add funds instantly
+
+</p>
+
+</div>
+
+</div>
+
+
+
+
+<div class="quick-card">
+
+<div class="quick-icon">
+
+<i class="fa-solid fa-arrow-up-right-from-square"></i>
+
+</div>
+
+<div>
+
+<h3>
+
+Withdraw
+
+</h3>
+
+<p>
+
+Transfer your winnings
+
+</p>
+
+</div>
+
+</div>
+
+
+
+
+<div class="quick-card">
+
+<div class="quick-icon">
+
+<i class="fa-solid fa-gift"></i>
+
+</div>
+
+<div>
+
+<h3>
+
+Rewards
+
+</h3>
+
+<p>
+
+Claim bonuses
+
+</p>
+
+</div>
+
+</div>
+
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+<!-- STATISTICS -->
+
+
+<section class="stats-section">
+
+
+<div class="section-title">
+
+<h2>
+
+Statistics
+
+</h2>
+
+</div>
+
+
+
+<div class="stats-grid">
+
+
+<div class="stat-card">
+
+
+<i class="fa-solid fa-chart-line"></i>
+
+
+<div>
+
+<p>
+
+Total Games
+
+</p>
+
+
+<h3>
+
+1,245
+
+</h3>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="stat-card">
+
+
+<i class="fa-solid fa-trophy"></i>
+
+
+<div>
+
+<p>
+
+Wins
+
+</p>
+
+
+<h3>
+
+834
+
+</h3>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="stat-card">
+
+
+<i class="fa-solid fa-percent"></i>
+
+
+<div>
+
+<p>
+
+Win Rate
+
+</p>
+
+
+<h3>
+
+67%
+
+</h3>
+
+
+</div>
+
+
+</div>
+
+
+
+
+<div class="stat-card">
+
+
+<i class="fa-solid fa-star"></i>
+
+
+<div>
+
+<p>
+
+VIP Level
+
+</p>
+
+
+<h3>
+
+Gold
+
+</h3>
+
+
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+</section>
+<!-- RECENT TRANSACTIONS -->
+
+<section class="transaction-section">
+
+
+<div class="section-title">
+
+<h2>
+Recent Transactions
+</h2>
+
+
+<a href="transactions.html">
+View All
+</a>
+
+</div>
+
+
+
+
+<div class="transaction-card" id="dashboardTransactions">
+
+
+<div class="empty-transactions">
+
+
+<i class="fa-solid fa-clock-rotate-left"></i>
+
+
+<h3>
+No Transactions Yet
+</h3>
+
+
+<p>
+Your wallet transactions will appear here after activity starts.
+</p>
+
+
+</div>
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+<!-- ACTIVITY AREA -->
+
+
+<section class="activity-section">
+
+
+
+<div class="section-title">
+
+<h2>
+
+Account Activity
+
+</h2>
+
+</div>
+
+
+
+
+<div class="activity-card">
+
+
+<div class="chart-placeholder">
+
+
+<div class="chart-line"></div>
+
+
+<div class="chart-points">
+
+
+<span></span>
+
+<span></span>
+
+<span></span>
+
+<span></span>
+
+<span></span>
+
+
+</div>
+
+
+
+</div>
+
+
+<div class="chart-labels">
+
+
+<span>
+
+Mon
+
+</span>
+
+
+<span>
+
+Tue
+
+</span>
+
+
+<span>
+
+Wed
+
+</span>
+
+
+<span>
+
+Thu
+
+</span>
+
+
+<span>
+
+Fri
+
+</span>
+
+
+</div>
+
+
+
+</div>
+
+
+</section>
+
+
+
+</main>
+
+
+</section>
+
+
+</div>
+
+
+
+<script src="storage.js"></script>
+<script src="popup.js"></script>
+
+<script src="dashboard.js"></script>
+
+</body>
+
+
+</html>

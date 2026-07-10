@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>Agent Management | Senku Stakes Admin</title>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+
+<link rel="stylesheet" href="admin-agents.css">
+<link rel="stylesheet" href="popup.css">
+
+
+</head>
+
+
+<body>
+
+
+
+<div class="agent-layout">
+
+
+
+
+
+
+<!-- SIDEBAR -->
+
+
+<aside class="admin-sidebar">
+
+
+<div class="admin-brand">
+
+
+<div class="logo-box">
+
+S
+
+</div>
+
+
+<div>
+
+<h2>
+
+Senku Stakes
+
+</h2>
+
+
+<span>
+
+Admin Panel
+
+</span>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+<nav>
+
+
+<a href="admin-dashboard.html">
+
+
+<i class="fa-solid fa-chart-line"></i>
+
+Dashboard
+
+
+</a>
+
+
+
+<a href="admin-users.html">
+
+
+<i class="fa-solid fa-users"></i>
+
+Users
+
+
+</a>
+
+
+
+<a href="admin-transactions.html">
+
+
+<i class="fa-solid fa-money-bill-transfer"></i>
+
+Transactions
+
+
+</a>
+
+
+
+
+<a href="#withdraw">
+
+
+<i class="fa-solid fa-wallet"></i>
+
+Withdraw Requests
+
+
+</a>
+
+
+
+
+
+<a href="admin-agents.html">
+
+
+<i class="fa-solid fa-user-shield"></i>
+
+Agents
+
+
+</a>
+
+<a href="admin-agent-requests.html">
+    <i class="fa-solid fa-envelope-open-text"></i>
+    Agent Requests
+</a>
+
+
+
+<a href="#security">
+
+
+<i class="fa-solid fa-shield-halved"></i>
+
+Security
+
+
+</a>
+
+
+
+
+
+<a href="admin-agents.html" class="active">
+
+
+<i class="fa-solid fa-user-shield"></i>
+
+Agents
+
+
+</a>
+
+
+
+</nav>
+
+
+
+
+
+
+<button class="admin-logout">
+
+
+<i class="fa-solid fa-right-from-bracket"></i>
+
+Logout
+
+
+</button>
+
+
+
+</aside>
+
+
+
+
+
+
+
+
+
+<main class="agent-main">
+
+
+
+
+
+<header class="page-header">
+
+
+<div>
+
+
+<h1>
+
+Agent Management
+
+</h1>
+
+
+<p>
+
+Control staff accounts and permissions
+
+</p>
+
+
+</div>
+
+
+
+<button class="create-agent">
+
+
+<i class="fa-solid fa-user-plus"></i>
+
+Create Agent
+
+</button>
+
+
+
+</header>
+
+
+
+
+
+
+
+
+
+<section class="agent-stats">
+
+
+
+<div class="agent-box">
+
+
+<i class="fa-solid fa-users"></i>
+
+
+<div>
+
+<p>
+
+Total Agents
+
+</p>
+
+
+<h2>
+
+15
+
+</h2>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="agent-box">
+
+
+<i class="fa-solid fa-user-check"></i>
+
+
+<div>
+
+<p>
+
+Active Agents
+
+</p>
+
+
+<h2>
+
+12
+
+</h2>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="agent-box">
+
+
+<i class="fa-solid fa-user-lock"></i>
+
+
+<div>
+
+<p>
+
+Disabled Agents
+
+</p>
+
+
+<h2>
+
+3
+
+</h2>
+
+
+</div>
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section class="agent-card">
+
+
+
+<div class="search-area">
+
+
+<i class="fa-solid fa-search"></i>
+
+
+<input
+
+type="text"
+
+id="agentSearch"
+
+placeholder="Search agent"
+
+>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="table-container">
+
+
+
+<table>
+
+
+<thead>
+
+
+<tr>
+
+
+<th>
+
+ID
+
+</th>
+
+
+<th>
+
+Agent Name
+
+</th>
+
+
+<th>
+
+Role
+
+</th>
+
+
+<th>
+
+Status
+
+</th>
+
+
+<th>
+
+Actions
+
+</th>
+
+
+</tr>
+
+
+</thead>
+
+
+
+
+
+
+<tbody id="agentTable">
+
+</tbody>
+
+
+
+</table>
+
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+<section class="sub-agent-card">
+
+
+<div class="section-header">
+
+
+<h2>
+
+Sub Agent Management
+
+</h2>
+
+
+</div>
+
+
+
+
+
+<div class="table-container">
+
+
+
+<table>
+
+
+<thead>
+
+
+<tr>
+
+
+<th>
+
+ID
+
+</th>
+
+
+<th>
+
+Name
+
+</th>
+
+
+<th>
+
+Wallet Balance
+
+</th>
+
+
+<th>
+
+Status
+
+</th>
+
+
+<th>
+
+Actions
+
+</th>
+
+
+</tr>
+
+
+</thead>
+
+
+
+
+
+
+<tbody id="subAgentTable">
+
+</tbody>
+
+
+
+</table>
+
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+</main>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<script src="storage.js"></script>
+<script src="popup.js"></script>
+
+<script src="admin-agents.js"></script>
+
+
+</body>
+
+</html>

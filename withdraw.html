@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>Withdraw | Senku Stakes</title>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+
+<link rel="stylesheet" href="withdraw.css">
+<link rel="stylesheet" href="popup.css">
+<link rel="stylesheet" href="responsive.css">
+
+</head>
+
+
+<body>
+
+
+
+<div class="withdraw-layout">
+
+
+
+<header class="withdraw-header">
+
+
+<a href="dashboard.html" class="back-btn">
+
+<i class="fa-solid fa-arrow-left"></i>
+
+Dashboard
+
+</a>
+
+
+
+<div class="logo">
+
+
+<div class="logo-box">
+
+S
+
+</div>
+
+
+<h2>
+
+Senku Stakes
+
+</h2>
+
+
+</div>
+
+
+
+</header>
+
+
+
+
+
+
+<main class="withdraw-container">
+
+
+
+
+
+<section class="withdraw-balance-card">
+
+
+<div>
+
+<p>
+
+Available Balance
+
+</p>
+
+
+<h1 id="withdrawBalance">
+--
+</h1>
+
+
+</div>
+
+
+
+<i class="fa-solid fa-money-bill-transfer"></i>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<section class="withdraw-form-card">
+
+
+<h2>
+
+Withdrawal Amount
+
+</h2>
+
+
+
+<div class="amount-input">
+
+
+<span>
+
+$
+
+</span>
+
+
+<input type="number" placeholder="Enter amount">
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+<section class="withdraw-method-card">
+
+<h2>
+
+Withdrawal Method
+
+</h2>
+
+<select id="withdrawMethod">
+
+<option value="cashapp">CashApp</option>
+
+<option value="chime">Chime</option>
+
+<option value="applepay">Apple Pay</option>
+
+<option value="paypal">PayPal</option>
+
+<option value="card">Debit / Credit Card</option>
+
+</select>
+
+</section>
+
+
+
+
+
+
+
+
+<section class="account-card">
+
+<h2>
+
+Payment Details
+
+</h2>
+
+<div id="paymentFields">
+
+</div>
+
+</section>
+
+
+
+
+
+
+
+
+<button class="confirm-withdraw">
+
+
+<i class="fa-solid fa-arrow-up"></i>
+
+
+Confirm Withdrawal
+
+
+</button>
+
+
+
+
+
+
+
+
+<section class="withdraw-history">
+
+    <h2>
+
+        Withdrawal History
+
+    </h2>
+
+    <div id="withdrawHistory">
+
+        <div class="empty-history">
+
+            <i class="fa-solid fa-clock-rotate-left"></i>
+
+            <h3>
+
+                No Withdrawals Yet
+
+            </h3>
+
+            <p>
+
+                Your withdrawal history will appear here.
+
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+
+
+
+
+</main>
+
+
+
+</div>
+
+
+
+<script src="storage.js"></script>
+<script src="popup.js"></script>
+
+<script src="withdraw.js"></script>
+
+
+</body>
+
+</html>
