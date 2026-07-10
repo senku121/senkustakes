@@ -40,10 +40,13 @@ const defaultAdmin = {
 
 const defaultDatabase = {
 
-
-    admin: defaultAdmin,
-
-
+admin:{
+    id:"ADMIN001",
+    username:"admin",
+    password:"admin123",
+    role:"ADMIN",
+    balance:0
+},
     users: [],
 
 
