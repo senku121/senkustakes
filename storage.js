@@ -149,7 +149,7 @@ admin:{
     id:"ADMIN001",
     username:"admin",
     password:"admin123",
-    role:"ADMIN",
+    role:"SUPER_ADMIN",
     balance:0
 },
 
@@ -164,6 +164,7 @@ transactions:[],
 
 
 agentRequests:[]
+withdrawals:[]
 
 
 };
