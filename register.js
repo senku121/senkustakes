@@ -218,53 +218,6 @@ return;
 
 
 
-/*================================
-        DUPLICATE CHECK
-================================*/
-
-const users=getUsers();
-
-
-
-const usernameExists=users.find(user=>
-
-user.username.toLowerCase()===
-
-username.value.trim().toLowerCase()
-
-);
-
-
-
-if(usernameExists){
-
-alert("Username already exists.");
-
-return;
-
-}
-
-
-
-const emailExists=users.find(user=>
-
-(user.email||"").toLowerCase()===
-
-email.value.trim().toLowerCase()
-
-);
-
-
-
-if(emailExists){
-
-alert("Email already exists.");
-
-return;
-
-}
-
-
 
 /*================================
         BUTTON LOADING
@@ -282,20 +235,88 @@ Creating Account...
 
 
 
-setTimeout(()=>{
-/*================================
-        CREATE USER
-================================*/
+setTimeout(async()=>{
 
-const newUser=createUser({
+try{
+
+const response = await fetch(
+"http://localhost:5000/api/auth/register",
+{
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+firstName:firstName.value.trim(),
+
+lastName:lastName.value.trim(),
+
+email:email.value.trim(),
 
 username:username.value.trim(),
 
-password:password.value,
+password:password.value
 
-email:email.value.trim()
+})
 
 });
+
+
+const data = await response.json();
+
+
+if(!response.ok){
+
+alert(data.message || "Registration failed");
+
+registerBtn.disabled=false;
+
+registerBtn.innerHTML="Create Account";
+
+return;
+
+}
+
+
+
+registerBtn.innerHTML=`
+
+<i class="fa-solid fa-circle-check"></i>
+
+Account Created
+
+`;
+
+
+
+setTimeout(()=>{
+
+window.location.href="login.html";
+
+},1500);
+
+
+
+}
+
+catch(error){
+
+console.log(error);
+
+alert("Server connection failed");
+
+
+registerBtn.disabled=false;
+
+registerBtn.innerHTML="Create Account";
+
+}
+
+
+},1500);
 
 
 /*================================
