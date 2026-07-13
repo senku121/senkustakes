@@ -1,27 +1,13 @@
 /*==================================================
         SENKU STAKES
-        ADMIN TRANSACTIONS JAVASCRIPT
+        ADMIN TRANSACTIONS
 ==================================================*/
 
+document.addEventListener("DOMContentLoaded", async () => {
 
-document.addEventListener("DOMContentLoaded",()=>{
+const token = localStorage.getItem("adminToken")
 
-
-
-
-
-/*================================
-        ADMIN SECURITY
-================================*/
-
-
-const currentUser = getCurrentUser();
-
-
-if(
-    !currentUser ||
-    currentUser.role !== "SUPER_ADMIN"
-){
+if(!token){
 
     window.location.href="admin-login.html";
 
@@ -29,434 +15,284 @@ if(
 
 }
 
+const table =
+document.getElementById("transactionTable");
 
+const searchInput =
+document.getElementById("transactionSearch");
 
+const filter =
+document.getElementById("typeFilter");
 
+const depositTotal =
+document.getElementById("depositTotal");
 
+const withdrawTotal =
+document.getElementById("withdrawTotal");
+
+const pendingTotal =
+document.getElementById("pendingTotal");
+
+const empty =
+document.getElementById("emptyTransactions");
+
+let transactions=[];
 
 
 /*================================
-        LOGOUT
+        LOAD TRANSACTIONS
 ================================*/
 
+async function loadTransactions(){
 
-const logoutBtn=document.querySelector(
+    try{
 
-".admin-logout"
+        const response = await fetch(
 
-);
+            "https://senkustakes-api.onrender.com/api/admin/transactions",
 
+            {
 
+                headers:{
 
-if(logoutBtn){
+                    Authorization:`Bearer ${token}`
 
+                }
 
+            }
 
-logoutBtn.addEventListener("click",()=>{
+        );
 
+        const data = await response.json();
 
+        if(!response.ok){
 
-    if(confirm("Logout from Admin Panel?")){
+            alert(data.message);
 
+            return;
 
-        logout();
+        }
 
+        transactions=data;
 
-        window.location.href="admin-login.html";
+        renderTransactions();
 
+    }
+
+    catch(err){
+
+        console.log(err);
+
+        alert("Unable to connect to server.");
+
+    }
 
 }
 
 
-
-});
-
-
-
-}
-
-
-
-
-
-
-
 /*================================
-        SEARCH SYSTEM
+        RENDER TABLE
 ================================*/
 
+function renderTransactions(){
 
-const searchInput=document.querySelector(
-
-"#transactionSearch"
-
-);
-
-
-
-const rows=document.querySelectorAll(
-
-"#transactionTable tr"
-
-);
-
-
-
-
-
-if(searchInput){
-
-
-
-searchInput.addEventListener("input",()=>{
-
-
-
-    let value=
-
+    let keyword =
     searchInput.value.toLowerCase();
 
-
-
-
-    rows.forEach(row=>{
-
-
-
-        let text=
-
-        row.innerText.toLowerCase();
-
-
-
-
-        if(text.includes(value)){
-
-
-
-            row.style.display="";
-
-
-        }
-
-
-        else{
-
-
-            row.style.display="none";
-
-
-        }
-
-
-
-    });
-
-
-
-});
-
-
-
-}
-
-
-
-
-
-
-
-/*================================
-        TYPE FILTER
-================================*/
-
-
-const filter=document.querySelector(
-
-"#typeFilter"
-
-);
-
-
-
-if(filter){
-
-
-
-filter.addEventListener("change",()=>{
-
-
-
-    let type=
-
+    let type =
     filter.value.toLowerCase();
 
+    let rows = transactions.filter(tx=>{
 
+        const username =
+        tx.user?.username || "";
 
+        const text = (
 
-    rows.forEach(row=>{
+            tx.id +
 
+            username +
 
+            tx.type +
 
-        let rowText=
+            tx.status +
 
-        row.innerText.toLowerCase();
+            tx.amount
 
+        ).toLowerCase();
 
+        if(keyword && !text.includes(keyword)){
 
+            return false;
+
+        }
 
         if(type==="all"){
 
-
-
-            row.style.display="";
-
+            return true;
 
         }
 
+        if(type==="deposit"){
 
-        else if(rowText.includes(type)){
-
-
-
-            row.style.display="";
-
+            return tx.type==="Deposit";
 
         }
 
+        if(type==="withdraw"){
 
-        else{
-
-
-            row.style.display="none";
-
+            return tx.type==="Withdrawal";
 
         }
 
+        if(type==="pending"){
 
+            return tx.status==="Pending";
+
+        }
+
+        if(type==="completed"){
+
+            return tx.status==="Completed";
+
+        }
+
+        if(type==="rejected"){
+
+            return tx.status==="Rejected";
+
+        }
+
+        return true;
 
     });
 
 
+    table.innerHTML="";
 
-});
+    if(rows.length===0){
+
+        empty.style.display="block";
+
+        return;
+
+    }
+
+    empty.style.display="none";
 
 
+    let deposits=0;
+
+    let withdrawals=0;
+
+    let pending=0;
+
+
+    rows.forEach(tx=>{
+
+        if(tx.type==="Deposit"){
+
+            deposits+=Number(tx.amount);
+
+        }
+
+        if(tx.type==="Withdrawal"){
+
+            withdrawals+=Number(tx.amount);
+
+        }
+
+        if(tx.status==="Pending"){
+
+            pending++;
+
+        }
+
+        table.innerHTML+=`
+
+        <tr>
+
+            <td>${tx.id}</td>
+
+            <td>
+
+                ${tx.user?.username || "-"}
+
+            </td>
+
+            <td>
+
+                ${tx.type}
+
+            </td>
+
+            <td>
+
+                $${Number(tx.amount).toFixed(2)}
+
+            </td>
+
+            <td>
+
+                ${tx.status}
+
+            </td>
+
+            <td>
+
+                ${new Date(tx.createdAt).toLocaleString()}
+
+            </td>
+
+        </tr>
+
+        `;
+
+    });
+
+
+    depositTotal.innerText =
+    "$"+deposits.toFixed(2);
+
+    withdrawTotal.innerText =
+    "$"+withdrawals.toFixed(2);
+
+    pendingTotal.innerText =
+    pending;
 
 }
 
 
-
-
-
-
-
 /*================================
-        APPROVE BUTTON
+        SEARCH
 ================================*/
 
+searchInput.addEventListener(
 
-const approveButtons=document.querySelectorAll(
+    "input",
 
-".approve-btn"
+    renderTransactions
 
 );
 
 
-
-approveButtons.forEach(button=>{
-
-
-
-button.addEventListener("click",()=>{
-
-
-
-    showConfirmModal({
-    title: "Approve Transaction",
-    message: "Are you sure you want to approve this transaction?",
-    confirmText: "Approve",
-    confirmClass: "approve",
-    onConfirm: () => {
-
-        button.innerHTML = `
-            <i class="fa-solid fa-check"></i>
-            Approved
-        `;
-
-        button.style.background =
-            "linear-gradient(135deg,#16a34a,#22c55e)";
-
-        button.disabled = true;
-    }
-});
-
-
-
-});
-
-
-
-});
-
-
-
-
-
-
-
 /*================================
-        REJECT BUTTON
+        FILTER
 ================================*/
 
+filter.addEventListener(
 
-const rejectButtons=document.querySelectorAll(
+    "change",
 
-".reject-btn"
+    renderTransactions
 
 );
 
 
-
-rejectButtons.forEach(button=>{
-
-
-
-button.addEventListener("click",()=>{
-
-
-
-    if(confirm("Reject this transaction?")){
-
-
-
-        button.innerHTML=
-
-        `
-
-        <i class="fa-solid fa-xmark"></i>
-
-        Rejected
-
-        `;
-
-
-
-        button.style.background=
-
-        "linear-gradient(135deg,#ef4444,#dc2626)";
-
-
-
-        button.disabled=true;
-
-
-
-    }
-
-
-
-});
-
-
-
-});
-
-
-
-
-
-
-
 /*================================
-        VIEW TRANSACTION
+        LOAD
 ================================*/
 
-
-const viewButtons=document.querySelectorAll(
-
-".manage-btn"
-
-);
-
-
-
-viewButtons.forEach(button=>{
-
-
-
-button.addEventListener("click",()=>{
-
-
-
-    showTransactionModal(transactionData);
-
-
-
-});
-
-
-
-});
-
-
-
-
-
-
-
-/*================================
-        PAGE ANIMATION
-================================*/
-
-
-const elements=document.querySelectorAll(
-
-".transaction-box,.transaction-card"
-
-);
-
-
-
-elements.forEach((element,index)=>{
-
-
-
-    element.style.opacity="0";
-
-
-    element.style.transform=
-
-    "translateY(25px)";
-
-
-
-    setTimeout(()=>{
-
-
-
-        element.style.transition=".6s ease";
-
-
-        element.style.opacity="1";
-
-
-        element.style.transform=
-
-        "translateY(0)";
-
-
-
-    },300+(index*150));
-
-
-
-});
-
-
-
-
-
-
+await loadTransactions();
 
 });

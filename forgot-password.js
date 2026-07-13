@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded",()=>{
             FORM SUBMIT
     =================================*/
 
-    form.addEventListener("submit",(e)=>{
+    form.addEventListener("submit", async (e)=>{
 
 
         e.preventDefault();
@@ -129,39 +129,99 @@ document.addEventListener("DOMContentLoaded",()=>{
 
         /* Simulated API request */
 
-        setTimeout(()=>{
+       try{
 
+const response = await fetch(
 
-    button.innerHTML=`
+"https://senkustakes-api.onrender.com/api/auth/forgot-password",
 
-        <i class="fa-solid fa-circle-check"></i>
+{
 
-        Code Sent
+method:"POST",
 
-    `;
+headers:{
 
+"Content-Type":"application/json"
 
-    button.style.background=
+},
 
-    "linear-gradient(135deg,#16a34a,#22c55e)";
+body:JSON.stringify({
 
+email:email.value.trim()
 
-    showSuccess();
+})
 
+}
 
+);
 
-    // Move user to OTP verification page
+const data = await response.json();
 
-    setTimeout(()=>{
+if(!response.ok){
 
-        window.location.href="verify.html";
+alert(data.message);
 
-    },1500);
+button.disabled=false;
 
+button.innerHTML=`
 
+<i class="fa-solid fa-paper-plane"></i>
 
-},2000);
+Send Reset Link
 
+`;
+
+return;
+
+}
+
+localStorage.setItem(
+
+"resetEmail",
+
+email.value.trim()
+
+);
+
+button.innerHTML=`
+
+<i class="fa-solid fa-circle-check"></i>
+
+Code Sent
+
+`;
+
+button.style.background=
+
+"linear-gradient(135deg,#16a34a,#22c55e)";
+
+showSuccess();
+
+setTimeout(()=>{
+
+window.location.href="verify.html";
+
+},1500);
+
+}
+
+catch(err){
+
+console.log(err);
+
+alert("Server connection failed.");
+
+button.disabled=false;
+
+button.innerHTML=`
+
+<i class="fa-solid fa-paper-plane"></i>
+
+Send Reset Link
+
+`;
+
+}
 
 
     });

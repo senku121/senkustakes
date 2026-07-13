@@ -237,144 +237,76 @@ Creating Account...
 
 setTimeout(async()=>{
 
-try{
+    try{
 
-const response = await fetch(
-"http://localhost:5000/api/auth/register",
-{
-method:"POST",
+        const response = await fetch(
+            "https://senkustakes-api.onrender.com/api/auth/register",
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({
 
-headers:{
-"Content-Type":"application/json"
-},
+                    firstName:firstName.value.trim(),
+                    lastName:lastName.value.trim(),
+                    email:email.value.trim(),
+                    username:username.value.trim(),
+                    password:password.value
 
-body:JSON.stringify({
+                })
+            }
+        );
 
-firstName:firstName.value.trim(),
+        const data = await response.json();
 
-lastName:lastName.value.trim(),
+        if(!response.ok){
 
-email:email.value.trim(),
+            alert(data.message || "Registration failed");
 
-username:username.value.trim(),
+            registerBtn.disabled=false;
+            registerBtn.innerHTML="Create Account";
 
-password:password.value
+            return;
 
-})
+        }
 
-});
+        registerBtn.innerHTML=`
 
+        <i class="fa-solid fa-circle-check"></i>
 
-const data = await response.json();
+        Verification Sent
 
+        `;
 
-if(!response.ok){
+        localStorage.setItem(
+            "verifyEmail",
+            email.value.trim()
+        );
 
-alert(data.message || "Registration failed");
+        setTimeout(()=>{
 
-registerBtn.disabled=false;
+            window.location.href="verify-email.html";
 
-registerBtn.innerHTML="Create Account";
+        },1500);
 
-return;
+    }
 
-}
+    catch(error){
 
+        console.log(error);
 
+        alert("Server connection failed");
 
-registerBtn.innerHTML=`
+        registerBtn.disabled=false;
 
-<i class="fa-solid fa-circle-check"></i>
+        registerBtn.innerHTML="Create Account";
 
-Account Created
-
-`;
-
-
-
-setTimeout(()=>{
-
-window.location.href="login.html";
-
-},1500);
-
-
-
-}
-
-catch(error){
-
-console.log(error);
-
-alert("Server connection failed");
-
-
-registerBtn.disabled=false;
-
-registerBtn.innerHTML="Create Account";
-
-}
-
-
-},1500);
-
-
-/*================================
-        EXTRA USER DATA
-================================*/
-
-let db=getDB();
-
-let savedUser=db.users.find(
-
-u=>u.id===newUser.id
-
-);
-
-
-if(savedUser){
-
-savedUser.firstName=firstName.value.trim();
-
-savedUser.lastName=lastName.value.trim();
-
-savedUser.country=country.value;
-
-savedUser.referral=referral.value.trim();
-
-saveDB(db);
-
-}
-
-
-/*================================
-        SUCCESS
-================================*/
-
-registerBtn.innerHTML=`
-
-<i class="fa-solid fa-circle-check"></i>
-
-Account Created
-
-`;
-
-
-
-registerBtn.style.background=
-
-"linear-gradient(135deg,#16a34a,#22c55e)";
-
-
-
-setTimeout(()=>{
-
-window.location.href="login.html";
-
-},1500);
+    }
 
 },1500);
 
 });
+
 
 });

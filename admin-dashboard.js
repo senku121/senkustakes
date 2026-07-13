@@ -4,36 +4,64 @@
 ==================================================*/
 
 
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded", async ()=>{
 
+const token = localStorage.getItem("adminToken");
+let dashboardUsers = [];
+let selectedUserId = null;
 
+if(!token){
 
+    window.location.href="admin-login.html";
+
+    return;
+
+}
+const userModal =
+document.getElementById("userModal");
+
+const closeUserModal =
+document.getElementById("closeUserModal");
 
 /*================================
         ADMIN SESSION CHECK
 ================================*/
 
-const currentUser = getCurrentUser();
-let selectedUserId=null;
-const userModal = document.getElementById(
-    "userModal"
-);
+try{
 
+const response = await fetch(
 
-const closeUserModal = document.getElementById(
-    "closeUserModal"
-);
-if(
-    !currentUser ||
-    currentUser.role !== "SUPER_ADMIN"
-){
+"https://senkustakes-api.onrender.com/api/admin/dashboard",
 
-    window.location.href = "admin-login.html";
+{
 
-    return;
+headers:{
+
+Authorization:`Bearer ${token}`
 
 }
 
+}
+
+);
+
+if(!response.ok){
+
+window.location.href="admin-login.html";
+
+return;
+
+}
+
+}
+
+catch{
+
+window.location.href="admin-login.html";
+
+return;
+
+}
 
 
 
@@ -75,7 +103,8 @@ confirm:true,
 
 onConfirm:()=>{
 
-logout();
+localStorage.removeItem("adminToken");
+localStorage.removeItem("currentUser");
 
 window.location.href="admin-login.html";
 
@@ -87,13 +116,7 @@ window.location.href="admin-login.html";
 
 
 
-    if(confirmLogout){
-
-    logout();
-
-    window.location.href = "admin-login.html";
-
-}
+    
 
 
 
@@ -130,13 +153,9 @@ button.dataset.id;
 
 
 
-        const db=getDB();
-
-
-
-        const user=db.users.find(
-            u=>u.id===id
-        );
+        const user = dashboardUsers.find(
+    u=>u.id===id
+);
 
 
 
@@ -290,13 +309,6 @@ const resetPasswordBtn=document.querySelector(
 
 
 
-function refreshDB(){
-
-    const db=getDB();
-
-    return db;
-
-}
 
 
 
@@ -304,145 +316,149 @@ function refreshDB(){
 
 if(addBalanceBtn){
 
+addBalanceBtn.onclick = async()=>{
 
-addBalanceBtn.onclick=()=>{
+const amount = Number(prompt("Enter amount"));
 
+if(!amount || amount<=0) return;
 
-    let amount=Number(
-        prompt("Enter amount to add")
-    );
+try{
 
+const response = await fetch(
 
-    if(!amount || amount<=0){
+`https://senkustakes-api.onrender.com/api/admin/users/${selectedUserId}/add-balance`,
 
-        return;
+{
 
-    }
+method:"POST",
 
+headers:{
+"Content-Type":"application/json",
+Authorization:`Bearer ${token}`
+},
 
-    let db=refreshDB();
-
-
-    let user=db.users.find(
-        u=>u.id===selectedUserId
-    );
-
-
-    if(db.admin.balance < amount){
-
-    alert("Insufficient Platform Balance");
-
-    return;
+body:JSON.stringify({
+amount
+})
 
 }
 
-db.admin.balance -= amount;
+);
 
-user.balance += amount;
+const data = await response.json();
 
+showPopup({
 
-    addTransaction(db,{
+type: response.ok ? "success" : "error",
 
-    userId:user.id,
+title: response.ok ? "Balance Added" : "Failed",
 
-    type:"Admin Added Balance",
-
-    amount:amount,
-
-    status:"Completed"
+message: data.message
 
 });
 
-saveDB(db);
+userModal.classList.remove("active");
 
-
-    alert("Balance added");
-
-
-    location.reload();
-
-
-};
-
+await loadUsers();
+await loadDashboard();
 
 }
 
+catch(err){
+
+console.log(err);
+
+showPopup({
+
+type:"error",
+
+title:"Failed",
+
+message:"Unable to add balance."
+
+});
+
+}
+
+};
+
+}
 
 
 
 
 if(deductBalanceBtn){
 
+deductBalanceBtn.onclick = async ()=>{
 
-deductBalanceBtn.onclick=()=>{
+const amount = Number(
+prompt("Enter amount to deduct")
+);
 
+if(!amount || amount<=0) return;
 
-    let amount=Number(
-        prompt("Enter amount to deduct")
-    );
+try{
 
+const response = await fetch(
 
-    if(!amount || amount<=0){
+`https://senkustakes-api.onrender.com/api/admin/users/${selectedUserId}/deduct-balance`,
 
-        return;
+{
 
-    }
+method:"POST",
 
+headers:{
+"Content-Type":"application/json",
+Authorization:`Bearer ${token}`
+},
 
-
-    let db=refreshDB();
-
-
-    let user=db.users.find(
-        u=>u.id===selectedUserId
-    );
-
-
-    if(user.balance < amount){
-
-        alert("Insufficient balance");
-
-        return;
-
-    }
-
-
-
-    user.balance -= amount;
-
-/* Add deducted money to admin balance */
-
-if(!db.admin){
-
-    db.admin = {
-        balance: 0
-    };
+body:JSON.stringify({
+amount
+})
 
 }
 
-db.admin.balance += amount;
+);
 
-addTransaction(db,{
+const data = await response.json();
 
-    userId:user.id,
+showPopup({
 
-    type:"Admin Deducted Balance",
+type:response.ok?"success":"error",
 
-    amount:-amount,
+title:response.ok?"Balance Updated":"Error",
 
-    status:"Completed"
+message:data.message
 
 });
 
-saveDB(db);
+if(response.ok){
 
-alert("Balance deducted");
+userModal.classList.remove("active");
 
-location.reload();
+await loadUsers();
+await loadDashboard();
+}
 
+}
+
+catch(err){
+
+console.log(err);
+
+showPopup({
+
+type:"error",
+
+title:"Server Error",
+
+message:"Unable to deduct balance."
+
+});
+
+}
 
 };
-
 
 }
 
@@ -454,33 +470,75 @@ location.reload();
 
 if(freezeBtn){
 
+freezeBtn.onclick = async ()=>{
 
-freezeBtn.onclick = ()=>{
+let newStatus =
+document.getElementById("modalStatus").innerText==="FROZEN"
+? "ACTIVE"
+: "FROZEN";
 
-    let db = getDB();
+try{
 
-    let user = db.users.find(
-        u=>u.id===selectedUserId
-    );
+const response = await fetch(
 
-    if(user.status==="FROZEN"){
+`https://senkustakes-api.onrender.com/api/admin/users/${selectedUserId}/status`,
 
-        user.status="ACTIVE";
+{
 
-    }
+method:"POST",
 
-    else{
+headers:{
+"Content-Type":"application/json",
+Authorization:`Bearer ${token}`
+},
 
-        user.status="FROZEN";
+body:JSON.stringify({
+status:newStatus
+})
 
-    }
+}
 
-    saveDB(db);
+);
 
-    location.reload();
+const data = await response.json();
+
+showPopup({
+
+type:response.ok?"success":"error",
+
+title:response.ok?"Status Updated":"Error",
+
+message:data.message
+
+});
+
+if(response.ok){
+
+userModal.classList.remove("active");
+
+await loadUsers();
+await loadDashboard();
+}
+
+}
+
+catch(err){
+
+console.log(err);
+
+showPopup({
+
+type:"error",
+
+title:"Server Error",
+
+message:"Unable to update user status."
+
+});
+
+}
 
 };
-
 
 }
 
@@ -488,36 +546,94 @@ freezeBtn.onclick = ()=>{
 
 
 
-
 if(blockBtn){
 
+blockBtn.onclick = async()=>{
 
-blockBtn.onclick = ()=>{
+const currentStatus =
+document.getElementById("modalStatus").innerText;
 
-    let db = getDB();
+const newStatus =
 
-    let user = db.users.find(
-        u=>u.id===selectedUserId
-    );
+currentStatus==="BLOCKED"
 
-    if(user.status==="BLOCKED"){
+?
 
-        user.status="ACTIVE";
+"ACTIVE"
 
-    }
+:
 
-    else{
+"BLOCKED";
 
-        user.status="BLOCKED";
+try{
 
-    }
+const response = await fetch(
 
-    saveDB(db);
+`https://senkustakes-api.onrender.com/api/admin/users/${selectedUserId}/status`,
 
-    location.reload();
+{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json",
+
+Authorization:`Bearer ${token}`
+
+},
+
+body:JSON.stringify({
+
+status:newStatus
+
+})
+
+}
+
+);
+
+const data = await response.json();
+
+showPopup({
+
+type:response.ok?"success":"error",
+
+title:response.ok?"Status Updated":"Failed",
+
+message:data.message
+
+});
+
+if(response.ok){
+
+userModal.classList.remove("active");
+
+await loadUsers();
+
+await loadDashboard();
+
+}
+
+}
+
+catch(err){
+
+console.log(err);
+
+showPopup({
+
+type:"error",
+
+title:"Server Error",
+
+message:"Unable to update status."
+
+});
+
+}
 
 };
-
 
 }
 
@@ -529,47 +645,68 @@ blockBtn.onclick = ()=>{
 
 if(resetPasswordBtn){
 
+resetPasswordBtn.onclick = async()=>{
 
-resetPasswordBtn.onclick=()=>{
+const password = prompt("Enter new password");
 
+if(!password) return;
 
-    let newPass=prompt(
-        "Enter new password"
-    );
+try{
 
+const response = await fetch(
 
-    if(!newPass){
+`https://senkustakes-api.onrender.com/api/admin/users/${selectedUserId}/reset-password`,
 
-        return;
+{
 
-    }
+method:"POST",
 
+headers:{
+"Content-Type":"application/json",
+Authorization:`Bearer ${token}`
+},
 
+body:JSON.stringify({
 
-    let db=refreshDB();
+password
 
+})
 
-    let user=db.users.find(
-        u=>u.id===selectedUserId
-    );
+}
 
+);
 
+const data = await response.json();
 
-    user.password=newPass;
+showPopup({
 
+type:response.ok?"success":"error",
 
-    saveDB(db);
+title:response.ok?"Success":"Failed",
 
+message:data.message
 
+});
 
-    alert(
-    "Password reset successful"
-    );
+}
 
+catch(err){
+
+console.log(err);
+
+showPopup({
+
+type:"error",
+
+title:"Server Error",
+
+message:"Unable to reset password."
+
+});
+
+}
 
 };
-
-
 
 }
 
@@ -610,57 +747,17 @@ userModal.addEventListener(
 ================================*/
 
 
-const addUser=document.querySelector(
-
-".add-user"
-
-);
-
-
+const addUser=document.querySelector(".add-user");
 
 if(addUser){
 
-
-
 addUser.addEventListener("click",()=>{
 
-
-
-    let username=
-
-    prompt(
-
-    "Enter new username"
-
-    );
-
-
-
-
-    if(username){
-
-
-
-        alert(
-
-        username+
-
-        " account created."
-
-        );
-
-
-
-    }
-
-
+window.location.href="admin-users.html";
 
 });
 
-
-
 }
-
 
 
 
@@ -671,156 +768,193 @@ addUser.addEventListener("click",()=>{
         LOAD LIVE DASHBOARD
 ================================*/
 
-const db = getDB();
+async function loadDashboard(){
 
-const totalUsers = db.users.length;
+    try{
 
-const totalAgents = db.agents.length;
+        const response =
+        await fetch(
 
-const totalUserBalance = db.users.reduce(
-    (sum,u)=>sum + (u.balance || 0),
-    0
-);
+            "https://senkustakes-api.onrender.com/api/admin/dashboard",
 
-const totalAgentBalance = db.agents.reduce(
-    (sum,a)=>sum + (a.balance || 0),
-    0
-);
+            {
 
-const totalBalance =
-    totalUserBalance +
-    totalAgentBalance +
-    (db.admin.balance || 0);
+                headers:{
 
-const today = new Date().toLocaleDateString();
+                    Authorization:
+                    `Bearer ${token}`
 
-const depositsToday = db.transactions
-.filter(t=>
+                }
 
-    t.type==="Deposit" &&
+            }
 
-    new Date(t.date).toLocaleDateString()===today
+        );
 
-)
-.reduce((sum,t)=>sum+t.amount,0);
+        const data =
+        await response.json();
 
-const pendingWithdraw = (db.withdrawals || [])
-.filter(w=>w.status==="Pending")
-.reduce((sum,w)=>sum+w.amount,0);
+        
 
-document.getElementById("totalUsers").innerText =
-totalUsers;
+        if(!response.ok){
 
-document.getElementById("totalAgents").innerText =
-totalAgents;
+            alert(data.message);
 
-document.getElementById("totalBalance").innerText =
-formatMoney(totalBalance);
+            return;
 
-const adminBalance =
-document.getElementById("adminBalance");
+        }
 
-if(adminBalance){
+        document.getElementById("totalUsers").innerText =
+        data.totalUsers;
 
-    adminBalance.innerText =
-    formatMoney(db.admin.balance || 0);
+        document.getElementById("totalBalance").innerText =
+        formatMoney(data.totalBalance);
 
-}
+        document.getElementById("todayDeposits").innerText =
+        formatMoney(data.todayDeposits);
 
-const availableBalance =
-document.getElementById("availableBalance");
+        document.getElementById("pendingWithdraw").innerText =
+        formatMoney(data.pendingWithdraw);
 
-if(availableBalance){
+    }
 
-    availableBalance.innerText =
-    formatMoney(db.admin.balance || 0);
+    catch(err){
+
+        console.log(err);
+
+    }
 
 }
 
-document.getElementById("todayDeposits").innerText =
-formatMoney(depositsToday);
-
-document.getElementById("pendingWithdraw").innerText =
-formatMoney(pendingWithdraw);
-
-
+loadDashboard();
 
 /*================================
         LOAD USERS TABLE
 ================================*/
 
 
-const usersTable = document.getElementById(
-    "usersTable"
-);
-
-
-if(usersTable){
-
-
-    usersTable.innerHTML="";
-
-
-    db.users.forEach(user=>{
-
-
-        usersTable.innerHTML += `
-
-
-        <tr>
-
-
-            <td>
-                ${user.username}
-            </td>
+const usersTable =
+document.getElementById("usersTable");
 
 
 
-            <td>
-                ${user.email || "No Email"}
-            </td>
+async function loadUsers(){
+
+
+    if(!usersTable){
+
+        return;
+
+    }
+
+
+    try{
+
+
+        const response =
+        await fetch(
+
+            "https://senkustakes-api.onrender.com/api/admin/users",
+
+            {
+
+                headers:{
+
+                    Authorization:
+                    `Bearer ${token}`
+
+                }
+
+            }
+
+        );
+
+
+        const users =
+await response.json();
+if(!response.ok){
+console.log(users);
+return;
+}
+
+dashboardUsers = users;
 
 
 
-            <td>
-                ${formatMoney(user.balance)}
-            </td>
+        usersTable.innerHTML="";
 
 
 
-            <td>
-
-                <span class="status ${user.status.toLowerCase()}-status">
-    ${user.status}
-</span>
-
-            </td>
+        users.forEach(user=>{
 
 
+            usersTable.innerHTML += `
 
-            <td>
 
-                <button 
-                class="manage-btn"
-                data-id="${user.id}">
+            <tr>
+
+
+                <td>
+                    ${user.username}
+                </td>
+
+
+                <td>
+                    ${user.email || "No Email"}
+                </td>
+
+
+                <td>
+                    ${formatMoney(user.balance)}
+                </td>
+
+
+                <td>
+
+                    <span class="status ${user.status.toLowerCase()}-status">
+
+                    ${user.status}
+
+                    </span>
+
+                </td>
+
+
+                <td>
+
+                    <button
+                    class="manage-btn"
+                    data-id="${user.id}">
 
                     Manage
 
-                </button>
+                    </button>
 
-            </td>
-
-
-        </tr>
+                </td>
 
 
-        `;
+            </tr>
 
 
-    });
+            `;
+
+
+        });
+
+
+
+    }
+
+    catch(err){
+
+        console.log(err);
+
+    }
 
 
 }
+
+
+loadUsers();
 
 
 

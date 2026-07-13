@@ -1,27 +1,18 @@
 /*==================================================
-        SENKU STAKES
-        ADMIN WITHDRAW REQUESTS
+        ADMIN WITHDRAW PAGE
 ==================================================*/
 
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded", async () => {
 
-/*================================
-        ADMIN CHECK
-================================*/
+const token = localStorage.getItem("adminToken")
 
-const admin=getAdmin();
-
-if(!admin || admin.role!=="SUPER_ADMIN"){
+if(!token){
 
     window.location.href="admin-login.html";
 
     return;
 
 }
-
-/*================================
-        ELEMENTS
-================================*/
 
 const requestContainer =
 document.getElementById("withdrawRequests");
@@ -35,44 +26,88 @@ document.getElementById("pendingAmount");
 const searchInput =
 document.getElementById("withdrawSearch");
 
+let withdrawRequests=[];
+
 /*================================
         LOAD REQUESTS
 ================================*/
 
-function loadRequests(){
+async function loadRequests(){
 
-    const db=getDB();
+    try{
 
-    let requests =
-    db.withdrawRequests || [];
+        const response = await fetch(
 
-    const keyword =
-    searchInput.value.toLowerCase();
+            "https://senkustakes-api.onrender.com/api/admin/withdraws",
 
-    requests=requests.filter(request=>
+            {
 
-        request.username
-        .toLowerCase()
-        .includes(keyword)
+                headers:{
 
-    );
+                    Authorization:`Bearer ${token}`
 
-    const pending =
-    requests.filter(
+                }
+
+            }
+
+        );
+
+        const data = await response.json();
+
+        if(!response.ok){
+
+            alert(data.message);
+
+            return;
+
+        }
+
+        withdrawRequests=data;
+
+        renderRequests();
+
+    }
+
+    catch(err){
+
+        console.log(err);
+
+        alert("Unable to connect to server.");
+
+    }
+
+}
+/*================================
+        RENDER REQUESTS
+================================*/
+
+function renderRequests(){
+
+    let keyword = searchInput.value.toLowerCase();
+
+    let requests = withdrawRequests.filter(request=>{
+
+        if(!keyword) return true;
+
+        return (
+            (request.user?.username || "")
+            .toLowerCase()
+            .includes(keyword)
+        );
+
+    });
+
+    const pending = requests.filter(
 
         request=>request.status==="Pending"
 
     );
 
-    pendingCount.innerText =
-    pending.length;
+    pendingCount.innerText = pending.length;
 
-    const total =
-    pending.reduce(
+    const total = pending.reduce(
 
-        (sum,item)=>
-
-        sum+Number(item.amount),
+        (sum,item)=>sum+Number(item.amount),
 
         0
 
@@ -91,17 +126,9 @@ function loadRequests(){
 
             <i class="fa-solid fa-wallet"></i>
 
-            <h2>
+            <h2>No Withdrawal Requests</h2>
 
-                No Withdrawal Requests
-
-            </h2>
-
-            <p>
-
-                Pending withdrawal requests will appear here.
-
-            </p>
+            <p>No withdrawal requests found.</p>
 
         </div>
 
@@ -113,7 +140,7 @@ function loadRequests(){
 
     requests.forEach(request=>{
 
-        requestContainer.innerHTML+=`
+        requestContainer.innerHTML += `
 
         <div class="request-card">
 
@@ -121,7 +148,7 @@ function loadRequests(){
 
                 <h3>
 
-                    ${request.username}
+                    ${request.user?.username || "Unknown User"}
 
                 </h3>
 
@@ -143,25 +170,9 @@ function loadRequests(){
 
                 <p>
 
-                    <strong>Email:</strong>
-
-                    ${request.email || "-"}
-
-                </p>
-
-                <p>
-
-                    <strong>Note:</strong>
-
-                    ${request.note || "-"}
-
-                </p>
-
-                <p>
-
                     <strong>Date:</strong>
 
-                    ${request.createdAt}
+                    ${new Date(request.createdAt).toLocaleString()}
 
                 </p>
 
@@ -171,7 +182,7 @@ function loadRequests(){
 
                 <div class="request-amount">
 
-                    ${formatMoney(request.amount)}
+                    ${formatMoney(Number(request.amount))}
 
                 </div>
 
@@ -183,21 +194,25 @@ function loadRequests(){
 
                 <div class="action-buttons">
 
-                    <button
-                    class="approve-btn"
-                    data-id="${request.id}">
-
+                    ${
+                        request.status==="Pending"
+                        ?
+                        `
+                        <button
+                        class="approve-btn"
+                        data-id="${request.id}">
                         Approve
+                        </button>
 
-                    </button>
-
-                    <button
-                    class="reject-btn"
-                    data-id="${request.id}">
-
+                        <button
+                        class="reject-btn"
+                        data-id="${request.id}">
                         Reject
-
-                    </button>
+                        </button>
+                        `
+                        :
+                        ""
+                    }
 
                 </div>
 
@@ -211,179 +226,150 @@ function loadRequests(){
 
 }
 
-loadRequests();
-
-/*================================
-        SEARCH
-================================*/
-
 searchInput.addEventListener(
 
-"input",
+    "input",
 
-loadRequests
+    renderRequests
 
 );
-
 /*================================
-        APPROVE / REJECT
+        APPROVE / REJECT ACTIONS
 ================================*/
 
-document.addEventListener("click",(e)=>{
+document.addEventListener(
+"click",
+async(e)=>{
 
-/*------------- APPROVE -------------*/
+
+/*=========================
+        APPROVE
+=========================*/
+
 
 if(e.target.classList.contains("approve-btn")){
 
-    const id=e.target.dataset.id;
 
-    const db=getDB();
+    const id =
+    e.target.dataset.id;
 
-    const request=db.withdrawRequests.find(
 
-        r=>r.id===id
+    try{
 
-    );
 
-    if(!request){
+        const response =
+        await fetch(
 
-        return;
+            `https://senkustakes-api.onrender.com/api/admin/withdraws/${id}/approve`,
+
+            {
+
+                method:"POST",
+
+                headers:{
+
+                    Authorization:
+                    `Bearer ${token}`
+
+                }
+
+            }
+
+        );
+
+
+        const data =
+        await response.json();
+
+
+        alert(data.message);
+
+
+        await loadRequests();
+
 
     }
 
-    if(request.status!=="Pending"){
+    catch(err){
 
-        showPopup({
+        console.log(err);
 
-            type:"warning",
-
-            title:"Already Processed",
-
-            message:"This request has already been processed."
-
-        });
-
-        return;
+        alert("Server error.");
 
     }
 
-    const user=db.users.find(
-
-        u=>u.id===request.userId
-
-    );
-
-    if(user){
-
-        user.lockedBalance-=request.amount;
-
-        user.withdrawn+=request.amount;
-    }
-
-    request.status="Approved";
-
-    db.transactions.unshift({
-
-        id:"TXN"+Date.now(),
-
-        userId:request.userId,
-
-        type:"Withdrawal",
-
-        amount:-request.amount,
-
-        status:"Approved",
-
-        date:new Date().toLocaleString()
-
-    });
-
-    saveDB(db);
-
-    showPopup({
-
-        type:"success",
-
-        title:"Withdrawal Approved",
-
-        message:"Ready for payment gateway integration."
-
-    });
-
-    loadRequests();
 
 }
 
-/*------------- REJECT -------------*/
+
+
+/*=========================
+        REJECT
+=========================*/
+
 
 if(e.target.classList.contains("reject-btn")){
 
-    const id=e.target.dataset.id;
 
-    const db=getDB();
+    const id =
+    e.target.dataset.id;
 
-    const request=db.withdrawRequests.find(
 
-        r=>r.id===id
+    try{
 
-    );
 
-    if(!request){
+        const response =
+        await fetch(
 
-        return;
+            `https://senkustakes-api.onrender.com/api/admin/withdraws/${id}/reject`,
 
-    }
+            {
 
-    if(request.status!=="Pending"){
+                method:"POST",
 
-        showPopup({
+                headers:{
 
-            type:"warning",
+                    Authorization:
+                    `Bearer ${token}`
 
-            title:"Already Processed",
+                }
 
-            message:"This request has already been processed."
+            }
 
-        });
+        );
 
-        return;
 
-    }
+        const data =
+        await response.json();
 
-    const user=db.users.find(
 
-        u=>u.id===request.userId
+        alert(data.message);
 
-    );
 
-    if(user){
+        await loadRequests();
 
-        user.balance+=request.amount;
-
-        user.lockedBalance-=request.amount;
 
     }
 
-    request.status="Rejected";
+    catch(err){
 
-    saveDB(db);
+        console.log(err);
 
-    showPopup({
+        alert("Server error.");
 
-        type:"success",
+    }
 
-        title:"Withdrawal Rejected",
-
-        message:"Funds have been returned to the user."
-
-    });
-
-    loadRequests();
 
 }
 
-});
 
+
+});
+/*================================
+        INITIAL LOAD
+================================*/
+
+await loadRequests();
 
 
 });

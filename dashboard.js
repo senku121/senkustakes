@@ -3,51 +3,81 @@
         DASHBOARD JAVASCRIPT
 ==================================================*/
 
+document.addEventListener("DOMContentLoaded", async () => {
 
-document.addEventListener("DOMContentLoaded",()=>{
-if(!checkAccountStatus()){
-
-    window.location.href="login.html";
-
-    return;
-
-}
-
-checkAccountStatus();
-
-setInterval(checkAccountStatus,3000);
-
-/*================================
-        LOAD WALLET DATA
-================================*/
+const token = localStorage.getItem("token");
 
 
-const currentUser = getCurrentUser();
+if (!token) {
 
-if(!currentUser || currentUser.role !== "USER"){
-
-    window.location.href="login.html";
+    window.location.href = "login.html";
 
     return;
 
 }
 
-const db = getDB();
+let userData;
 
-const userData = db.users.find(
-    u => u.id === currentUser.id
-);
 
-if(!userData){
+try {
 
-    window.location.href="login.html";
+
+    const response = await fetch(
+        "https://senkustakes-api.onrender.com/api/wallet",
+        {
+
+            headers: {
+
+                Authorization:`Bearer ${token}`
+
+            }
+
+        }
+    );
+
+
+    if(!response.ok){
+
+
+        localStorage.removeItem("token");
+
+        localStorage.removeItem("currentUser");
+
+
+        window.location.href="login.html";
+
+        return;
+
+
+    }
+
+
+    userData = await response.json();
+
+
+}
+catch(error){
+
+
+    console.log(error);
+
+
+    showPopup({
+
+type:"error",
+
+title:"Connection Error",
+
+message:"Cannot connect to the server."
+
+});
+
 
     return;
 
+
 }
-/*================================
-        LOAD USER PROFILE
-================================*/
+
 
 const welcome=document.getElementById(
 "dashboardWelcome"
@@ -86,7 +116,8 @@ const withdrawnElement = document.getElementById(
 "dashboardWithdrawn"
 );
 
-
+const lockedElement =
+document.getElementById("dashboardLocked");
 
 if(balanceElement){
 
@@ -113,106 +144,105 @@ if(withdrawnElement){
 
 }
 
+if (lockedElement) {
+
+    lockedElement.innerText =
+    formatMoney(userData.lockedBalance || 0);
+
+}
+
 /*================================
         LOAD RECENT TRANSACTIONS
 ================================*/
 
 
-const transactionContainer=document.getElementById(
-"dashboardTransactions"
-);
+const transactionContainer = document.getElementById("dashboardTransactions");
 
+if (transactionContainer) {
 
+    try {
 
-if(transactionContainer){
-
-
-    const transactions = db.transactions.filter(
-    tx => tx.userId === userData.id
-);
-
-
-    if(transactions.length > 0){
-
-
-        transactionContainer.innerHTML="";
-
-
-        transactions.slice(0,5).forEach(tx=>{
-
-
-            let icon="fa-arrow-down";
-            let color="positive";
-            let sign="+";
-
-
-            if(tx.type==="Withdrawal"){
-
-                icon="fa-arrow-up";
-                color="negative";
-                sign="-";
-
+        const response = await fetch(
+            "https://senkustakes-api.onrender.com/api/transactions",
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             }
+        );
 
+        if(!response.ok){
 
+    throw new Error("Unable to load transactions");
 
-            transactionContainer.innerHTML += `
+}
 
+const transactions = await response.json();
+console.log(transactions);
 
-            <div class="transaction-row">
+        if (transactions.length > 0) {
 
+            transactionContainer.innerHTML = "";
 
-                <div class="transaction-info">
+            transactions.slice(0,5).forEach(tx=>{
 
+                let icon = "fa-arrow-down";
+                let color = "positive";
+                let sign = "+";
 
-                    <div class="transaction-icon">
+                if(tx.type === "Withdrawal"){
 
-                        <i class="fa-solid ${icon}"></i>
+                    icon = "fa-arrow-up";
+                    color = "negative";
+                    sign = "-";
+
+                }
+
+                transactionContainer.innerHTML += `
+
+                <div class="transaction-row">
+
+                    <div class="transaction-info">
+
+                        <div class="transaction-icon">
+
+                            <i class="fa-solid ${icon}"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h4>${tx.type}</h4>
+
+                            <p>
+${new Date(tx.createdAt).toLocaleString()}
+<br>
+Status: ${tx.status}
+</p>
+
+                        </div>
 
                     </div>
 
+                    <div class="transaction-amount ${color}">
 
-
-                    <div>
-
-
-                        <h4>
-                        ${tx.type}
-                        </h4>
-
-
-                        <p>
-                        ${tx.date}
-                        </p>
-
+                        ${sign}$${Number(tx.amount).toFixed(2)}
 
                     </div>
 
-
                 </div>
 
+                `;
 
+            });
 
-                <div class="transaction-amount ${color}">
+        }
 
-                    ${sign}$${Math.abs(tx.amount).toFixed(2)}
+    } catch(err){
 
-                </div>
-
-
-            </div>
-
-
-            `;
-
-
-
-        });
-
-
+        console.log(err);
 
     }
-
 
 }
 
@@ -369,11 +399,7 @@ if(addFunds){
 addFunds.addEventListener("click",()=>{
 
 
-    alert(
-
-    "Deposit section coming soon."
-
-    );
+    window.location.href = "deposit.html";
 
 
 });
@@ -390,38 +416,23 @@ addFunds.addEventListener("click",()=>{
 ================================*/
 
 
-const transactions=document.querySelectorAll(
-
-".transaction-row, .empty-transactions"
-
-);
 
 
 
-transactions.forEach(transaction=>{
 
+document.addEventListener("click",(e)=>{
 
-    transaction.addEventListener("click",()=>{
+    const row = e.target.closest(".transaction-row");
 
+    if(!row) return;
 
-        transaction.style.background=
+    row.style.background="rgba(123,44,255,.08)";
 
-        "rgba(123,44,255,.08)";
+    setTimeout(()=>{
 
+        row.style.background="";
 
-
-        setTimeout(()=>{
-
-
-            transaction.style.background="";
-
-
-        },500);
-
-
-
-    });
-
+    },500);
 
 });
 

@@ -1,92 +1,25 @@
 /*==================================================
         SENKU STAKES
-        WITHDRAW JAVASCRIPT
+        WITHDRAW PAGE
 ==================================================*/
 
+document.addEventListener("DOMContentLoaded", async () => {
 
-document.addEventListener("DOMContentLoaded",()=>{
-    if(!checkAccountStatus()){
+const token = localStorage.getItem("token");
 
-    window.location.href="login.html";
+if (!token) {
+
+    window.location.href = "login.html";
 
     return;
 
 }
 
-const userData = getUserData();
+const balanceElement =
+document.getElementById("withdrawBalance");
 
-
-
-const withdrawBalance=document.getElementById(
-"withdrawBalance"
-);
-
-
-
-if(withdrawBalance){
-
-    withdrawBalance.innerText =
-    formatMoney(userData.balance);
-
-}
-
-/*================================
-        LOAD WITHDRAW HISTORY
-================================*/
-
-const history=document.getElementById(
-"withdrawHistory"
-);
-
-if(history){
-
-    const withdrawals=userData.transactions.filter(
-        tx=>tx.type==="Withdrawal"
-    );
-
-    if(withdrawals.length>0){
-
-        history.innerHTML="";
-
-        withdrawals.forEach(tx=>{
-
-            history.innerHTML+=`
-
-            <div class="history-row">
-
-                <div>
-
-                    <i class="fa-solid fa-arrow-up"></i>
-
-                    <div>
-
-                        <h4>Withdrawal</h4>
-
-                        <p>${tx.date}</p>
-
-                    </div>
-
-                </div>
-
-                <strong>
-
-                    -${formatMoney(Math.abs(tx.amount))}
-
-                </strong>
-
-            </div>
-
-            `;
-
-        });
-
-    }
-
-}
-
-/*================================
-        PAYMENT METHOD SWITCH
-================================*/
+const amountInput =
+document.querySelector(".amount-input input");
 
 const methodSelect =
 document.getElementById("withdrawMethod");
@@ -94,10 +27,59 @@ document.getElementById("withdrawMethod");
 const paymentFields =
 document.getElementById("paymentFields");
 
+const historyContainer =
+document.getElementById("withdrawHistory");
+
+const withdrawBtn =
+document.querySelector(".confirm-withdraw");
+
+let currentBalance = 0;
+
+/*================================
+        LOAD WALLET
+================================*/
+
+async function loadWallet(){
+
+    try{
+
+        const response = await fetch(
+
+            "https://senkustakes-api.onrender.com/api/wallet",
+
+            {
+
+                headers:{
+                    Authorization:`Bearer ${token}`
+                }
+
+            }
+
+        );
+
+        const wallet = await response.json();
+
+        currentBalance = Number(wallet.balance);
+
+        balanceElement.innerText =
+        "$" + currentBalance.toFixed(2);
+
+    }
+
+    catch(err){
+
+        console.log(err);
+
+    }
+
+}
+/*================================
+        PAYMENT FIELDS
+================================*/
+
 function updatePaymentFields(){
 
-    const method =
-    methodSelect.value;
+    const method = methodSelect.value;
 
     if(method==="cashapp"){
 
@@ -112,52 +94,6 @@ function updatePaymentFields(){
         id="emailInput"
         type="email"
         placeholder="CashApp Email">
-
-        <input
-        id="noteInput"
-        type="text"
-        placeholder="Optional Note">
-
-        `;
-
-    }
-
-    else if(method==="chime"){
-
-        paymentFields.innerHTML=`
-
-        <input
-        id="accountInput"
-        type="text"
-        placeholder="Chime Username">
-
-        <input
-        id="emailInput"
-        type="text"
-        placeholder="Chime Email / Phone">
-
-        <input
-        id="noteInput"
-        type="text"
-        placeholder="Optional Note">
-
-        `;
-
-    }
-
-    else if(method==="applepay"){
-
-        paymentFields.innerHTML=`
-
-        <input
-        id="accountInput"
-        type="text"
-        placeholder="Apple ID">
-
-        <input
-        id="emailInput"
-        type="email"
-        placeholder="Apple Pay Email">
 
         <input
         id="noteInput"
@@ -186,17 +122,83 @@ function updatePaymentFields(){
 
     }
 
+    else if(method==="chime"){
+
+        paymentFields.innerHTML=`
+
+        <input
+        id="accountInput"
+        type="text"
+        placeholder="Chime Username">
+
+        <input
+        id="emailInput"
+        type="text"
+        placeholder="Phone or Email">
+
+        <input
+        id="noteInput"
+        type="text"
+        placeholder="Optional Note">
+
+        `;
+
+    }
+
+    else if(method==="applepay"){
+
+        paymentFields.innerHTML=`
+
+        <input
+        id="accountInput"
+        type="email"
+        placeholder="Apple ID">
+
+        <input
+        id="noteInput"
+        type="text"
+        placeholder="Optional Note">
+
+        `;
+
+    }
+
+    else if(method==="bank"){
+
+        paymentFields.innerHTML=`
+
+        <input
+        id="accountInput"
+        type="text"
+        placeholder="Bank Account Number">
+
+        <input
+        id="emailInput"
+        type="text"
+        placeholder="Bank Name">
+
+        <input
+        id="noteInput"
+        type="text"
+        placeholder="Account Holder Name">
+
+        `;
+
+    }
+
     else{
 
         paymentFields.innerHTML=`
 
-        <div class="comingSoon">
+        <input
+        id="accountInput"
+        type="text"
+        placeholder="Crypto Wallet Address">
 
-            <i class="fa-solid fa-credit-card"></i><br><br>
-
-            Card Withdrawals are coming soon.
-
-        </div>
+        <input
+        id="noteInput"
+        type="text"
+        placeholder="Network (BTC, ETH, TRC20...)">
 
         `;
 
@@ -213,157 +215,118 @@ updatePaymentFields
 );
 
 updatePaymentFields();
-
-
-
-
-
-
 /*================================
-        CONFIRM WITHDRAW
+        CREATE WITHDRAW
 ================================*/
 
+withdrawBtn.addEventListener("click", async()=>{
 
-const withdrawBtn=document.querySelector(
+    const amount = Number(amountInput.value);
 
-".confirm-withdraw"
+    if(!amount || amount <= 0){
 
-);
+        alert("Enter a valid withdrawal amount.");
 
+        return;
 
+    }
 
-const amountInput=document.querySelector(
+    if(amount > currentBalance){
 
-".amount-input input"
+        alert("Insufficient balance.");
 
-);
+        return;
 
+    }
 
+    const accountInput =
+    document.getElementById("accountInput");
 
+    if(accountInput && accountInput.value.trim()===""){
 
+        alert("Please enter payment details.");
 
+        return;
 
+    }
 
+    withdrawBtn.disabled = true;
 
-if(withdrawBtn){
+    withdrawBtn.innerHTML = `
 
+    <i class="fa-solid fa-spinner fa-spin"></i>
 
-withdrawBtn.addEventListener("click",()=>{
+    Processing...
 
+    `;
 
+    try{
 
-   if(amountInput.value.trim()===""){
+        const response = await fetch(
 
-    alert("Please enter withdrawal amount.");
+            "https://senkustakes-api.onrender.com/api/withdraw/create",
 
-    amountInput.focus();
+            {
 
-    return;
+                method:"POST",
 
-}
+                headers:{
 
-const amount = Number(amountInput.value);
+                    "Content-Type":"application/json",
 
-if(amount < 30){
+                    Authorization:`Bearer ${token}`
 
-    showPopup({
+                },
 
-        type:"error",
+                body:JSON.stringify({
 
-        title:"Minimum Withdrawal",
+                    amount,
 
-        message:"Minimum withdrawal amount is $30."
+                    method:methodSelect.value,
 
-    });
+                    account:accountInput
+                        ? accountInput.value
+                        : ""
 
-    amountInput.focus();
+                })
 
-    return;
+            }
 
-}
+        );
 
-const accountInput =
-document.getElementById("accountInput");
+        const data = await response.json();
 
-if(accountInput && accountInput.value.trim()===""){
+        if(!response.ok){
 
-    alert("Please enter payment details.");
+            alert(data.message);
 
-    accountInput.focus();
+            return;
 
-    return;
+        }
 
-}
+        alert(data.message);
 
-const method =
-methodSelect.value;
+        amountInput.value="";
 
-const account =
-document.getElementById("accountInput")?.value || "";
+        await loadWallet();
 
-const email =
-document.getElementById("emailInput")?.value || "";
+        await loadWithdrawHistory();
 
-const note =
-document.getElementById("noteInput")?.value || "";
+    }
 
-const success = createWithdrawRequest({
+    catch(err){
 
-    amount,
+        console.log(err);
 
-    method,
+        alert("Server connection failed.");
 
-    account,
+    }
 
-    email,
+    finally{
 
-    note
+        withdrawBtn.disabled = false;
 
-});
-
-
-
-if(!success){
-
-    alert(
-        "Insufficient balance or invalid request."
-    );
-
-    return;
-
-}
-
-
-
-withdrawBtn.disabled=true;
-
-
-withdrawBtn.innerHTML=`
-
-<i class="fa-solid fa-spinner fa-spin"></i>
-
-Processing...
-
-`;
-
-
-
-setTimeout(()=>{
-
-
-
-
-
-    if(!success){
-
-
-        alert("Insufficient balance");
-
-
-        withdrawBtn.disabled=false;
-
-
-        withdrawBtn.innerHTML=`
+        withdrawBtn.innerHTML = `
 
         <i class="fa-solid fa-arrow-up"></i>
 
@@ -371,154 +334,119 @@ setTimeout(()=>{
 
         `;
 
+    }
 
-        return;
+});
+/*================================
+        LOAD WITHDRAW HISTORY
+================================*/
 
+async function loadWithdrawHistory(){
+
+    try{
+
+        const response = await fetch(
+
+            "https://senkustakes-api.onrender.com/api/withdraw",
+
+            {
+
+                headers:{
+
+                    Authorization:`Bearer ${token}`
+
+                }
+
+            }
+
+        );
+
+        const withdrawals = await response.json();
+
+        if(!historyContainer){
+
+            return;
+
+        }
+
+        historyContainer.innerHTML="";
+
+        if(withdrawals.length===0){
+
+            historyContainer.innerHTML=`
+
+            <div class="empty-history">
+
+                <i class="fa-solid fa-clock-rotate-left"></i>
+
+                <h3>No Withdrawals Yet</h3>
+
+                <p>Your withdrawal history will appear here.</p>
+
+            </div>
+
+            `;
+
+            return;
+
+        }
+
+        withdrawals.forEach(tx=>{
+
+            historyContainer.innerHTML += `
+
+            <div class="history-row">
+
+                <div>
+
+                    <i class="fa-solid fa-arrow-up"></i>
+
+                    <div>
+
+                        <h4>$${Number(tx.amount).toFixed(2)}</h4>
+
+                        <p>
+
+                            ${tx.method}
+
+                            •
+
+                            ${tx.status}
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <strong>
+
+                    ${new Date(tx.createdAt).toLocaleDateString()}
+
+                </strong>
+
+            </div>
+
+            `;
+
+        });
 
     }
 
+    catch(err){
 
-
-    withdrawBtn.innerHTML=`
-
-    <i class="fa-solid fa-circle-check"></i>
-
-    Withdraw Request Sent
-
-`;
-withdrawBalance.innerText =
-formatMoney(getUserData().balance);
-
-amountInput.value="";
-
-["accountInput","emailInput","noteInput"].forEach(id=>{
-
-    const input=document.getElementById(id);
-
-    if(input) input.value="";
-
-});
-
-
-
-        withdrawBtn.style.background=
-
-        "linear-gradient(135deg,#16a34a,#22c55e)";
-
-
-
-
-
-        setTimeout(()=>{
-
-    alert(
-"Your withdrawal request has been sent to the administrator.\n\nStatus: Pending Approval"
-);
-
-window.location.href="dashboard.html";
-
-},1500);
-
-
-
-
-    },1500);
-
-
-
-});
-
-
-}
-
-
-
-
-
-
-
-
-/*================================
-        INPUT PROTECTION
-================================*/
-
-
-if(amountInput){
-
-
-amountInput.addEventListener("input",()=>{
-
-
-    if(amountInput.value<0){
-
-
-        amountInput.value=0;
-
+        console.log(err);
 
     }
 
-
-});
-
-
 }
 
-
-
-
-
-
-
-
 /*================================
-        PAGE ENTRANCE
+        INITIAL LOAD
 ================================*/
 
+await loadWallet();
 
-const sections=document.querySelectorAll(
-
-".withdraw-form-card,.withdraw-method-card,.account-card,.withdraw-history,.confirm-withdraw"
-
-);
-
-
-
-sections.forEach((section,index)=>{
-
-
-    section.style.opacity="0";
-
-
-    section.style.transform=
-
-    "translateY(25px)";
-
-
-
-    setTimeout(()=>{
-
-
-        section.style.transition=".6s ease";
-
-
-        section.style.opacity="1";
-
-
-        section.style.transform=
-
-        "translateY(0)";
-
-
-
-    },300+(index*150));
-
-
-
-});
-
-
-
-
-
+await loadWithdrawHistory();
 
 });

@@ -693,31 +693,37 @@ body::before{
             TRANSACTION ITEMS
 ==================================================*/
 
-
 .transaction-item{
 
+display:flex;
 
-    height:85px;
+justify-content:space-between;
 
+align-items:center;
 
-    display:flex;
+padding:20px;
 
+margin-top:15px;
 
-    align-items:center;
+background:rgba(255,255,255,.04);
 
+border:1px solid rgba(255,255,255,.08);
 
-    justify-content:space-between;
+border-radius:18px;
 
-
-    border-bottom:
-
-
-    1px solid var(--border);
-
+transition:.3s;
 
 }
 
+.transaction-item:hover{
 
+transform:translateY(-4px);
+
+border-color:rgba(123,44,255,.35);
+
+background:rgba(123,44,255,.06);
+
+}
 
 .transaction-item:last-child{
 
@@ -744,76 +750,53 @@ body::before{
 }
 
 
-
 .transaction-left i{
 
+width:52px;
 
-    width:45px;
+height:52px;
 
+border-radius:16px;
 
-    height:45px;
+display:flex;
 
+align-items:center;
 
-    border-radius:15px;
+justify-content:center;
 
+font-size:18px;
 
-    display:flex;
-
-
-    align-items:center;
-
-
-    justify-content:center;
-
-
-    background:
-
-
-    rgba(123,44,255,.15);
-
-
-    color:#b794ff;
-
+transition:.3s;
 
 }
-
 
 
 .transaction-left h3{
 
+font-size:18px;
 
-    font-size:16px;
+font-weight:700;
 
-
-    margin-bottom:5px;
-
+margin-bottom:6px;
 
 }
-
-
 
 .transaction-left p{
 
+font-size:13px;
 
-    font-size:13px;
-
-
-    color:var(--muted);
-
+color:#8b94a7;
 
 }
-
 
 
 .transaction-item strong{
 
+font-size:22px;
 
-    font-size:17px;
-
+font-weight:800;
 
 }
-
-
 
 
 
@@ -2283,6 +2266,51 @@ width:100%;
 
 }
 
+/*================================
+        TRANSACTION STATUS
+================================*/
+
+.tx-status{
+
+display:inline-flex;
+
+align-items:center;
+
+padding:6px 14px;
+
+margin-top:8px;
+
+border-radius:50px;
+
+font-size:12px;
+
+font-weight:700;
+
+}
+
+.tx-status.completed{
+
+background:rgba(34,197,94,.15);
+
+color:#22c55e;
+
+}
+
+.tx-status.pending{
+
+background:rgba(245,158,11,.15);
+
+color:#f59e0b;
+
+}
+
+.tx-status.failed{
+
+background:rgba(239,68,68,.15);
+
+color:#ef4444;
+
+}
 
 
 /*================================
@@ -2327,5 +2355,40 @@ padding:15px;
 
 }
 
+
+}
+/*================================
+        TRANSACTION ICON COLORS
+================================*/
+
+.transaction-item.deposit i{
+
+background:rgba(34,197,94,.15);
+
+color:#22c55e;
+
+}
+
+.transaction-item.withdrawal i{
+
+background:rgba(239,68,68,.15);
+
+color:#ef4444;
+
+}
+
+.transaction-item.game i{
+
+background:rgba(245,158,11,.15);
+
+color:#f59e0b;
+
+}
+
+.transaction-item.reward i{
+
+background:rgba(59,130,246,.15);
+
+color:#3b82f6;
 
 }

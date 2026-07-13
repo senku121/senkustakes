@@ -197,7 +197,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     =================================*/
 
 
-    form.addEventListener("submit",(e)=>{
+    form.addEventListener("submit", async (e)=>{
 
 
         e.preventDefault();
@@ -236,59 +236,107 @@ document.addEventListener("DOMContentLoaded",()=>{
 
 
 
-        button.disabled=true;
+        button.disabled = true;
 
+button.innerHTML = `
 
+<i class="fa-solid fa-spinner fa-spin"></i>
 
-        button.innerHTML=
+Updating Password...
 
-        `
+`;
 
-        <i class="fa-solid fa-spinner fa-spin"></i>
+try{
 
-        Updating Password...
+const email = localStorage.getItem("resetEmail");
 
-        `;
+const response = await fetch(
 
+"https://senkustakes-api.onrender.com/api/auth/reset-password",
 
+{
 
+method:"POST",
 
-        setTimeout(()=>{
+headers:{
 
+"Content-Type":"application/json"
 
-            button.innerHTML=
+},
 
-            `
+body:JSON.stringify({
 
-            <i class="fa-solid fa-circle-check"></i>
+email,
 
-            Password Updated
+password:password.value
 
-            `;
+})
 
+}
 
+);
 
-            button.style.background=
+const data = await response.json();
 
-            "linear-gradient(135deg,#16a34a,#22c55e)";
+if(!response.ok){
 
+alert(data.message);
 
+button.disabled = false;
 
-            showSuccess();
+button.innerHTML = `
 
+<i class="fa-solid fa-check"></i>
 
+Update Password
 
-            setTimeout(()=>{
+`;
 
+return;
 
-                window.location.href="login.html";
+}
 
+button.innerHTML = `
 
-            },2500);
+<i class="fa-solid fa-circle-check"></i>
 
+Password Updated
 
+`;
 
-        },2000);
+button.style.background =
+
+"linear-gradient(135deg,#16a34a,#22c55e)";
+
+localStorage.removeItem("resetEmail");
+
+showSuccess();
+
+setTimeout(()=>{
+
+window.location.href="login.html";
+
+},2000);
+
+}
+
+catch(err){
+
+console.log(err);
+
+alert("Server connection failed.");
+
+button.disabled = false;
+
+button.innerHTML = `
+
+<i class="fa-solid fa-check"></i>
+
+Update Password
+
+`;
+
+}
 
 
 

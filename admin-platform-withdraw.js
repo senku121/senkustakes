@@ -34,13 +34,12 @@ function safePopup(options){
 ================================*/
 
 
-const admin = getAdmin();
+const token = localStorage.getItem("adminToken")
+
+let platformData = {};
 
 
-if(
-    !admin ||
-    admin.role !== "SUPER_ADMIN"
-){
+if(!token){
 
     window.location.href="admin-login.html";
 
@@ -127,82 +126,62 @@ if(!withdrawBtn){
 ================================*/
 
 
-function loadPlatformData(){
+async function loadPlatformData(){
 
+    try{
 
-    const db = getDB();
+        const response = await fetch(
 
+            "https://senkustakes-api.onrender.com/api/admin/platform-withdraw",
 
-    const withdrawals = 
-    db.platformWithdrawals || [];
+            {
 
+                headers:{
 
+                    Authorization:`Bearer ${token}`
 
-    if(balanceElement){
+                }
 
-        balanceElement.innerText =
-        formatMoney(
-            admin.balance || 0
+            }
+
         );
 
-    }
+        platformData = await response.json();
 
+        if(!response.ok){
 
+            safePopup({
 
-    const totalWithdraw =
-    withdrawals.reduce(
+                type:"error",
 
-        (sum,item)=>
-        sum + Number(item.amount || 0),
+                title:"Error",
 
-        0
+                message:platformData.message
 
-    );
+            });
 
+            return;
 
+        }
 
-    if(totalWithdrawElement){
-
-        totalWithdrawElement.innerText =
-        formatMoney(totalWithdraw);
-
-    }
-
-
-
-    const today =
-    new Date().toLocaleDateString();
-
-
-
-    const todayAmount =
-    withdrawals.filter(item=>{
-
-
-        return new Date(
-            item.createdAt
-        ).toLocaleDateString() === today;
-
-
-    })
-    .reduce(
-
-        (sum,item)=>
-        sum + Number(item.amount || 0),
-
-        0
-
-    );
-
-
-
-    if(todayWithdrawElement){
+        balanceElement.innerText =
+        formatMoney(platformData.balance);
 
         todayWithdrawElement.innerText =
-        formatMoney(todayAmount);
+        formatMoney(platformData.todayWithdraw);
+
+        totalWithdrawElement.innerText =
+        formatMoney(platformData.totalWithdraw);
+
+        loadWithdrawHistory();
 
     }
 
+    catch(err){
+
+        console.log(err);
+
+    }
 
 }
 
@@ -217,10 +196,8 @@ loadWithdrawHistory();
 
 function loadWithdrawHistory(){
 
-    const db = getDB();
-
     const withdrawals =
-    db.platformWithdrawals || [];
+platformData.history || [];
 
     historyTable.innerHTML = "";
 
@@ -524,7 +501,7 @@ function processPlatformWithdraw(){
 
 
 
-    if(amount > Number(admin.balance || 0)){
+    if(amount > Number(platformData.balance || 0)){
 
 
         safePopup({
@@ -644,7 +621,7 @@ function processPlatformWithdraw(){
 ================================*/
 
 
-function createWithdrawal(
+async function createWithdrawal(
     amount,
     method,
     destination,
@@ -652,100 +629,83 @@ function createWithdrawal(
     note
 ){
 
+    try{
 
-    const db = getDB();
+        const response = await fetch(
 
+            "https://senkustakes-api.onrender.com/api/admin/platform-withdraw",
 
+            {
 
-    if(!db.platformWithdrawals){
+                method:"POST",
 
-        db.platformWithdrawals = [];
+                headers:{
+
+                    "Content-Type":"application/json",
+
+                    Authorization:`Bearer ${token}`
+
+                },
+
+                body:JSON.stringify({
+
+                    amount,
+                    method,
+                    destination,
+                    holder,
+                    note
+
+                })
+
+            }
+
+        );
+
+        const data = await response.json();
+
+        safePopup({
+
+            type:response.ok ? "success" : "error",
+
+            title:response.ok
+                ? "Withdrawal Successful"
+                : "Failed",
+
+            message:data.message
+
+        });
+
+        if(response.ok){
+
+            amountInput.value="";
+
+            holderName.value="";
+
+            noteInput.value="";
+
+            updatePaymentFields();
+
+            await loadPlatformData();
+
+        }
 
     }
 
+    catch(err){
 
+        console.log(err);
 
+        safePopup({
 
-    const withdrawal = {
+            type:"error",
 
+            title:"Server Error",
 
-        id:
-        "PW-" +
-        Date.now(),
+            message:"Unable to process withdrawal."
 
+        });
 
-        amount:
-        amount,
-
-
-        method:
-        method,
-
-
-        destination:
-        destination,
-
-
-        holder:
-        holder,
-
-
-        note:
-        note,
-
-
-        status:
-        "completed",
-
-
-        createdAt:
-        new Date().toISOString()
-
-
-    };
-
-
-
-
-
-    db.platformWithdrawals.push(
-        withdrawal
-    );
-
-
-
-
-    admin.balance =
-    Number(admin.balance || 0)
-    -
-    amount;
-
-
-
-    saveDB(db);
-
-
-
-    safePopup({
-
-        type:"success",
-
-        title:"Withdrawal Successful",
-
-        message:
-
-        `
-        ${formatMoney(amount)}
-        withdrawn successfully.
-        `
-
-    });
-
-
-
-    loadPlatformData();
-
-
+    }
 
 }
 
@@ -754,98 +714,6 @@ function createWithdrawal(
         PLATFORM WITHDRAW
 ================================*/
 
-withdrawBtn.addEventListener("click", () => {
 
-    const amount = Number(amountInput.value);
-
-    if (!amount || amount <= 0) {
-
-        safePopup({
-
-            type: "error",
-
-            title: "Invalid Amount",
-
-            message: "Enter a valid withdrawal amount."
-
-        });
-
-        return;
-
-    }
-
-    const db = getDB();
-
-    if (db.admin.balance < amount) {
-
-        safePopup({
-
-            type: "error",
-
-            title: "Insufficient Balance",
-
-            message: "Platform balance is too low."
-
-        });
-
-        return;
-
-    }
-
-    db.admin.balance -= amount;
-
-    if (!db.platformWithdrawals) {
-
-        db.platformWithdrawals = [];
-
-    }
-
-    db.platformWithdrawals.unshift({
-
-        id: "PW" + Date.now(),
-
-        amount: amount,
-
-        method: methodSelect.value,
-
-        destination: document.getElementById("accountInput")
-            ? document.getElementById("accountInput").value
-            : "-",
-
-        holder: holderName.value,
-
-        note: noteInput.value,
-
-        status: "Completed",
-
-        createdAt: new Date().toISOString()
-
-    });
-
-    saveDB(db);
-
-loadPlatformData();
-
-loadWithdrawHistory();
-
-safePopup({
-
-    type:"success",
-
-    title:"Withdrawal Successful",
-
-    message:"Platform withdrawal completed."
-
-});
-
-amountInput.value = "";
-
-holderName.value = "";
-
-noteInput.value = "";
-
-updatePaymentFields();
-
-});
 
 });

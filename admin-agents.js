@@ -4,24 +4,11 @@
 ==================================================*/
 
 
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded", async () => {
 
+const token = localStorage.getItem("adminToken")
 
-
-
-
-/*================================
-        ADMIN SECURITY CHECK
-================================*/
-
-
-const currentUser = getCurrentUser();
-
-
-if(
-    !currentUser ||
-    currentUser.role !== "SUPER_ADMIN"
-){
+if(!token){
 
     window.location.href="admin-login.html";
 
@@ -29,173 +16,142 @@ if(
 
 }
 
+const agentTable =
+document.getElementById("agentTable");
+const totalAgents =
+document.getElementById("totalAgents");
+
+const activeAgents =
+document.getElementById("activeAgents");
+
+const disabledAgents =
+document.getElementById("disabledAgents");
 
 
+let agents = [];
 
+function renderAgents(){
 
-
-
-/*================================
-        LOGOUT
-================================*/
-
-
-const logoutBtn=document.querySelector(
-
-".admin-logout"
-
-);
-
-
-
-if(logoutBtn){
-
-
-
-logoutBtn.addEventListener("click",()=>{
-
-
-
-    if(confirm("Logout from Admin Panel?")){
-
-
-    logout();
-
-
-    window.location.href="admin-login.html";
-
-
-}
-
-
-
-});
-
-
-
-}
-
-
-
-/*================================
-        LOAD REAL AGENTS
-================================*/
-
-
-const agentTable=document.getElementById(
-"agentTable"
-);
-
-
-let agents=getAgents();
-
-
-
-function loadAgents(){
-
-
-    if(!agentTable) return;
-
-
-    agentTable.innerHTML="";
-
-
+    agentTable.innerHTML = "";
 
     if(agents.length===0){
 
-
-        agentTable.innerHTML=`
-
+        agentTable.innerHTML = `
         <tr>
-
-        <td colspan="5" style="text-align:center;padding:30px;">
-
-        No Agents Created
-
-        </td>
-
+            <td colspan="5" style="text-align:center;padding:25px;">
+                No agents found
+            </td>
         </tr>
-
         `;
-
 
         return;
 
     }
 
-
-
-
-    agents.forEach((agent,index)=>{
-
+    agents.forEach(agent=>{
 
         agentTable.innerHTML += `
 
-
         <tr>
 
+            <td>${agent.id}</td>
 
-        <td>
+            <td>${agent.name}</td>
 
-        ${agent.id}
+            <td>${agent.role || "AGENT"}</td>
 
-        </td>
+            <td>
+                <span class="${agent.status==="ACTIVE"?"active-status":"disabled-status"}">
+                    ${agent.status}
+                </span>
+            </td>
 
+            <td>
 
-        <td>
+                <button
+                    class="manage-agent"
+                    data-id="${agent.id}">
+                    Manage
+                </button>
 
-        ${agent.name}
-
-        </td>
-
-
-        <td>
-
-        ${agent.role}
-
-        </td>
-
-
-        <td>
-
-
-        <span class="active-status">
-
-        Active
-
-        </span>
-
-
-        </td>
-
-
-
-        <td>
-
-
-        <button class="manage-agent" data-id="${agent.id}">
-
-        Manage
-
-        </button>
-
-
-        </td>
-
+            </td>
 
         </tr>
 
-
         `;
-
 
     });
 
+}
+
+async function loadAgents(){
+
+    try{
+
+        const response = await fetch(
+
+            "https://senkustakes-api.onrender.com/api/admin/agents",
+
+            {
+
+                headers:{
+
+                    Authorization:`Bearer ${token}`
+
+                }
+
+            }
+
+        );
+
+        agents = await response.json();
+
+updateAgentStats();
+
+renderAgents();
+
+    }
+
+    catch(err){
+
+        console.log(err);
+
+        alert("Unable to load agents.");
+
+    }
+
+}
+
+function updateAgentStats(){
+
+    totalAgents.innerText =
+    agents.length;
+
+
+    const active =
+    agents.filter(
+        agent=>agent.status==="ACTIVE"
+    );
+
+
+    const disabled =
+    agents.filter(
+        agent=>agent.status!=="ACTIVE"
+    );
+
+
+    activeAgents.innerText =
+    active.length;
+
+
+    disabledAgents.innerText =
+    disabled.length;
 
 }
 
 
-loadAgents();
+
+await loadAgents();
 
 
 
@@ -212,11 +168,7 @@ const search=document.querySelector(
 
 
 
-const rows=document.querySelectorAll(
 
-"#agentTable tr"
-
-);
 
 
 
@@ -229,7 +181,7 @@ if(search){
 search.addEventListener("input",()=>{
 
 
-
+const rows=document.querySelectorAll("#agentTable tr");
     let value=
 
     search.value.toLowerCase();
@@ -279,7 +231,31 @@ search.addEventListener("input",()=>{
 
 
 
+const manageModal =
+document.getElementById("manageAgentModal");
 
+const closeManageModal =
+document.getElementById("closeManageModal");
+
+const closeManageButton =
+document.getElementById("closeManageButton");
+
+const manageAgentName =
+document.getElementById("manageAgentName");
+
+const manageAgentUsername =
+document.getElementById("manageAgentUsername");
+
+const manageAgentStatus =
+document.getElementById("manageAgentStatus");
+
+const toggleAgentStatusButton =
+document.getElementById("toggleAgentStatus");
+
+const resetAgentPasswordButton =
+document.getElementById("resetAgentPassword");
+
+let selectedAgent = null;
 
 
 
@@ -287,306 +263,322 @@ search.addEventListener("input",()=>{
         MANAGE AGENT
 ================================*/
 
+document.addEventListener("click",(e)=>{
 
-const manageButtons=document.querySelectorAll(
+if(!e.target.classList.contains("manage-agent")) return;
 
-".manage-agent"
+const id = e.target.dataset.id;
 
-);
+selectedAgent = agents.find(a=>a.id===id);
 
+if(!selectedAgent) return;
 
+manageAgentName.innerText =
+selectedAgent.name;
 
-manageButtons.forEach(button=>{
+manageAgentUsername.innerText =
+selectedAgent.username;
 
+manageAgentStatus.innerText =
+selectedAgent.status;
 
+toggleAgentStatusButton.innerText =
 
-button.addEventListener("click",()=>{
+selectedAgent.status==="ACTIVE"
 
+?
 
+"Disable Agent"
 
-    let action=
+:
 
-prompt(
+"Enable Agent";
 
-`Agent Management
+manageModal.classList.add("active");
 
-1. View Activity
+});
 
-2. Change Role
+closeManageModal.addEventListener("click",()=>{
 
-3. Disable Agent
+manageModal.classList.remove("active");
 
-4. Reset Password
+});
 
+closeManageButton.addEventListener("click",()=>{
 
-Enter option:`
+manageModal.classList.remove("active");
 
-);
+});
 
+toggleAgentStatusButton.addEventListener(
 
+"click",
 
-
-
-
-switch(action){
-
-
-
-case "1":
-
-
-
-alert(
-
-"Showing agent activity logs..."
-
-);
+async()=>{
 
 
-
-break;
-
+if(!selectedAgent) return;
 
 
+try{
 
 
-case "2":
+const response = await fetch(
 
+`https://senkustakes-api.onrender.com/api/admin/agents/${selectedAgent.id}/toggle`,
 
+{
 
-let role=
+method:"POST",
 
-prompt(
+headers:{
 
-"Enter new role:"
+Authorization:`Bearer ${token}`
 
-);
+}
 
-
-
-if(role){
-
-
-alert(
-
-"Agent role changed to "+role
+}
 
 );
+
+
+
+const data = await response.json();
+
+
+
+if(response.ok){
+
+
+showPopup({
+
+type:"success",
+
+title:"Agent Updated",
+
+message:data.message
+
+});
+
+
+manageModal.classList.remove("active");
+
+
+await loadAgents();
+
+
+}
+
+else{
+
+
+showPopup({
+
+type:"error",
+
+title:"Update Failed",
+
+message:data.message
+
+});
 
 
 }
 
 
+}
 
-break;
-
-
-
+catch(err){
 
 
-case "3":
+console.log(err);
 
 
+showPopup({
 
-alert(
+type:"error",
 
-"Agent disabled successfully."
+title:"Server Error",
 
-);
+message:"Unable to update agent status."
 
-
-
-break;
-
-
-
-
-
-case "4":
-
-
-
-alert(
-
-"Password reset request created."
-
-);
-
-
-
-break;
-
-
-
-
-
-default:
-
-
-
-alert(
-
-"Invalid option."
-
-);
-
+});
 
 
 }
 
 
-
 });
 
+manageModal.addEventListener("click",(e)=>{
 
+if(e.target===manageModal){
+
+manageModal.classList.remove("active");
+
+}
 
 });
-
-
-
-
-
 
 
 /*================================
         CREATE REAL AGENT
 ================================*/
 
-const createAgentBtn = document.querySelector(
-".create-agent"
-);
+const createAgentBtn =
+document.querySelector(".create-agent");
+
+const agentModal =
+document.getElementById("createAgentModal");
+
+const closeAgentModal =
+document.getElementById("closeAgentModal");
+
+const cancelAgent =
+document.getElementById("cancelAgent");
+
+const createAgentForm =
+document.getElementById("createAgentForm");
+
 
 
 if(createAgentBtn){
 
-
 createAgentBtn.addEventListener("click",()=>{
 
-
-let name = prompt(
-"Enter agent name:"
-);
-
-
-if(!name) return;
-
-
-
-let username = prompt(
-"Enter agent username:"
-);
-
-
-if(!username) return;
-
-
-
-let email = prompt(
-"Enter agent email:"
-);
-
-
-
-let password = prompt(
-"Create agent password:"
-);
-
-
-
-if(!password){
-
-alert("Password required.");
-
-return;
-
-}
-
-
-
-let roleOption = prompt(
-
-`Select Agent Role:
-
-1. Support Agent
-
-2. Finance Agent
-
-3. Manager Agent`
-
-);
-
-if(!roleOption){
-    return;
-}
-
-let role = "AGENT";
-
-switch(roleOption){
-
-    case "1":
-        role = "SUPPORT_AGENT";
-        break;
-
-    case "2":
-        role = "FINANCE_AGENT";
-        break;
-
-    case "3":
-        role = "AGENT";
-        break;
-
-    default:
-        alert("Invalid Role.");
-        return;
-}
-
-
-
-
-let agent=createAgent({
-
-name:name,
-
-username:username,
-
-email:email,
-
-password:password,
-
-role:role
-
-});
-
-
-
-
-
-alert(
-
-`Agent Created Successfully!
-
-
-Name:
-${agent.name}
-
-
-Username:
-${agent.username}
-
-
-Agent ID:
-${agent.id}`
-
-);
-
-
+    agentModal.classList.add("active");
 
 });
 
 }
 
+closeAgentModal.addEventListener("click",()=>{
 
+    agentModal.classList.remove("active");
 
+});
+
+cancelAgent.addEventListener("click",()=>{
+
+    agentModal.classList.remove("active");
+
+});
+
+agentModal.addEventListener("click",(e)=>{
+
+    if(e.target===agentModal){
+
+        agentModal.classList.remove("active");
+
+    }
+
+});
+
+createAgentForm.addEventListener(
+
+"submit",
+
+async(e)=>{
+
+e.preventDefault();
+
+const name =
+document.getElementById("agentName").value.trim();
+
+const username =
+document.getElementById("agentUsername").value.trim();
+
+const password =
+document.getElementById("agentPassword").value;
+
+const role =
+document.getElementById("agentRole").value;
+
+try{
+
+const response = await fetch(
+
+"https://senkustakes-api.onrender.com/api/admin/agents/create",
+
+{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json",
+
+Authorization:`Bearer ${token}`
+
+},
+
+body:JSON.stringify({
+
+name,
+username,
+password,
+role
+
+})
+
+}
+
+);
+
+const data = await response.json();
+
+if(response.ok){
+
+showPopup({
+
+type:"success",
+
+title:"Agent Created",
+
+message:"The new agent account has been created successfully."
+
+});
+
+createAgentForm.reset();
+
+agentModal.classList.remove("active");
+
+await loadAgents();
+
+}
+else{
+
+showPopup({
+
+type:"error",
+
+title:"Creation Failed",
+
+message:data.message
+
+});
+
+}
+
+}
+
+catch(err){
+
+console.log(err);
+
+showPopup({
+
+type:"error",
+
+title:"Creation Failed",
+
+message:"Unable to create the agent. Please try again."
+
+});
+
+}
+
+});
 
 
 

@@ -1,330 +1,261 @@
-/*==================================================
-        SENKU STAKES
-        DEPOSIT JAVASCRIPT
-==================================================*/
+document.addEventListener("DOMContentLoaded", async()=>{
 
 
-document.addEventListener("DOMContentLoaded",()=>{
-if(!checkAccountStatus()){
+const token = localStorage.getItem("token");
+
+
+if(!token){
 
     window.location.href="login.html";
 
     return;
 
 }
-checkAccountStatus();
 
-setInterval(checkAccountStatus,3000);
+
+
+const balanceElement =
+document.getElementById("depositBalance");
+
+
+const amountInput =
+document.getElementById("depositAmount");
+
+
+const confirmBtn =
+document.getElementById("confirmDeposit");
+
+
+const errorBox =
+document.getElementById("depositError");
+
+
+
+let selectedMethod="card";
+
+
+
+/* LOAD WALLET BALANCE */
+
+async function loadBalance(){
+
+
+try{
+
+
+const response = await fetch(
+
+"https://senkustakes-api.onrender.com/api/wallet",
+
+{
+
+headers:{
+
+Authorization:`Bearer ${token}`
+
+}
+
+}
+
+);
+
+
+
+const data = await response.json();
+
+
+
+balanceElement.innerText =
+"$"+Number(data.balance).toFixed(2);
+
+
+
+}
+catch(error){
+
+console.log(error);
+
+}
+
+
+
+}
 
 /*================================
-        PAYMENT METHOD SWITCH
+        LOAD BALANCE
 ================================*/
 
+loadBalance();
 
-const paymentOptions=document.querySelectorAll(
+/* PAYMENT METHOD SELECT */
 
-".payment-option"
 
-);
+document.querySelectorAll(".payment-option")
+.forEach(option=>{
 
 
+option.addEventListener("click",()=>{
 
-paymentOptions.forEach(option=>{
 
+document.querySelectorAll(".payment-option")
+.forEach(o=>o.classList.remove("active"));
 
-    option.addEventListener("click",()=>{
 
 
-        paymentOptions.forEach(item=>{
+option.classList.add("active");
 
 
-            item.classList.remove("active");
 
-
-        });
-
-
-
-        option.classList.add("active");
-
-
-const method=option.dataset.method;
-
-
-const gatewayText=document.querySelector(
-".qr-box p"
-);
-
-
-const gatewayTitle=document.querySelector(
-".qr-box h3"
-);
-
-
-
-if(method==="card"){
-
-
-    gatewayTitle.innerText="Card Payment";
-
-
-    gatewayText.innerText=
-    "Card gateway details will appear here.";
-
-
-}
-
-
-else if(method==="crypto"){
-
-
-    gatewayTitle.innerText="Crypto Payment";
-
-
-    gatewayText.innerText=
-    "Crypto wallet address will appear here.";
-
-
-}
-
-
-else if(method==="bank"){
-
-
-    gatewayTitle.innerText="Bank Transfer";
-
-
-    gatewayText.innerText=
-    "Bank transfer details will appear here.";
-
-
-}
-
-
-
-    });
-
-
-});
-
-
-const loader=document.querySelector(
-".gateway-loader"
-);
-
-
-if(loader){
-
-
-    setTimeout(()=>{
-
-
-        loader.style.display="none";
-
-
-    },2000);
-
-
-}
-
-
-
-
-/*================================
-        CONFIRM DEPOSIT
-================================*/
-
-
-const confirmBtn=document.getElementById(
-"confirmDeposit"
-);
-
-
-const amountInput=document.querySelector(
-".amount-input input"
-);
-
-
-const depositError=document.getElementById(
-"depositError"
-);
-
-
-
-if(confirmBtn){
-
-
-confirmBtn.addEventListener("click",()=>{
-
-
-    let amount=Number(amountInput.value);
-
-
-
-    /* Minimum deposit $1 */
-
-if(isNaN(amount) || amount < 1){
-
-    depositError.style.display="flex";
-
-    depositError.querySelector("span").innerText =
-    "Minimum deposit amount is $1.00";
-
-    amountInput.focus();
-
-    return;
-
-}
-
-
-
-    // ADD MONEY TO STORAGE
-
-    addDeposit(amount);
-
-
-
-    depositError.style.display="none";
-
-
-
-    confirmBtn.disabled=true;
-
-
-
-    confirmBtn.innerHTML=
-
-    `
-
-    <i class="fa-solid fa-spinner fa-spin"></i>
-
-    Processing...
-
-    `;
-
-
-
-    setTimeout(()=>{
-
-
-        confirmBtn.innerHTML=
-
-        `
-
-        <i class="fa-solid fa-circle-check"></i>
-
-        Deposit Successful
-
-        `;
-
-
-
-        confirmBtn.style.background=
-
-        "linear-gradient(135deg,#16a34a,#22c55e)";
-
-
-
-        amountInput.value="";
-
-
-
-        setTimeout(()=>{
-
-
-            window.location.href="dashboard.html";
-
-
-        },1500);
-
-
-
-    },1500);
+selectedMethod =
+option.dataset.method;
 
 
 
 });
 
 
-}
-
-
-
-
-
-
-/*================================
-        INPUT FORMAT
-================================*/
-
-
-if(amountInput){
-
-
-amountInput.addEventListener("input",()=>{
-
-
-    if(amountInput.value<0){
-
-        amountInput.value=0;
-
-    }
-
-
-    
-
-
 });
 
 
+
+
+
+/* CREATE DEPOSIT */
+
+
+confirmBtn.addEventListener("click",async()=>{
+
+
+const amount =
+Number(amountInput.value);
+
+
+
+if(!amount || amount<=0){
+
+
+errorBox.style.display="flex";
+
+
+return;
+
+
 }
 
 
+errorBox.style.display="none";
 
 
 
-
-/*================================
-        PAGE ENTRANCE
-================================*/
+confirmBtn.disabled=true;
 
 
-const sections=document.querySelectorAll(
+confirmBtn.innerHTML=
 
-".form-card,.payment-card,.payment-details,.deposit-history,.confirm-deposit"
+`
+<i class="fa-solid fa-spinner fa-spin"></i>
+Creating Deposit...
+`;
+
+
+
+try{
+
+
+const response = await fetch(
+
+"https://senkustakes-api.onrender.com/api/deposit/create",
+
+{
+
+method:"POST",
+
+headers:{
+
+
+"Content-Type":"application/json",
+
+
+Authorization:
+`Bearer ${token}`
+
+
+},
+
+
+body:JSON.stringify({
+
+amount,
+
+method:selectedMethod
+
+})
+
+
+}
 
 );
 
 
 
-sections.forEach((section,index)=>{
-
-
-    section.style.opacity="0";
-
-
-    section.style.transform=
-
-    "translateY(25px)";
+const data = await response.json();
 
 
 
-    setTimeout(()=>{
+if(!response.ok){
 
 
-        section.style.transition=".6s ease";
+alert(data.message);
 
 
-        section.style.opacity="1";
+return;
 
 
-        section.style.transform=
-
-        "translateY(0)";
+}
 
 
 
-    },300+(index*150));
+alert(
+"Deposit request created successfully"
+);
+
+
+
+loadDeposits();
+
+
+
+amountInput.value="";
+
+
+
+}
+catch(error){
+
+
+console.log(error);
+
+alert(
+"Server connection failed"
+);
+
+
+}
+finally{
+
+
+confirmBtn.disabled=false;
+
+
+confirmBtn.innerHTML=
+
+`
+<i class="fa-solid fa-check"></i>
+Confirm Deposit
+`;
+
+
+}
 
 
 
@@ -334,4 +265,188 @@ sections.forEach((section,index)=>{
 
 
 
+/* LOAD DEPOSIT HISTORY */
+
+
+async function loadDeposits(){
+
+
+const container =
+document.querySelector(".deposit-history");
+
+
+try{
+
+
+const response = await fetch(
+
+"https://senkustakes-api.onrender.com/api/deposit",
+
+{
+
+headers:{
+
+Authorization:
+`Bearer ${token}`
+
+}
+
+}
+
+);
+
+
+
+const deposits =
+await response.json();
+
+
+
+container.innerHTML =
+
+`
+<h2>
+Recent Deposits
+</h2>
+`;
+
+
+
+if(!deposits.length){
+
+
+container.innerHTML +=
+
+`
+
+<div class="empty-deposit">
+
+
+<i class="fa-solid fa-clock-rotate-left"></i>
+
+
+<h3>
+No Deposit History
+</h3>
+
+
+<p>
+Your deposit records will appear here after payment.
+</p>
+
+
+</div>
+
+`;
+
+return;
+
+
+}
+
+
+
+
+deposits
+.slice(0,5)
+.forEach(dep=>{
+
+
+let statusClass="pending";
+
+let statusText="Pending";
+
+
+if(dep.status==="SUCCESS"){
+
+    statusClass="success";
+
+    statusText="Completed";
+
+}
+
+
+if(dep.status==="FAILED"){
+
+    statusClass="failed";
+
+    statusText="Failed";
+
+}
+
+
+
+container.innerHTML +=
+
+
+`
+
+<div class="deposit-item">
+
+
+<div class="deposit-left">
+
+
+<div class="deposit-icon">
+
+<i class="fa-solid fa-wallet"></i>
+
+</div>
+
+
+
+<div>
+
+<h3>
+$${Number(dep.amount).toFixed(2)}
+</h3>
+
+
+<p>
+${dep.method}
+</p>
+
+
+<small>
+${new Date(dep.createdAt).toLocaleString()}
+</small>
+
+
+</div>
+
+
+</div>
+
+
+
+<div class="deposit-status ${statusClass}">
+
+${statusText}
+
+</div>
+
+
+
+</div>
+
+`;
+
+
+
+});
+
+
+
+}
+catch(error){
+
+console.log(error);
+
+}
+
+
+
+}
+
+loadDeposits();
 });

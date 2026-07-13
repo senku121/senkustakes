@@ -6,14 +6,24 @@
 
 document.addEventListener("DOMContentLoaded",()=>{
 
+    const token = localStorage.getItem("token");
+
+if(!token){
+
+    window.location.href="login.html";
+
+    return;
+
+}
+
 
 console.log("Wallet JS loaded");
 
 
-console.log(getUserData());
 
 
-const userData = getUserData();
+
+
 
 
 const walletBalance = document.getElementById(
@@ -32,31 +42,76 @@ const totalWithdrawn = document.getElementById(
 
 
 
-if(walletBalance){
+(async()=>{
 
-    walletBalance.innerText =
-    formatMoney(userData.balance);
+try{
+
+const response = await fetch(
+
+"https://senkustakes-api.onrender.com/api/wallet",
+
+{
+
+headers:{
+
+Authorization:`Bearer ${token}`
 
 }
 
+}
 
+);
+
+if(!response.ok){
+
+window.location.href="login.html";
+
+return;
+
+}
+
+const userData = await response.json();
+
+if(walletBalance){
+
+walletBalance.innerText =
+formatMoney(userData.balance);
+
+}
 
 if(totalDeposited){
 
-    totalDeposited.innerText =
-    formatMoney(userData.deposited);
+totalDeposited.innerText =
+formatMoney(userData.deposited);
 
 }
-
-
 
 if(totalWithdrawn){
 
-    totalWithdrawn.innerText =
-    formatMoney(userData.withdrawn);
+totalWithdrawn.innerText =
+formatMoney(userData.withdrawn);
 
 }
 
+}
+
+catch(err){
+
+console.log(err);
+
+showPopup({
+
+type:"error",
+
+title:"Connection Error",
+
+message:"Unable to load wallet."
+
+});
+
+}
+
+})();
 
 
 /*================================

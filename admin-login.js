@@ -1,175 +1,131 @@
 /*==================================================
-        SENKU STAKES
         ADMIN LOGIN
 ==================================================*/
 
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded", () => {
 
-const form=document.getElementById("adminLoginForm");
+    const form = document.getElementById("adminLoginForm");
 
-const adminUsername=document.getElementById("adminUsername");
+    const username = document.getElementById("adminUsername");
 
-const password=document.getElementById("adminPassword");
+    const password = document.getElementById("adminPassword");
 
-const loginBtn=document.querySelector(".admin-login-btn");
+    const loginBtn = document.querySelector(".admin-login-btn");
 
-const toggle=document.querySelector(".toggle-password");
-/*================================
-        PASSWORD SHOW / HIDE
-================================*/
+    const toggle = document.querySelector(".toggle-password");
 
-if(toggle){
+    if (toggle) {
 
-    toggle.addEventListener("click",()=>{
+        toggle.addEventListener("click", () => {
 
-        if(password.type==="password"){
+            if (password.type === "password") {
 
-            password.type="text";
+                password.type = "text";
 
-            toggle.className=
-            "fa-solid fa-eye-slash toggle-password";
+                toggle.className =
+                    "fa-solid fa-eye-slash toggle-password";
+
+            }
+
+            else {
+
+                password.type = "password";
+
+                toggle.className =
+                    "fa-solid fa-eye toggle-password";
+
+            }
+
+        });
+
+    }
+
+    form.addEventListener("submit", async (e) => {
+
+        e.preventDefault();
+
+        loginBtn.disabled = true;
+
+        loginBtn.innerHTML =
+            '<i class="fa-solid fa-spinner fa-spin"></i> Logging in...';
+
+        try {
+
+            const response = await fetch(
+
+                "https://senkustakes-api.onrender.com/api/admin/auth/login",
+
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type": "application/json"
+
+                    },
+
+                    body: JSON.stringify({
+
+                        username: username.value,
+
+                        password: password.value
+
+                    })
+
+                }
+
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+
+                alert(data.message);
+
+                loginBtn.disabled = false;
+
+                loginBtn.innerHTML =
+                    '<i class="fa-solid fa-right-to-bracket"></i> Login Dashboard';
+
+                return;
+
+            }
+
+            localStorage.setItem(
+
+                "adminToken",
+
+                data.token
+
+            );
+
+            localStorage.setItem(
+
+                "currentUser",
+
+                JSON.stringify(data.admin)
+
+            );
+
+            window.location.href =
+                "admin-dashboard.html";
 
         }
 
-        else{
+        catch (err) {
 
-            password.type="password";
+            console.log(err);
 
-            toggle.className=
-            "fa-solid fa-eye toggle-password";
+            alert("Unable to connect to server.");
+
+            loginBtn.disabled = false;
+
+            loginBtn.innerHTML =
+                '<i class="fa-solid fa-right-to-bracket"></i> Login Dashboard';
 
         }
 
     });
 
-}
-/*================================
-        ADMIN LOGIN
-================================*/
-
-form.addEventListener("submit",(e)=>{
-
-    e.preventDefault();
-
-
-
-    if(adminUsername.value.trim()===""){
-
-        alert("Enter username.");
-
-        adminUsername.focus();
-
-        return;
-
-    }
-
-
-
-    if(password.value.trim()===""){
-
-        alert("Enter password.");
-
-        password.focus();
-
-        return;
-
-    }
-
-
-
-    loginBtn.disabled=true;
-
-    loginBtn.innerHTML=`
-
-        <i class="fa-solid fa-spinner fa-spin"></i>
-
-        Verifying...
-
-    `;
-
-
-
-    setTimeout(()=>{
-
-        const admin=getAdmin();
-
-
-
-        if(
-
-            adminUsername.value.trim()===admin.username &&
-
-            password.value===admin.password
-
-        ){
-
-            loginBtn.innerHTML=`
-
-                <i class="fa-solid fa-circle-check"></i>
-
-                Access Granted
-
-            `;
-
-            loginBtn.style.background=
-
-            "linear-gradient(135deg,#16a34a,#22c55e)";
-
-
-
-            setCurrentUser({
-id:admin.id,
-role:"SUPER_ADMIN",
-username:admin.username
-});
-
-
-
-            setTimeout(()=>{
-
-    console.log("Redirecting...");
-
-    window.location.href="admin-dashboard.html";
-
-},1200);
-
-        }
-
-        else{
-
-            loginBtn.innerHTML=`
-
-                <i class="fa-solid fa-xmark"></i>
-
-                Invalid Username or Password
-
-            `;
-
-            loginBtn.style.background=
-
-            "linear-gradient(135deg,#ef4444,#dc2626)";
-
-
-
-            setTimeout(()=>{
-
-                loginBtn.innerHTML=`
-
-                    <i class="fa-solid fa-right-to-bracket"></i>
-
-                    Login Dashboard
-
-                `;
-
-                loginBtn.style.background="";
-
-                loginBtn.disabled=false;
-
-            },2000);
-
-        }
-
-    },1200);
-
-});
 });

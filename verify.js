@@ -224,7 +224,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     =================================*/
 
 
-    form.addEventListener("submit",(e)=>{
+    form.addEventListener("submit", async (e)=>{
 
 
         e.preventDefault();
@@ -277,38 +277,93 @@ document.addEventListener("DOMContentLoaded",()=>{
 
 
 
-        setTimeout(()=>{
+        try{
 
+const email = localStorage.getItem("resetEmail");
 
-            verifyBtn.innerHTML=
+const response = await fetch(
 
-            `
+"https://senkustakes-api.onrender.com/api/auth/verify-reset-otp",
 
-            <i class="fa-solid fa-circle-check"></i>
+{
 
-            Verified
+method:"POST",
 
-            `;
+headers:{
 
+"Content-Type":"application/json"
 
+},
 
-            verifyBtn.style.background=
+body:JSON.stringify({
 
-            "linear-gradient(135deg,#16a34a,#22c55e)";
+email,
 
+otp
 
+})
 
-            setTimeout(()=>{
+}
 
+);
 
-                window.location.href="reset-password.html";
+const data = await response.json();
 
+if(!response.ok){
 
-            },1200);
+alert(data.message);
 
+verifyBtn.disabled=false;
 
+verifyBtn.innerHTML=`
 
-        },2000);
+<i class="fa-solid fa-check"></i>
+
+Verify Code
+
+`;
+
+return;
+
+}
+
+verifyBtn.innerHTML=`
+
+<i class="fa-solid fa-circle-check"></i>
+
+Verified
+
+`;
+
+verifyBtn.style.background=
+
+"linear-gradient(135deg,#16a34a,#22c55e)";
+
+setTimeout(()=>{
+
+window.location.href="reset-password.html";
+
+},1500);
+
+}
+
+catch(err){
+
+console.log(err);
+
+alert("Server connection failed.");
+
+verifyBtn.disabled=false;
+
+verifyBtn.innerHTML=`
+
+<i class="fa-solid fa-check"></i>
+
+Verify Code
+
+`;
+
+}
 
 
 

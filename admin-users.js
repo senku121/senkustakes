@@ -4,28 +4,29 @@
 ==================================================*/
 
 
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded", async()=>{
 
 
-/*================================
-        ADMIN SECURITY CHECK
-================================*/
+const token = localStorage.getItem("adminToken")
 
 
-const currentUser = getCurrentUser();
+if(!token){
 
+window.location.href="admin-login.html";
 
-if(
-    !currentUser ||
-    currentUser.role !== "SUPER_ADMIN"
-){
-
-    window.location.href="admin-login.html";
-
-    return;
+return;
 
 }
 
+
+
+const userTable =
+document.getElementById("userTable");
+
+
+let users=[];
+
+let selectedUser=null;
 
 
 
@@ -34,143 +35,162 @@ if(
 ================================*/
 
 
-const userTable = document.getElementById(
-"userTable"
+async function loadUsers(){
+
+
+try{
+
+
+const response = await fetch(
+
+"https://senkustakes-api.onrender.com/api/admin/users",
+
+{
+
+headers:{
+
+Authorization:`Bearer ${token}`
+
+}
+
+}
+
 );
 
 
-let users = getUsers();
 
+users = await response.json();
 
 
-function loadUsers(){
-
-
-    userTable.innerHTML="";
-
-
-    if(users.length===0){
-
-
-        userTable.innerHTML=`
-
-        <tr>
-
-        <td colspan="6">
-
-        No users found
-
-        </td>
-
-        </tr>
-
-        `;
-
-
-        return;
-
-    }
-
-
-
-
-
-    users.forEach((user,index)=>{
-
-
-
-        userTable.innerHTML += `
-
-
-        <tr>
-
-
-        <td>
-
-        #${index+1001}
-
-        </td>
-
-
-
-        <td>
-
-        ${user.username}
-
-        </td>
-
-
-
-        <td>
-
-        ${user.email || "N/A"}
-
-        </td>
-
-
-
-        <td>
-
-        $${Number(user.balance || 0).toLocaleString()}
-
-        </td>
-
-
-
-        <td>
-
-
-        <span class="${user.status==="Blocked" ? "blocked-status":"active-status"}">
-
-        ${user.status || "Active"}
-
-        </span>
-
-
-        </td>
-
-
-
-        <td>
-
-
-        <button class="manage-btn" data-id="${user.id}">
-
-        Manage
-
-        </button>
-
-
-        </td>
-
-
-        </tr>
-
-
-        `;
-
-
-    });
+renderUsers();
 
 
 }
 
 
-loadUsers();
+catch(err){
 
+console.log(err);
+
+showPopup({
+
+type:"error",
+
+title:"Error",
+
+message:"Unable to load users"
+
+});
+
+}
+
+
+}
+
+
+
+
+
+function renderUsers(){
+
+
+userTable.innerHTML="";
+
+
+
+users.forEach(user=>{
+
+
+userTable.innerHTML += `
+
+
+<tr>
+
+
+<td>
+${user.id}
+</td>
+
+
+<td>
+${user.username}
+</td>
+
+
+<td>
+${user.email || "N/A"}
+</td>
+
+
+<td>
+$${Number(user.balance).toLocaleString()}
+</td>
+
+
+<td>
+
+<span class="${
+user.status==="BLOCKED"
+?
+"blocked-status"
+:
+"active-status"
+}">
+
+${user.status}
+
+</span>
+
+</td>
+
+
+<td>
+
+
+<button
+
+class="manage-btn"
+
+data-id="${user.id}"
+
+>
+
+Manage
+
+</button>
+
+
+</td>
+
+
+
+</tr>
+
+
+`;
+
+
+});
+
+
+}
+
+
+
+
+await loadUsers();
 
 
 
 
 
 /*================================
-        SEARCH USERS
+        SEARCH
 ================================*/
 
 
-const search=document.getElementById(
-"userSearch"
-);
+const search =
+document.getElementById("userSearch");
 
 
 
@@ -180,7 +200,8 @@ if(search){
 search.addEventListener("input",()=>{
 
 
-let value=search.value.toLowerCase();
+const value =
+search.value.toLowerCase();
 
 
 
@@ -188,20 +209,20 @@ document.querySelectorAll("#userTable tr")
 .forEach(row=>{
 
 
-    if(
-        row.innerText.toLowerCase()
-        .includes(value)
-    ){
+row.style.display =
 
-        row.style.display="";
+row.innerText
+.toLowerCase()
+.includes(value)
 
-    }
+?
 
-    else{
+""
 
-        row.style.display="none";
+:
 
-    }
+"none";
+
 
 
 });
@@ -219,120 +240,126 @@ document.querySelectorAll("#userTable tr")
 
 
 /*================================
-        MANAGE USER
+        MODAL ELEMENTS
 ================================*/
+
+
+const modal =
+document.getElementById("userManageModal");
+
+
+const closeModal =
+document.getElementById("closeUserModal");
+
+
+const manageUsername =
+document.getElementById("manageUsername");
+
+
+const manageEmail =
+document.getElementById("manageEmail");
+
+
+const manageBalance =
+document.getElementById("manageBalance");
+
+
+const manageStatus =
+document.getElementById("manageStatus");
+
+
+
 
 
 document.addEventListener("click",(e)=>{
 
 
-if(e.target.classList.contains("manage-btn")){
-
-
-    let id=e.target.dataset.id;
-
-
-
-    let user=users.find(
-        u=>u.id===id
-    );
+if(!e.target.classList.contains("manage-btn"))
+return;
 
 
 
-    if(!user) return;
+const id =
+e.target.dataset.id;
 
 
 
-
-    let action=prompt(
-
-`Manage User
-
-Username:
-${user.username}
-
-1. Add Balance
-2. Remove Balance
-3. Block User
-4. Unblock User
-
-Enter option:`
-
-    );
+selectedUser =
+users.find(
+u=>u.id===id
+);
 
 
 
+if(!selectedUser){
 
-    if(action==="1"){
+showPopup({
 
+type:"error",
 
-        let amount=Number(
-            prompt("Amount to add:")
-        );
+title:"Error",
 
+message:"User not found"
 
-        user.balance += amount;
+});
 
-
-    }
-
-
-
-    if(action==="2"){
-
-
-        let amount=Number(
-            prompt("Amount to remove:")
-        );
-
-
-        user.balance -= amount;
-
-
-        if(user.balance<0)
-            user.balance=0;
-
-
-    }
-
-
-
-
-    if(action==="3"){
-
-
-        user.status="Blocked";
-
-
-    }
-
-
-
-    if(action==="4"){
-
-
-        user.status="Active";
-
-
-    }
-
-
-
-    let db = getDB();
-
-db.users = users;
-
-saveDB(db);
-
-
-    loadUsers();
-
+return;
 
 }
 
 
 
+manageUsername.innerText =
+selectedUser.username;
+
+
+manageEmail.innerText =
+selectedUser.email;
+
+
+manageBalance.innerText =
+"$"+selectedUser.balance;
+
+
+manageStatus.innerText =
+selectedUser.status;
+
+
+
+modal.classList.add("active");
+
+
+
 });
+
+
+
+
+
+
+
+closeModal.onclick=()=>{
+
+modal.classList.remove("active");
+
+};
+
+
+
+
+modal.onclick=(e)=>{
+
+
+if(e.target===modal){
+
+modal.classList.remove("active");
+
+}
+
+
+};
+
+
 
 
 
@@ -341,101 +368,349 @@ saveDB(db);
 
 
 /*================================
-        CREATE REAL USER
+        ADD BALANCE
 ================================*/
 
 
-const createUserBtn = document.querySelector(
-"#createUserBtn"
+document.getElementById(
+"addBalanceBtn"
+)
+.onclick=async()=>{
+
+
+const amount =
+prompt("Enter amount");
+
+
+
+if(!amount)return;
+
+
+
+await userAction(
+
+`/${selectedUser.id}/add-balance`,
+
+{amount}
+
 );
 
 
 
-if(createUserBtn){
+};
 
 
-createUserBtn.addEventListener("click",()=>{
 
 
-let username = prompt(
-"Enter username:"
+
+
+
+/*================================
+        DEDUCT BALANCE
+================================*/
+
+
+document.getElementById(
+"deductBalanceBtn"
+)
+.onclick=async()=>{
+
+
+const amount =
+prompt("Enter amount");
+
+
+
+if(!amount)return;
+
+
+
+await userAction(
+
+`/${selectedUser.id}/deduct-balance`,
+
+{amount}
+
 );
 
 
 
-if(!username){
+};
 
-return;
+
+
+
+
+
+
+/*================================
+        FREEZE
+================================*/
+
+
+document.getElementById(
+"freezeUserBtn"
+)
+.onclick=async()=>{
+
+
+await userStatus(
+"FROZEN"
+);
+
+
+};
+
+
+
+
+
+
+
+/*================================
+        BLOCK
+================================*/
+
+
+document.getElementById(
+"blockUserBtn"
+)
+.onclick=async()=>{
+
+
+await userStatus(
+"BLOCKED"
+);
+
+
+};
+
+
+
+
+
+
+
+async function userStatus(status){
+
+
+
+await userAction(
+
+`/${selectedUser.id}/status`,
+
+{status}
+
+);
+
+
 
 }
 
 
 
-let email = prompt(
-"Enter email:"
+
+
+
+
+
+/*================================
+        RESET PASSWORD
+================================*/
+
+
+document.getElementById(
+"resetPasswordBtn"
+)
+.onclick=async()=>{
+
+
+const password =
+prompt(
+"Enter new password"
 );
 
 
 
-let password = prompt(
-"Enter password:"
+if(!password)return;
+
+
+
+await userAction(
+
+`/${selectedUser.id}/reset-password`,
+
+{
+password
+}
+
 );
 
 
+};
 
-if(!password){
 
-alert("Password required.");
 
-return;
+
+
+
+
+/*================================
+        TRANSACTION HISTORY
+================================*/
+
+
+document.getElementById(
+"transactionHistoryBtn"
+)
+.onclick=async()=>{
+
+
+const response =
+await fetch(
+
+`https://senkustakes-api.onrender.com/api/admin/users/${selectedUser.id}/transactions`,
+
+{
+
+headers:{
+
+Authorization:`Bearer ${token}`
 
 }
 
+}
+
+);
 
 
 
-let user = createUser({
+const data =
+await response.json();
 
-username:username,
-
-email:email,
-
-password:password
-
-});
-
-
-
-
-
-users = getUsers();
-
-loadUsers();
 
 
 alert(
+JSON.stringify(
+data,
+null,
+2
+)
+);
 
-`User Created Successfully!
 
 
-Username:
-${user.username}
+};
 
 
-User ID:
-${user.id}`
+
+
+
+
+
+async function userAction(endpoint,body){
+
+
+try{
+
+
+const response =
+await fetch(
+
+"https://senkustakes-api.onrender.com/api/admin/users"+endpoint,
+
+{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json",
+
+Authorization:`Bearer ${token}`
+
+},
+
+
+body:JSON.stringify(body)
+
+
+}
 
 );
 
 
 
+const data =
+await response.json();
+
+
+
+if(response.ok){
+
+
+showPopup({
+
+type:"success",
+
+title:"Success",
+
+message:data.message
 
 });
 
 
 
+await loadUsers();
+
+
+modal.classList.remove("active");
+
 }
 
+
+else{
+
+
+showPopup({
+
+type:"error",
+
+title:"Failed",
+
+message:data.message
+
+});
+
+
+}
+
+
+}
+
+
+catch(err){
+
+
+console.log(err);
+
+
+showPopup({
+
+type:"error",
+
+title:"Error",
+
+message:"Server error"
+
+});
+
+
+}
+
+
+
+}
 
 
 
@@ -446,19 +721,15 @@ ${user.id}`
 ================================*/
 
 
-const logoutBtn=document.querySelector(
-".admin-logout"
-);
+const logoutBtn =
+document.querySelector(".admin-logout");
 
 
 
 if(logoutBtn){
 
 
-logoutBtn.addEventListener("click",()=>{
-
-
-if(confirm("Logout from Admin Panel?")){
+logoutBtn.onclick=()=>{
 
 
 logout();
@@ -467,14 +738,10 @@ logout();
 window.location.href="admin-login.html";
 
 
-}
-
-
-});
+};
 
 
 }
-
 
 
 
