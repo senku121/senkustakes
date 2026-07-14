@@ -969,5 +969,136 @@ form{
 
 }
 
+/*==================================================
+                MOBILE RESPONSIVE
+==================================================*/
 
+@media (max-width:768px){
+
+    header{
+
+        padding:20px;
+
+    }
+
+    .logo-box{
+
+        width:50px;
+        height:50px;
+        font-size:22px;
+
+    }
+
+    .logo h2{
+
+        font-size:22px;
+
+    }
+
+    main{
+
+        padding:20px;
+
+    }
+
+    .verify-card{
+
+        padding:30px 20px;
+        border-radius:24px;
+
+    }
+
+    .card-top h1{
+
+        font-size:30px;
+
+    }
+
+    .card-top p{
+
+        font-size:14px;
+
+    }
+
+    .verify-icon{
+
+        width:75px;
+        height:75px;
+        font-size:28px;
+
+    }
+
+    .otp-container{
+
+        gap:8px;
+
+    }
+
+    .otp-container input{
+
+        width:48px;
+        height:54px;
+        font-size:22px;
+        border-radius:14px;
+
+    }
+
+    .verify-btn{
+
+        height:56px;
+        font-size:16px;
+
+    }
+
+}
+
+
+@media (max-width:480px){
+
+    .verify-card{
+
+        padding:25px 15px;
+
+    }
+
+    .otp-container{
+
+        gap:6px;
+
+    }
+
+    .otp-container input{
+
+        width:42px;
+        height:50px;
+        font-size:20px;
+
+    }
+
+    .card-top h1{
+
+        font-size:26px;
+
+    }
+
+}
+
+
+@media (max-width:360px){
+
+    .otp-container{
+
+        gap:4px;
+
+    }
+
+    .otp-container input{
+
+        width:38px;
+        height:46px;
+        font-size:18px;
+
+    }
+
+}
 
