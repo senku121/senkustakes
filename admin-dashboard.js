@@ -1,575 +1,1999 @@
 /*==================================================
-        SENKU STAKES
-        ADMIN DASHBOARD JAVASCRIPT
+                SENKU PAY
+              ADMIN DASHBOARD
 ==================================================*/
 
+document.addEventListener("DOMContentLoaded",async()=>{
 
-document.addEventListener("DOMContentLoaded", async ()=>{
+const API_BASE_URL=
+"https://senkustakes-api.onrender.com";
 
-const token = localStorage.getItem("adminToken");
-let dashboardUsers = [];
-let selectedUserId = null;
+const DASHBOARD_ENDPOINT=
+`${API_BASE_URL}/api/admin/dashboard`;
 
-if(!token){
+const USERS_ENDPOINT=
+`${API_BASE_URL}/api/admin/users`;
 
-    window.location.href="admin-login.html";
+/*==================================
+        ADMIN SESSION
+==================================*/
 
-    return;
+function getAdminToken(){
 
-}
-const userModal =
-document.getElementById("userModal");
+return(
 
-const closeUserModal =
-document.getElementById("closeUserModal");
+sessionStorage.getItem("adminToken")||
 
-/*================================
-        ADMIN SESSION CHECK
-================================*/
-
-try{
-
-const response = await fetch(
-
-"https://senkustakes-api.onrender.com/api/admin/dashboard",
-
-{
-
-headers:{
-
-Authorization:`Bearer ${token}`
-
-}
-
-}
+localStorage.getItem("adminToken")
 
 );
 
-if(!response.ok){
+}
 
-window.location.href="admin-login.html";
+function getStoredAdmin(){
 
-return;
+const raw=
+
+sessionStorage.getItem("currentAdmin")||
+
+localStorage.getItem("currentAdmin")||
+
+sessionStorage.getItem("currentUser")||
+
+localStorage.getItem("currentUser");
+
+if(!raw){
+
+return null;
 
 }
+
+try{
+
+return JSON.parse(raw);
 
 }
 
 catch{
 
-window.location.href="admin-login.html";
+return null;
+
+}
+
+}
+
+function clearAdminSession(){
+
+[
+"adminToken",
+"currentAdmin",
+"currentUser",
+"adminRememberDevice"
+
+].forEach(key=>{
+
+sessionStorage.removeItem(key);
+
+localStorage.removeItem(key);
+
+});
+
+}
+
+function redirectToAdminLogin(){
+
+clearAdminSession();
+
+window.location.replace(
+
+"admin-login.html"
+
+);
+
+}
+
+const token=getAdminToken();
+
+if(!token){
+
+redirectToAdminLogin();
 
 return;
 
 }
 
+/*==================================
+        ELEMENTS
+==================================*/
 
+const sidebar=
+document.getElementById("adminSidebar");
 
+const sidebarOverlay=
+document.getElementById("adminSidebarOverlay");
 
+const mobileMenuButton=
+document.getElementById("adminMobileMenuButton");
 
+const logoutButton=
+document.getElementById("adminLogoutButton");
 
-/*================================
-        LOGOUT SYSTEM
-================================*/
+const messageBox=
+document.getElementById("adminDashboardMessage");
 
+const totalUsers=
+document.getElementById("totalUsers");
 
-const logoutBtn=document.querySelector(
+const totalBalance=
+document.getElementById("totalBalance");
 
-".admin-logout"
+const adminBalance=
+document.getElementById("adminBalance");
 
-);
+const todayDeposits=
+document.getElementById("todayDeposits");
 
+const totalAgents=
+document.getElementById("totalAgents");
 
+const pendingWithdraw=
+document.getElementById("pendingWithdraw");
 
-if(logoutBtn){
+const usersTable=
+document.getElementById("usersTable");
 
+const userSearch=
+document.getElementById("dashboardUserSearch");
 
+const refreshButton=
+document.getElementById("refreshDashboardButton");
 
-logoutBtn.addEventListener("click",()=>{
+const addUserButton=
+document.getElementById("addUserButton");
 
+const backendConnectionStatus=
+document.getElementById("backendConnectionStatus");
 
+const adminSessionStatus=
+document.getElementById("adminSessionStatus");
 
-    let confirmLogout=
+const lastDashboardSync=
+document.getElementById("lastDashboardSync");
 
-    showPopup({
+const adminProfileIcon=
+document.getElementById("adminProfileIcon");
 
-type:"warning",
+const adminProfileName=
+document.getElementById("adminProfileName");
 
-title:"Logout",
+const adminProfileRole=
+document.getElementById("adminProfileRole");
 
-message:"Logout from the Admin Panel?",
+/*==================================
+        MODAL ELEMENTS
+==================================*/
 
-confirm:true,
+const userModal=
+document.getElementById("userModal");
 
-onConfirm:()=>{
+const closeUserModal=
+document.getElementById("closeUserModal");
 
-localStorage.removeItem("adminToken");
-localStorage.removeItem("currentUser");
+const modalUsername=
+document.getElementById("modalUsername");
 
-window.location.href="admin-login.html";
+const modalEmail=
+document.getElementById("modalEmail");
+
+const modalBalance=
+document.getElementById("modalBalance");
+
+const modalStatus=
+document.getElementById("modalStatus");
+
+const modalUserId=
+document.getElementById("modalUserId");
+
+const modalJoined=
+document.getElementById("modalJoined");
+
+const modalUserIcon=
+document.getElementById("modalUserIcon");
+
+const modalMessage=
+document.getElementById("modalMessage");
+
+const openAddBalanceForm=
+document.getElementById("openAddBalanceForm");
+
+const openDeductBalanceForm=
+document.getElementById("openDeductBalanceForm");
+
+const freezeUserButton=
+document.getElementById("freezeUserButton");
+
+const blockUserButton=
+document.getElementById("blockUserButton");
+
+const openResetPasswordForm=
+document.getElementById("openResetPasswordForm");
+
+const balanceActionForm=
+document.getElementById("balanceActionForm");
+
+const balanceActionTitle=
+document.getElementById("balanceActionTitle");
+
+const balanceActionAmount=
+document.getElementById("balanceActionAmount");
+
+const closeBalanceActionForm=
+document.getElementById("closeBalanceActionForm");
+
+const cancelBalanceAction=
+document.getElementById("cancelBalanceAction");
+
+const submitBalanceAction=
+document.getElementById("submitBalanceAction");
+
+const passwordResetForm=
+document.getElementById("passwordResetForm");
+
+const newUserPassword=
+document.getElementById("newUserPassword");
+
+const closePasswordResetForm=
+document.getElementById("closePasswordResetForm");
+
+const cancelPasswordReset=
+document.getElementById("cancelPasswordReset");
+
+const submitPasswordReset=
+document.getElementById("submitPasswordReset");
+
+let dashboardUsers=[];
+
+let selectedUser=null;
+
+let balanceActionType="add";
+
+/*==================================
+        MESSAGE
+==================================*/
+
+function showMessage(
+
+text,
+
+type="info"
+
+){
+
+if(!messageBox){
+
+return;
 
 }
 
-});
+messageBox.hidden=false;
 
+messageBox.className=
 
+`admin-dashboard-message show ${type}`;
 
-
-
-    
-
-
-
-});
-
-
+messageBox.textContent=text;
 
 }
 
+function hideMessage(){
 
+if(!messageBox){
 
-
-
-
-
-/*================================
-        USER MANAGEMENT MODAL
-================================*/
-
-
-document.addEventListener(
-"click",
-(e)=>{
-
-
-    const button = e.target.closest(".manage-btn");
-
-
-if(button){
-
-
-        const id =
-button.dataset.id;
-
-
-
-        const user = dashboardUsers.find(
-    u=>u.id===id
-);
-
-
-
-        if(!user){
-
-            alert("User not found");
-
-            return;
-
-        }
-
-
-
-        selectedUserId=user.id;
-
-
-
-        document.getElementById(
-            "modalUsername"
-        ).innerText=user.username;
-
-
-
-        document.getElementById(
-            "modalEmail"
-        ).innerText=user.email;
-
-
-
-        document.getElementById(
-            "modalBalance"
-        ).innerText=
-        formatMoney(user.balance);
-
-
-
-        document.getElementById(
-            "modalStatus"
-        ).innerText=
-        user.status;
-
-const freezeBtn = document.querySelector(".freeze-user");
-const blockBtn = document.querySelector(".block-user");
-
-if(user.status === "ACTIVE"){
-
-    freezeBtn.innerHTML = `
-        <i class="fa-solid fa-snowflake"></i>
-        Freeze User
-    `;
-
-    blockBtn.innerHTML = `
-        <i class="fa-solid fa-ban"></i>
-        Block User
-    `;
+return;
 
 }
 
-else if(user.status === "FROZEN"){
+messageBox.hidden=true;
 
-    freezeBtn.innerHTML = `
-        <i class="fa-solid fa-fire"></i>
-        Unfreeze User
-    `;
+messageBox.className=
 
-    blockBtn.innerHTML = `
-        <i class="fa-solid fa-ban"></i>
-        Block User
-    `;
+"admin-dashboard-message";
+
+messageBox.textContent="";
 
 }
 
-else if(user.status === "BLOCKED"){
+function showModalMessage(
 
-    freezeBtn.innerHTML = `
-        <i class="fa-solid fa-snowflake"></i>
-        Freeze User
-    `;
+text,
 
-    blockBtn.innerHTML = `
-        <i class="fa-solid fa-unlock"></i>
-        Unblock User
-    `;
+type="error"
 
-}
+){
 
-        document.getElementById(
-            "userModal"
-        ).classList.add("active");
+if(!modalMessage){
 
-
-    }
-
-
-});
-
-
-
-
-
-/* CLOSE MODAL */
-
-
-if(closeUserModal){
-
-
-closeUserModal.addEventListener(
-"click",
-()=>{
-
-
-    userModal.classList.remove(
-        "active"
-    );
-
-
-});
-
+return;
 
 }
 
+modalMessage.hidden=false;
 
-/*================================
-        USER ACTIONS
-================================*/
+modalMessage.className=
 
+`modal-message show ${type}`;
 
-const addBalanceBtn=document.querySelector(
-".add-balance"
-);
+modalMessage.textContent=text;
 
+}
 
-const deductBalanceBtn=document.querySelector(
-".deduct-balance"
-);
+function hideModalMessage(){
 
+if(!modalMessage){
 
-const freezeBtn=document.querySelector(
-".freeze-user"
-);
+return;
 
+}
 
-const blockBtn=document.querySelector(
-".block-user"
-);
+modalMessage.hidden=true;
 
+modalMessage.className=
 
-const resetPasswordBtn=document.querySelector(
-".reset-password"
-);
+"modal-message";
 
+modalMessage.textContent="";
 
+}
 
+/*==================================
+        FORMATTERS
+==================================*/
 
+function formatMoney(value){
 
+return new Intl.NumberFormat(
 
-
-
-if(addBalanceBtn){
-
-addBalanceBtn.onclick = async()=>{
-
-const amount = Number(prompt("Enter amount"));
-
-if(!amount || amount<=0) return;
-
-try{
-
-const response = await fetch(
-
-`https://senkustakes-api.onrender.com/api/admin/users/${selectedUserId}/add-balance`,
+"en-US",
 
 {
 
-method:"POST",
+style:"currency",
 
-headers:{
-"Content-Type":"application/json",
-Authorization:`Bearer ${token}`
-},
+currency:"USD"
 
-body:JSON.stringify({
-amount
-})
+}
+
+).format(
+
+Number(value||0)
+
+);
+
+}
+
+function formatDate(value){
+
+if(!value){
+
+return "--";
+
+}
+
+const date=new Date(value);
+
+if(
+
+Number.isNaN(
+
+date.getTime()
+
+)
+
+){
+
+return "--";
+
+}
+
+return date.toLocaleDateString(
+
+undefined,
+
+{
+
+year:"numeric",
+
+month:"short",
+
+day:"numeric"
 
 }
 
 );
 
-const data = await response.json();
+}
 
-showPopup({
+function formatRole(value){
 
-type: response.ok ? "success" : "error",
+return String(
 
-title: response.ok ? "Balance Added" : "Failed",
+value||
 
-message: data.message
+"SUPER_ADMIN"
 
-});
+)
 
-userModal.classList.remove("active");
+.replaceAll("_"," ")
 
-await loadUsers();
-await loadDashboard();
+.toLowerCase()
+
+.replace(
+
+/\b\w/g,
+
+letter=>
+
+letter.toUpperCase()
+
+);
 
 }
 
-catch(err){
+/*==================================
+        ESCAPE HTML
+==================================*/
 
-console.log(err);
+function escapeHtml(value){
 
-showPopup({
+return String(value??"")
 
-type:"error",
+.replaceAll("&","&amp;")
 
-title:"Failed",
+.replaceAll("<","&lt;")
 
-message:"Unable to add balance."
+.replaceAll(">","&gt;")
 
-});
+.replaceAll('"',"&quot;")
+
+.replaceAll("'","&#039;");
 
 }
+
+/*==================================
+        API
+==================================*/
+
+async function api(
+
+url,
+
+options={}
+
+){
+
+const response=
+
+await fetch(
+
+url,
+
+{
+
+...options,
+
+headers:{
+
+Accept:"application/json",
+
+Authorization:
+
+`Bearer ${token}`,
+
+...(options.headers||{})
+
+}
+
+}
+
+);
+
+if(
+
+response.status===401||
+
+response.status===403
+
+){
+
+redirectToAdminLogin();
+
+throw new Error(
+
+"Administrator session expired."
+
+);
+
+}
+
+const contentType=
+
+response.headers.get(
+
+"content-type"
+
+)||"";
+
+let data={};
+
+if(
+
+contentType.includes(
+
+"application/json"
+
+)
+
+){
+
+data=await response.json();
+
+}
+
+else{
+
+const text=
+
+await response.text();
+
+data={
+
+message:
+
+text||
+
+"Unexpected server response."
 
 };
 
 }
 
+if(!response.ok){
 
+throw new Error(
 
+data.message||
 
-if(deductBalanceBtn){
+data.error||
 
-deductBalanceBtn.onclick = async ()=>{
-
-const amount = Number(
-prompt("Enter amount to deduct")
-);
-
-if(!amount || amount<=0) return;
-
-try{
-
-const response = await fetch(
-
-`https://senkustakes-api.onrender.com/api/admin/users/${selectedUserId}/deduct-balance`,
-
-{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json",
-Authorization:`Bearer ${token}`
-},
-
-body:JSON.stringify({
-amount
-})
-
-}
+"Admin request failed."
 
 );
 
-const data = await response.json();
+}
 
-showPopup({
+return data;
 
-type:response.ok?"success":"error",
+}
+/*==================================
+        ADMIN PROFILE
+==================================*/
 
-title:response.ok?"Balance Updated":"Error",
+function populateAdminProfile(){
 
-message:data.message
+const admin=
 
-});
+getStoredAdmin()||
 
-if(response.ok){
+{};
 
-userModal.classList.remove("active");
+const name=
 
-await loadUsers();
-await loadDashboard();
+admin.fullName||
+
+admin.name||
+
+admin.username||
+
+"Administrator";
+
+const role=
+
+formatRole(
+
+admin.role||
+
+"SUPER_ADMIN"
+
+);
+
+if(adminProfileName){
+
+adminProfileName.textContent=
+
+name;
+
+}
+
+if(adminProfileRole){
+
+adminProfileRole.textContent=
+
+role;
+
+}
+
+if(adminProfileIcon){
+
+adminProfileIcon.textContent=
+
+String(name)
+
+.trim()
+
+.charAt(0)
+
+.toUpperCase()||
+
+"A";
+
+}
+
+if(adminSessionStatus){
+
+adminSessionStatus.textContent=
+
+`${role} session verified.`;
+
 }
 
 }
 
-catch(err){
+/*==================================
+        NORMALIZE DASHBOARD DATA
+==================================*/
 
-console.log(err);
+function normalizeDashboardData(data){
 
-showPopup({
+const source=
 
-type:"error",
+data.dashboard||
 
-title:"Server Error",
+data.stats||
 
-message:"Unable to deduct balance."
+data.data||
 
-});
+data||
 
-}
+{};
+
+return{
+
+totalUsers:
+
+source.totalUsers??
+
+source.usersCount??
+
+source.userCount??
+
+0,
+
+totalBalance:
+
+source.totalBalance??
+
+source.usersBalance??
+
+source.userBalance??
+
+0,
+
+adminBalance:
+
+source.adminBalance??
+
+source.platformBalance??
+
+source.availableBalance??
+
+0,
+
+todayDeposits:
+
+source.todayDeposits??
+
+source.depositsToday??
+
+source.dailyDeposits??
+
+0,
+
+totalAgents:
+
+source.totalAgents??
+
+source.agentsCount??
+
+source.agentCount??
+
+0,
+
+pendingWithdraw:
+
+source.pendingWithdraw??
+
+source.pendingWithdrawals??
+
+source.pendingWithdrawalAmount??
+
+0
 
 };
 
 }
 
+/*==================================
+        LOAD DASHBOARD
+==================================*/
 
-
-
-
-
-
-if(freezeBtn){
-
-freezeBtn.onclick = async ()=>{
-
-let newStatus =
-document.getElementById("modalStatus").innerText==="FROZEN"
-? "ACTIVE"
-: "FROZEN";
+async function loadDashboard(){
 
 try{
 
-const response = await fetch(
+const response=
 
-`https://senkustakes-api.onrender.com/api/admin/users/${selectedUserId}/status`,
+await api(
 
-{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json",
-Authorization:`Bearer ${token}`
-},
-
-body:JSON.stringify({
-status:newStatus
-})
-
-}
+DASHBOARD_ENDPOINT
 
 );
 
-const data = await response.json();
+const stats=
 
-showPopup({
+normalizeDashboardData(
 
-type:response.ok?"success":"error",
+response
 
-title:response.ok?"Status Updated":"Error",
+);
 
-message:data.message
+if(totalUsers){
 
-});
+totalUsers.textContent=
 
-if(response.ok){
+String(
 
-userModal.classList.remove("active");
+Number(stats.totalUsers||0)
 
-await loadUsers();
-await loadDashboard();
+);
+
+}
+
+if(totalBalance){
+
+totalBalance.textContent=
+
+formatMoney(
+
+stats.totalBalance
+
+);
+
+}
+
+if(adminBalance){
+
+adminBalance.textContent=
+
+formatMoney(
+
+stats.adminBalance
+
+);
+
+}
+
+if(todayDeposits){
+
+todayDeposits.textContent=
+
+formatMoney(
+
+stats.todayDeposits
+
+);
+
+}
+
+if(totalAgents){
+
+totalAgents.textContent=
+
+String(
+
+Number(stats.totalAgents||0)
+
+);
+
+}
+
+if(pendingWithdraw){
+
+pendingWithdraw.textContent=
+
+formatMoney(
+
+stats.pendingWithdraw
+
+);
+
+}
+
+if(backendConnectionStatus){
+
+backendConnectionStatus.textContent=
+
+"Connected to the Senku Pay backend.";
+
+}
+
+if(lastDashboardSync){
+
+lastDashboardSync.textContent=
+
+new Date()
+
+.toLocaleString();
+
+}
+
+return response;
+
+}
+
+catch(error){
+
+console.error(
+
+"Dashboard load failed:",
+
+error
+
+);
+
+if(backendConnectionStatus){
+
+backendConnectionStatus.textContent=
+
+"Backend connection failed.";
+
+}
+
+showMessage(
+
+error.message||
+
+"Unable to load dashboard statistics.",
+
+"error"
+
+);
+
+return null;
+
 }
 
 }
 
-catch(err){
+/*==================================
+        NORMALIZE USERS
+==================================*/
 
-console.log(err);
+function normalizeUsersResponse(response){
 
-showPopup({
+const users=
 
-type:"error",
+Array.isArray(response)
 
-title:"Server Error",
+? response
 
-message:"Unable to update user status."
+: response.users||
 
-});
+response.data||
+
+response.results||
+
+[];
+
+return Array.isArray(users)
+
+? users
+
+: [];
 
 }
 
-};
+/*==================================
+        USER STATUS CLASS
+==================================*/
 
-}
+function getStatusClass(status){
 
+const normalized=
 
+String(
 
-
-
-if(blockBtn){
-
-blockBtn.onclick = async()=>{
-
-const currentStatus =
-document.getElementById("modalStatus").innerText;
-
-const newStatus =
-
-currentStatus==="BLOCKED"
-
-?
+status||
 
 "ACTIVE"
 
-:
+).toLowerCase();
 
-"BLOCKED";
+if(
+
+normalized==="active"||
+
+normalized==="verified"
+
+){
+
+return "active-status";
+
+}
+
+if(
+
+normalized==="frozen"
+
+){
+
+return "frozen-status";
+
+}
+
+if(
+
+normalized==="blocked"
+
+){
+
+return "blocked-status";
+
+}
+
+if(
+
+normalized==="disabled"
+
+){
+
+return "disabled-status";
+
+}
+
+if(
+
+normalized==="suspended"
+
+){
+
+return "suspended-status";
+
+}
+
+return "pending-status";
+
+}
+
+/*==================================
+        RENDER USERS
+==================================*/
+
+function renderUsers(users){
+
+if(!usersTable){
+
+return;
+
+}
+
+if(users.length===0){
+
+usersTable.innerHTML=`
+
+<tr class="loading-row">
+
+<td colspan="6">
+
+<i class="fa-solid fa-users-slash"></i>
+
+No users found.
+
+</td>
+
+</tr>
+
+`;
+
+return;
+
+}
+
+usersTable.innerHTML="";
+
+users
+
+.slice(0,10)
+
+.forEach(user=>{
+
+const id=
+
+user.id||
+
+user.userId||
+
+"";
+
+const usernameValue=
+
+user.username||
+
+user.fullName||
+
+user.name||
+
+"User";
+
+const emailValue=
+
+user.email||
+
+"No email";
+
+const statusValue=
+
+String(
+
+user.status||
+
+"ACTIVE"
+
+);
+
+usersTable.insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<tr>
+
+<td>
+
+${escapeHtml(usernameValue)}
+
+</td>
+
+<td>
+
+${escapeHtml(emailValue)}
+
+</td>
+
+<td>
+
+${formatMoney(user.balance)}
+
+</td>
+
+<td>
+
+<span class="status ${getStatusClass(statusValue)}">
+
+${escapeHtml(statusValue)}
+
+</span>
+
+</td>
+
+<td>
+
+${formatDate(
+
+user.createdAt||
+
+user.registeredAt
+
+)}
+
+</td>
+
+<td>
+
+<button
+type="button"
+class="manage-btn"
+data-id="${escapeHtml(id)}">
+
+Manage
+
+</button>
+
+</td>
+
+</tr>
+
+`
+
+);
+
+});
+
+}
+
+/*==================================
+        LOAD USERS
+==================================*/
+
+async function loadUsers(){
+
+if(!usersTable){
+
+return [];
+
+}
 
 try{
 
-const response = await fetch(
+const response=
 
-`https://senkustakes-api.onrender.com/api/admin/users/${selectedUserId}/status`,
+await api(
+
+USERS_ENDPOINT
+
+);
+
+dashboardUsers=
+
+normalizeUsersResponse(
+
+response
+
+);
+
+renderUsers(
+
+dashboardUsers
+
+);
+
+return dashboardUsers;
+
+}
+
+catch(error){
+
+console.error(
+
+"Users load failed:",
+
+error
+
+);
+
+usersTable.innerHTML=`
+
+<tr class="loading-row">
+
+<td colspan="6">
+
+Unable to load users.
+
+</td>
+
+</tr>
+
+`;
+
+showMessage(
+
+error.message||
+
+"Unable to load users.",
+
+"error"
+
+);
+
+return [];
+
+}
+
+}
+/*==================================
+        USER SEARCH
+==================================*/
+
+function applyUserSearch(){
+
+const keyword=
+
+String(
+
+userSearch?.value||
+
+""
+
+)
+
+.trim()
+
+.toLowerCase();
+
+if(!keyword){
+
+renderUsers(
+
+dashboardUsers
+
+);
+
+return;
+
+}
+
+const filtered=
+
+dashboardUsers.filter(user=>{
+
+const searchable=[
+
+user.username,
+
+user.fullName,
+
+user.name,
+
+user.email,
+
+user.status,
+
+user.id,
+
+user.userId
+
+]
+
+.map(value=>
+
+String(value??"")
+
+.toLowerCase()
+
+)
+
+.join(" ");
+
+return searchable.includes(
+
+keyword
+
+);
+
+});
+
+renderUsers(
+
+filtered
+
+);
+
+}
+
+userSearch?.addEventListener(
+
+"input",
+
+applyUserSearch
+
+);
+
+/*==================================
+        MODAL HELPERS
+==================================*/
+
+function closeAllModalForms(){
+
+if(balanceActionForm){
+
+balanceActionForm.hidden=true;
+
+}
+
+if(passwordResetForm){
+
+passwordResetForm.hidden=true;
+
+}
+
+if(balanceActionAmount){
+
+balanceActionAmount.value="";
+
+}
+
+if(newUserPassword){
+
+newUserPassword.value="";
+
+}
+
+hideModalMessage();
+
+}
+
+function openUserModal(user){
+
+if(
+
+!userModal||
+
+!user
+
+){
+
+return;
+
+}
+
+selectedUser=user;
+
+const usernameValue=
+
+user.username||
+
+user.fullName||
+
+user.name||
+
+"User";
+
+const statusValue=
+
+String(
+
+user.status||
+
+"ACTIVE"
+
+).toUpperCase();
+
+if(modalUsername){
+
+modalUsername.textContent=
+
+usernameValue;
+
+}
+
+if(modalEmail){
+
+modalEmail.textContent=
+
+user.email||
+
+"No email address";
+
+}
+
+if(modalBalance){
+
+modalBalance.textContent=
+
+formatMoney(
+
+user.balance
+
+);
+
+}
+
+if(modalStatus){
+
+modalStatus.textContent=
+
+statusValue;
+
+}
+
+if(modalUserId){
+
+modalUserId.textContent=
+
+user.id||
+
+user.userId||
+
+"--";
+
+}
+
+if(modalJoined){
+
+modalJoined.textContent=
+
+formatDate(
+
+user.createdAt||
+
+user.registeredAt
+
+);
+
+}
+
+if(modalUserIcon){
+
+modalUserIcon.textContent=
+
+String(usernameValue)
+
+.trim()
+
+.charAt(0)
+
+.toUpperCase()||
+
+"U";
+
+}
+
+/*==================================
+        STATUS BUTTON LABELS
+==================================*/
+
+if(freezeUserButton){
+
+freezeUserButton.innerHTML=
+
+statusValue==="FROZEN"
+
+? `
+
+<i class="fa-solid fa-fire"></i>
+
+<span>Unfreeze User</span>
+
+`
+
+: `
+
+<i class="fa-solid fa-snowflake"></i>
+
+<span>Freeze User</span>
+
+`;
+
+}
+
+if(blockUserButton){
+
+blockUserButton.innerHTML=
+
+statusValue==="BLOCKED"
+
+? `
+
+<i class="fa-solid fa-unlock"></i>
+
+<span>Unblock User</span>
+
+`
+
+: `
+
+<i class="fa-solid fa-ban"></i>
+
+<span>Block User</span>
+
+`;
+
+}
+
+closeAllModalForms();
+
+userModal.classList.add(
+
+"active"
+
+);
+
+userModal.setAttribute(
+
+"aria-hidden",
+
+"false"
+
+);
+
+document.body.style.overflow=
+
+"hidden";
+
+}
+
+function closeUserManagementModal(){
+
+if(!userModal){
+
+return;
+
+}
+
+userModal.classList.remove(
+
+"active"
+
+);
+
+userModal.setAttribute(
+
+"aria-hidden",
+
+"true"
+
+);
+
+document.body.style.overflow="";
+
+selectedUser=null;
+
+closeAllModalForms();
+
+}
+
+/*==================================
+        OPEN USER MODAL
+==================================*/
+
+document.addEventListener(
+
+"click",
+
+event=>{
+
+const button=
+
+event.target.closest(
+
+".manage-btn"
+
+);
+
+if(!button){
+
+return;
+
+}
+
+const id=
+
+button.dataset.id;
+
+const user=
+
+dashboardUsers.find(item=>
+
+String(
+
+item.id||
+
+item.userId||
+
+""
+
+)===String(id)
+
+);
+
+if(!user){
+
+showMessage(
+
+"Selected user could not be found.",
+
+"error"
+
+);
+
+return;
+
+}
+
+openUserModal(
+
+user
+
+);
+
+}
+
+);
+
+closeUserModal?.addEventListener(
+
+"click",
+
+closeUserManagementModal
+
+);
+
+userModal?.addEventListener(
+
+"click",
+
+event=>{
+
+if(
+
+event.target===userModal
+
+){
+
+closeUserManagementModal();
+
+}
+
+}
+
+);
+
+/*==================================
+        BALANCE FORM
+==================================*/
+
+function openBalanceForm(type){
+
+if(!selectedUser){
+
+return;
+
+}
+
+balanceActionType=type;
+
+if(balanceActionTitle){
+
+balanceActionTitle.textContent=
+
+type==="add"
+
+? "Add User Balance"
+
+: "Deduct User Balance";
+
+}
+
+if(submitBalanceAction){
+
+submitBalanceAction.textContent=
+
+type==="add"
+
+? "Add Balance"
+
+: "Deduct Balance";
+
+}
+
+if(balanceActionForm){
+
+balanceActionForm.hidden=false;
+
+}
+
+if(passwordResetForm){
+
+passwordResetForm.hidden=true;
+
+}
+
+hideModalMessage();
+
+setTimeout(()=>{
+
+balanceActionAmount?.focus();
+
+},50);
+
+}
+
+openAddBalanceForm?.addEventListener(
+
+"click",
+
+()=>{
+
+openBalanceForm(
+
+"add"
+
+);
+
+}
+
+);
+
+openDeductBalanceForm?.addEventListener(
+
+"click",
+
+()=>{
+
+openBalanceForm(
+
+"deduct"
+
+);
+
+}
+
+);
+
+function closeBalanceForm(){
+
+if(balanceActionForm){
+
+balanceActionForm.hidden=true;
+
+}
+
+if(balanceActionAmount){
+
+balanceActionAmount.value="";
+
+}
+
+hideModalMessage();
+
+}
+
+closeBalanceActionForm?.addEventListener(
+
+"click",
+
+closeBalanceForm
+
+);
+
+cancelBalanceAction?.addEventListener(
+
+"click",
+
+closeBalanceForm
+
+);
+
+/*==================================
+        PASSWORD FORM
+==================================*/
+
+function openPasswordForm(){
+
+if(!selectedUser){
+
+return;
+
+}
+
+if(passwordResetForm){
+
+passwordResetForm.hidden=false;
+
+}
+
+if(balanceActionForm){
+
+balanceActionForm.hidden=true;
+
+}
+
+hideModalMessage();
+
+setTimeout(()=>{
+
+newUserPassword?.focus();
+
+},50);
+
+}
+
+openResetPasswordForm?.addEventListener(
+
+"click",
+
+openPasswordForm
+
+);
+
+function closePasswordForm(){
+
+if(passwordResetForm){
+
+passwordResetForm.hidden=true;
+
+}
+
+if(newUserPassword){
+
+newUserPassword.value="";
+
+}
+
+hideModalMessage();
+
+}
+
+closePasswordResetForm?.addEventListener(
+
+"click",
+
+closePasswordForm
+
+);
+
+cancelPasswordReset?.addEventListener(
+
+"click",
+
+closePasswordForm
+
+);
+
+/*==================================
+        MODAL BUTTON STATE
+==================================*/
+
+function setModalButtonLoading(
+
+button,
+
+loading,
+
+loadingText="Processing..."
+
+){
+
+if(!button){
+
+return;
+
+}
+
+button.disabled=loading;
+
+if(loading){
+
+button.dataset.originalHtml=
+
+button.innerHTML;
+
+button.innerHTML=`
+
+<i class="fa-solid fa-spinner fa-spin"></i>
+
+<span>${loadingText}</span>
+
+`;
+
+}
+
+else if(
+
+button.dataset.originalHtml
+
+){
+
+button.innerHTML=
+
+button.dataset.originalHtml;
+
+delete button.dataset.originalHtml;
+
+}
+
+}
+/*==================================
+        SUBMIT BALANCE ACTION
+==================================*/
+
+submitBalanceAction?.addEventListener(
+
+"click",
+
+async()=>{
+
+if(!selectedUser){
+
+showModalMessage(
+
+"No user is selected.",
+
+"error"
+
+);
+
+return;
+
+}
+
+const amount=
+
+Number(
+
+balanceActionAmount?.value
+
+);
+
+if(
+
+!Number.isFinite(amount)||
+
+amount<=0
+
+){
+
+showModalMessage(
+
+"Enter a valid balance amount.",
+
+"error"
+
+);
+
+balanceActionAmount?.focus();
+
+return;
+
+}
+
+const userId=
+
+selectedUser.id||
+
+selectedUser.userId;
+
+const endpoint=
+
+balanceActionType==="add"
+
+? `${USERS_ENDPOINT}/${userId}/add-balance`
+
+: `${USERS_ENDPOINT}/${userId}/deduct-balance`;
+
+setModalButtonLoading(
+
+submitBalanceAction,
+
+true,
+
+balanceActionType==="add"
+
+? "Adding..."
+
+: "Deducting..."
+
+);
+
+hideModalMessage();
+
+try{
+
+const response=
+
+await api(
+
+endpoint,
 
 {
 
@@ -577,9 +2001,185 @@ method:"POST",
 
 headers:{
 
-"Content-Type":"application/json",
+"Content-Type":"application/json"
 
-Authorization:`Bearer ${token}`
+},
+
+body:JSON.stringify({
+
+amount
+
+})
+
+}
+
+);
+
+showModalMessage(
+
+response.message||
+
+(
+
+balanceActionType==="add"
+
+? "Balance added successfully."
+
+: "Balance deducted successfully."
+
+),
+
+"success"
+
+);
+
+await Promise.all([
+
+loadUsers(),
+
+loadDashboard()
+
+]);
+
+const updatedUser=
+
+dashboardUsers.find(user=>
+
+String(
+
+user.id||
+
+user.userId
+
+)===String(userId)
+
+);
+
+if(updatedUser){
+
+selectedUser=updatedUser;
+
+if(modalBalance){
+
+modalBalance.textContent=
+
+formatMoney(
+
+updatedUser.balance
+
+);
+
+}
+
+}
+
+balanceActionAmount.value="";
+
+setTimeout(()=>{
+
+closeBalanceForm();
+
+},900);
+
+}
+
+catch(error){
+
+console.error(
+
+"Balance update failed:",
+
+error
+
+);
+
+showModalMessage(
+
+error.message||
+
+"Unable to update the user balance.",
+
+"error"
+
+);
+
+}
+
+finally{
+
+setModalButtonLoading(
+
+submitBalanceAction,
+
+false
+
+);
+
+}
+
+}
+
+);
+
+/*==================================
+        UPDATE USER STATUS
+==================================*/
+
+async function updateUserStatus(
+
+newStatus,
+
+button
+
+){
+
+if(!selectedUser){
+
+showModalMessage(
+
+"No user is selected.",
+
+"error"
+
+);
+
+return;
+
+}
+
+const userId=
+
+selectedUser.id||
+
+selectedUser.userId;
+
+setModalButtonLoading(
+
+button,
+
+true,
+
+"Updating..."
+
+);
+
+hideModalMessage();
+
+try{
+
+const response=
+
+await api(
+
+`${USERS_ENDPOINT}/${userId}/status`,
+
+{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
 
 },
 
@@ -593,77 +2193,268 @@ status:newStatus
 
 );
 
-const data = await response.json();
+showModalMessage(
 
-showPopup({
+response.message||
 
-type:response.ok?"success":"error",
+`User status changed to ${newStatus}.`,
 
-title:response.ok?"Status Updated":"Failed",
+"success"
 
-message:data.message
+);
 
-});
+await Promise.all([
 
-if(response.ok){
+loadUsers(),
 
-userModal.classList.remove("active");
+loadDashboard()
 
-await loadUsers();
+]);
 
-await loadDashboard();
+const updatedUser=
+
+dashboardUsers.find(user=>
+
+String(
+
+user.id||
+
+user.userId
+
+)===String(userId)
+
+);
+
+if(updatedUser){
+
+openUserModal(
+
+updatedUser
+
+);
+
+showModalMessage(
+
+response.message||
+
+"User status updated successfully.",
+
+"success"
+
+);
 
 }
 
 }
 
-catch(err){
+catch(error){
 
-console.log(err);
+console.error(
 
-showPopup({
+"Status update failed:",
 
-type:"error",
+error
 
-title:"Server Error",
+);
 
-message:"Unable to update status."
+showModalMessage(
 
-});
+error.message||
+
+"Unable to update the user status.",
+
+"error"
+
+);
 
 }
 
-};
+finally{
+
+setModalButtonLoading(
+
+button,
+
+false
+
+);
 
 }
 
+}
 
+/*==================================
+        FREEZE USER
+==================================*/
 
+freezeUserButton?.addEventListener(
 
+"click",
 
+async()=>{
 
+if(!selectedUser){
 
-if(resetPasswordBtn){
+return;
 
-resetPasswordBtn.onclick = async()=>{
+}
 
-const password = prompt("Enter new password");
+const currentStatus=
 
-if(!password) return;
+String(
+
+selectedUser.status||
+
+"ACTIVE"
+
+).toUpperCase();
+
+const newStatus=
+
+currentStatus==="FROZEN"
+
+? "ACTIVE"
+
+: "FROZEN";
+
+await updateUserStatus(
+
+newStatus,
+
+freezeUserButton
+
+);
+
+}
+
+);
+
+/*==================================
+        BLOCK USER
+==================================*/
+
+blockUserButton?.addEventListener(
+
+"click",
+
+async()=>{
+
+if(!selectedUser){
+
+return;
+
+}
+
+const currentStatus=
+
+String(
+
+selectedUser.status||
+
+"ACTIVE"
+
+).toUpperCase();
+
+const newStatus=
+
+currentStatus==="BLOCKED"
+
+? "ACTIVE"
+
+: "BLOCKED";
+
+await updateUserStatus(
+
+newStatus,
+
+blockUserButton
+
+);
+
+}
+
+);
+
+/*==================================
+        RESET PASSWORD
+==================================*/
+
+submitPasswordReset?.addEventListener(
+
+"click",
+
+async()=>{
+
+if(!selectedUser){
+
+showModalMessage(
+
+"No user is selected.",
+
+"error"
+
+);
+
+return;
+
+}
+
+const password=
+
+newUserPassword?.value||
+
+"";
+
+if(password.length<6){
+
+showModalMessage(
+
+"New password must contain at least 6 characters.",
+
+"error"
+
+);
+
+newUserPassword?.focus();
+
+return;
+
+}
+
+const userId=
+
+selectedUser.id||
+
+selectedUser.userId;
+
+setModalButtonLoading(
+
+submitPasswordReset,
+
+true,
+
+"Resetting..."
+
+);
+
+hideModalMessage();
 
 try{
 
-const response = await fetch(
+const response=
 
-`https://senkustakes-api.onrender.com/api/admin/users/${selectedUserId}/reset-password`,
+await api(
+
+`${USERS_ENDPOINT}/${userId}/reset-password`,
 
 {
 
 method:"POST",
 
 headers:{
-"Content-Type":"application/json",
-Authorization:`Bearer ${token}`
+
+"Content-Type":"application/json"
+
 },
 
 body:JSON.stringify({
@@ -676,386 +2467,513 @@ password
 
 );
 
-const data = await response.json();
+showModalMessage(
 
-showPopup({
+response.message||
 
-type:response.ok?"success":"error",
+"User password reset successfully.",
 
-title:response.ok?"Success":"Failed",
+"success"
 
-message:data.message
+);
 
-});
+newUserPassword.value="";
 
-}
+setTimeout(()=>{
 
-catch(err){
+closePasswordForm();
 
-console.log(err);
-
-showPopup({
-
-type:"error",
-
-title:"Server Error",
-
-message:"Unable to reset password."
-
-});
+},900);
 
 }
 
-};
+catch(error){
+
+console.error(
+
+"Password reset failed:",
+
+error
+
+);
+
+showModalMessage(
+
+error.message||
+
+"Unable to reset the user password.",
+
+"error"
+
+);
 
 }
 
+finally{
 
-/* CLOSE BY CLICKING OUTSIDE */
+setModalButtonLoading(
 
+submitPasswordReset,
 
-if(userModal){
+false
 
+);
 
-userModal.addEventListener(
+}
+
+}
+
+);
+/*==================================
+        REFRESH DASHBOARD
+==================================*/
+
+async function refreshDashboard(){
+
+if(refreshButton){
+
+refreshButton.disabled=true;
+
+refreshButton.classList.add(
+
+"loading"
+
+);
+
+}
+
+hideMessage();
+
+try{
+
+await Promise.all([
+
+loadDashboard(),
+
+loadUsers()
+
+]);
+
+showMessage(
+
+"Dashboard synchronized successfully.",
+
+"success"
+
+);
+
+setTimeout(()=>{
+
+hideMessage();
+
+},2200);
+
+}
+
+catch(error){
+
+console.error(
+
+"Dashboard refresh failed:",
+
+error
+
+);
+
+showMessage(
+
+error.message||
+
+"Unable to refresh the dashboard.",
+
+"error"
+
+);
+
+}
+
+finally{
+
+if(refreshButton){
+
+refreshButton.disabled=false;
+
+refreshButton.classList.remove(
+
+"loading"
+
+);
+
+}
+
+}
+
+}
+
+refreshButton?.addEventListener(
+
 "click",
-(e)=>{
 
+refreshDashboard
 
-    if(e.target===userModal){
+);
 
+/*==================================
+        MANAGE ALL USERS
+==================================*/
 
-        userModal.classList.remove(
-            "active"
-        );
+addUserButton?.addEventListener(
 
+"click",
 
-    }
+()=>{
 
+window.location.href=
 
-});
-
-
-}
-
-
-
-
-
-/*================================
-        ADD USER BUTTON
-================================*/
-
-
-const addUser=document.querySelector(".add-user");
-
-if(addUser){
-
-addUser.addEventListener("click",()=>{
-
-window.location.href="admin-users.html";
-
-});
+"admin-users.html";
 
 }
 
+);
 
+/*==================================
+        MOBILE SIDEBAR
+==================================*/
 
+function openSidebar(){
 
+if(
 
+!sidebar||
 
-/*================================
-        LOAD LIVE DASHBOARD
-================================*/
+!sidebarOverlay
 
-async function loadDashboard(){
+){
 
-    try{
-
-        const response =
-        await fetch(
-
-            "https://senkustakes-api.onrender.com/api/admin/dashboard",
-
-            {
-
-                headers:{
-
-                    Authorization:
-                    `Bearer ${token}`
-
-                }
-
-            }
-
-        );
-
-        const data =
-        await response.json();
-
-        
-
-        if(!response.ok){
-
-            alert(data.message);
-
-            return;
-
-        }
-
-        document.getElementById("totalUsers").innerText =
-        data.totalUsers;
-
-        document.getElementById("totalBalance").innerText =
-        formatMoney(data.totalBalance);
-
-        document.getElementById("todayDeposits").innerText =
-        formatMoney(data.todayDeposits);
-
-        document.getElementById("pendingWithdraw").innerText =
-        formatMoney(data.pendingWithdraw);
-
-    }
-
-    catch(err){
-
-        console.log(err);
-
-    }
-
-}
-
-loadDashboard();
-
-/*================================
-        LOAD USERS TABLE
-================================*/
-
-
-const usersTable =
-document.getElementById("usersTable");
-
-
-
-async function loadUsers(){
-
-
-    if(!usersTable){
-
-        return;
-
-    }
-
-
-    try{
-
-
-        const response =
-        await fetch(
-
-            "https://senkustakes-api.onrender.com/api/admin/users",
-
-            {
-
-                headers:{
-
-                    Authorization:
-                    `Bearer ${token}`
-
-                }
-
-            }
-
-        );
-
-
-        const users =
-await response.json();
-if(!response.ok){
-console.log(users);
 return;
-}
-
-dashboardUsers = users;
-
-
-
-        usersTable.innerHTML="";
-
-
-
-        users.forEach(user=>{
-
-
-            usersTable.innerHTML += `
-
-
-            <tr>
-
-
-                <td>
-                    ${user.username}
-                </td>
-
-
-                <td>
-                    ${user.email || "No Email"}
-                </td>
-
-
-                <td>
-                    ${formatMoney(user.balance)}
-                </td>
-
-
-                <td>
-
-                    <span class="status ${user.status.toLowerCase()}-status">
-
-                    ${user.status}
-
-                    </span>
-
-                </td>
-
-
-                <td>
-
-                    <button
-                    class="manage-btn"
-                    data-id="${user.id}">
-
-                    Manage
-
-                    </button>
-
-                </td>
-
-
-            </tr>
-
-
-            `;
-
-
-        });
-
-
-
-    }
-
-    catch(err){
-
-        console.log(err);
-
-    }
-
 
 }
 
+sidebar.classList.add(
 
-loadUsers();
+"mobile-open"
 
+);
 
+sidebarOverlay.classList.add(
 
-/*================================
-        SIDEBAR ACTIVE CHANGE
-================================*/
+"show"
 
+);
 
-const links=document.querySelectorAll(
+document.body.classList.add(
+
+"admin-sidebar-open"
+
+);
+
+mobileMenuButton?.setAttribute(
+
+"aria-expanded",
+
+"true"
+
+);
+
+}
+
+function closeSidebar(){
+
+if(
+
+!sidebar||
+
+!sidebarOverlay
+
+){
+
+return;
+
+}
+
+sidebar.classList.remove(
+
+"mobile-open"
+
+);
+
+sidebarOverlay.classList.remove(
+
+"show"
+
+);
+
+document.body.classList.remove(
+
+"admin-sidebar-open"
+
+);
+
+mobileMenuButton?.setAttribute(
+
+"aria-expanded",
+
+"false"
+
+);
+
+}
+
+mobileMenuButton?.addEventListener(
+
+"click",
+
+()=>{
+
+if(
+
+sidebar?.classList.contains(
+
+"mobile-open"
+
+)
+
+){
+
+closeSidebar();
+
+}
+
+else{
+
+openSidebar();
+
+}
+
+}
+
+);
+
+sidebarOverlay?.addEventListener(
+
+"click",
+
+closeSidebar
+
+);
+
+document
+
+.querySelectorAll(
 
 ".admin-sidebar nav a"
 
-);
+)
 
+.forEach(link=>{
 
+link.addEventListener(
 
-links.forEach(link=>{
+"click",
 
+()=>{
 
+if(
 
-link.addEventListener("click",()=>{
+window.innerWidth<=760
 
+){
 
+closeSidebar();
 
-    links.forEach(item=>{
+}
 
-
-        item.classList.remove("active");
-
-
-    });
-
-
-
-    link.classList.add("active");
-
-
-
-});
-
-
-
-});
-
-
-
-
-
-
-
-/*================================
-        DASHBOARD ENTRANCE
-================================*/
-
-
-const items=document.querySelectorAll(
-
-".stat-card,.admin-card"
+}
 
 );
 
+});
 
+/*==================================
+        LOGOUT
+==================================*/
 
-items.forEach((item,index)=>{
+logoutButton?.addEventListener(
 
+"click",
 
+()=>{
 
-    item.style.opacity="0";
+const confirmLogout=()=>{
 
+clearAdminSession();
 
-    item.style.transform=
+window.location.href=
 
-    "translateY(30px)";
+"admin-login.html";
 
+};
 
+if(
 
-    setTimeout(()=>{
+typeof showPopup==="function"
 
+){
 
-        item.style.transition=".6s ease";
+showPopup({
 
+type:"warning",
 
-        item.style.opacity="1";
+title:"Administrator Logout",
 
+message:
 
-        item.style.transform=
+"Are you sure you want to log out of the Senku Pay administration panel?",
 
-        "translateY(0)";
+confirm:true,
 
+onConfirm:
 
-
-    },300+(index*150));
-
-
+confirmLogout
 
 });
 
+return;
 
+}
 
+if(
 
+window.confirm(
 
+"Logout from the administration panel?"
 
+)
+
+){
+
+confirmLogout();
+
+}
+
+}
+
+);
+
+/*==================================
+        KEYBOARD SUPPORT
+==================================*/
+
+document.addEventListener(
+
+"keydown",
+
+event=>{
+
+if(event.key==="Escape"){
+
+if(
+
+userModal?.classList.contains(
+
+"active"
+
+)
+
+){
+
+closeUserManagementModal();
+
+return;
+
+}
+
+if(
+
+sidebar?.classList.contains(
+
+"mobile-open"
+
+)
+
+){
+
+closeSidebar();
+
+}
+
+}
+
+}
+
+);
+
+/*==================================
+        RESIZE HANDLING
+==================================*/
+
+window.addEventListener(
+
+"resize",
+
+()=>{
+
+if(
+
+window.innerWidth>760
+
+){
+
+closeSidebar();
+
+}
+
+}
+
+);
+
+/*==================================
+        AUTO SYNC TIME
+==================================*/
+
+setInterval(()=>{
+
+if(lastDashboardSync){
+
+lastDashboardSync.textContent=
+
+new Date().toLocaleString();
+
+}
+
+},60000);
+
+/*==================================
+        INITIALIZE
+==================================*/
+
+populateAdminProfile();
+
+const [
+
+dashboardResult
+
+]=await Promise.all([
+
+loadDashboard(),
+
+loadUsers()
+
+]);
+
+if(dashboardResult){
+
+hideMessage();
+
+}
+
+/*==================================
+        END
+==================================*/
 
 });

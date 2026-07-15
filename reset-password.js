@@ -1,258 +1,687 @@
 /*==================================================
-        SENKU STAKES
-        RESET PASSWORD JAVASCRIPT
+                SENKU PAY
+            RESET PASSWORD
 ==================================================*/
-
 
 document.addEventListener("DOMContentLoaded",()=>{
 
+const API_BASE="https://senkustakes-api.onrender.com";
 
-    const inputs=document.querySelectorAll(".password-box input");
+const RESET_ENDPOINT=`${API_BASE}/api/auth/reset-password`;
 
-    const toggles=document.querySelectorAll(".toggle-password");
+const form=document.getElementById("resetPasswordForm");
 
-    const form=document.querySelector("form");
+const password=document.getElementById("newPassword");
 
-    const button=document.querySelector(".reset-btn");
+const confirmPassword=document.getElementById("confirmPassword");
 
-    const strengthBar=document.querySelector(".strength-bar");
+const button=document.getElementById("resetButton");
 
-    const strengthText=document.querySelector(".strength span");
+const formMessage=document.getElementById("formMessage");
 
+const strengthBar=document.getElementById("strengthBar");
 
+const strengthText=document.getElementById("strengthText");
 
-    const password=inputs[0];
+const passwordError=document.getElementById("newPasswordError");
 
-    const confirmPassword=inputs[1];
+const confirmError=document.getElementById("confirmPasswordError");
 
+const originalButton=button.innerHTML;
 
+const lengthRequirement=document.getElementById("lengthRequirement");
 
-    /*================================
-            SHOW / HIDE PASSWORD
-    =================================*/
+const letterRequirement=document.getElementById("letterRequirement");
 
+const numberRequirement=document.getElementById("numberRequirement");
 
-    toggles.forEach((toggle,index)=>{
+const specialRequirement=document.getElementById("specialRequirement");
 
+/*==================================
+        MESSAGE
+==================================*/
 
-        toggle.addEventListener("click",()=>{
+function showMessage(text,type){
 
+formMessage.hidden=false;
 
-            if(inputs[index].type==="password"){
+formMessage.className="form-message show "+type;
 
+formMessage.innerHTML=text;
 
-                inputs[index].type="text";
+}
 
+function hideMessage(){
 
-                toggle.classList.remove("fa-eye");
+formMessage.hidden=true;
 
+formMessage.className="form-message";
 
-                toggle.classList.add("fa-eye-slash");
+formMessage.innerHTML="";
 
+}
 
-            }
+/*==================================
+        CLEAR ERRORS
+==================================*/
 
-            else{
+function clearErrors(){
 
+password.classList.remove("invalid","valid");
 
-                inputs[index].type="password";
+confirmPassword.classList.remove("invalid","valid");
 
+passwordError.textContent="";
 
-                toggle.classList.remove("fa-eye-slash");
+confirmError.textContent="";
 
+hideMessage();
 
-                toggle.classList.add("fa-eye");
+}
+/*==================================
+        SHOW / HIDE PASSWORD
+==================================*/
 
+document
+.querySelectorAll(".toggle-password")
+.forEach(toggle=>{
 
-            }
+toggle.addEventListener("click",()=>{
 
+const targetId=toggle.dataset.target;
 
-        });
+const target=document.getElementById(targetId);
 
+const icon=toggle.querySelector("i");
 
-    });
+if(!target || !icon){
 
+return;
 
+}
 
+const showPassword=
 
+target.type==="password";
 
-    /*================================
-            PASSWORD STRENGTH
-    =================================*/
+target.type=
 
+showPassword
 
-    password.addEventListener("input",()=>{
+? "text"
 
+: "password";
 
-        const value=password.value;
+icon.classList.toggle(
 
+"fa-eye",
 
-        let strength=0;
+!showPassword
 
+);
 
+icon.classList.toggle(
 
-        if(value.length>=8){
+"fa-eye-slash",
 
-            strength++;
+showPassword
 
-        }
+);
 
+toggle.setAttribute(
 
-        if(/[A-Z]/.test(value)){
+"aria-label",
 
-            strength++;
+showPassword
 
-        }
+? "Hide password"
 
+: "Show password"
 
-        if(/[0-9]/.test(value)){
+);
 
-            strength++;
+});
 
-        }
+});
 
+/*==================================
+        PASSWORD RULES
+==================================*/
 
-        if(/[^A-Za-z0-9]/.test(value)){
+function getRules(value){
 
-            strength++;
+return{
 
-        }
+length:value.length>=8,
 
+letters:
 
+/[a-z]/.test(value) &&
 
-        if(strength===0){
+/[A-Z]/.test(value),
 
+number:/\d/.test(value),
 
-            strengthBar.style.width="0%";
+special:/[^A-Za-z0-9]/.test(value)
 
-            strengthText.textContent="Weak";
+};
 
-            strengthText.style.color="#ef4444";
+}
 
+function updateRequirement(
 
-        }
+element,
 
+valid
 
-        else if(strength===1){
+){
 
+element.classList.toggle(
 
-            strengthBar.style.width="25%";
+"valid",
 
-            strengthText.textContent="Weak";
+valid
 
-            strengthText.style.color="#ef4444";
+);
 
+const icon=
 
-        }
+element.querySelector("i");
 
+if(icon){
 
-        else if(strength===2){
+icon.className=
 
+valid
 
-            strengthBar.style.width="50%";
+? "fa-solid fa-circle-check"
 
-            strengthText.textContent="Medium";
+: "fa-solid fa-circle";
 
-            strengthText.style.color="#f59e0b";
+}
 
+}
 
-        }
+/*==================================
+        PASSWORD STRENGTH
+==================================*/
 
+function updateStrength(){
 
-        else if(strength===3){
+const value=password.value;
 
+const rules=getRules(value);
 
-            strengthBar.style.width="75%";
+const score=[
 
-            strengthText.textContent="Good";
+rules.length,
 
-            strengthText.style.color="#3b82f6";
+rules.letters,
 
+rules.number,
 
-        }
+rules.special
 
+].filter(Boolean).length;
 
-        else{
+updateRequirement(
 
+lengthRequirement,
 
-            strengthBar.style.width="100%";
+rules.length
 
-            strengthText.textContent="Strong";
+);
 
-            strengthText.style.color="#22c55e";
+updateRequirement(
 
+letterRequirement,
 
-        }
+rules.letters
 
+);
 
+updateRequirement(
 
-    });
+numberRequirement,
 
+rules.number
 
+);
 
+updateRequirement(
 
+specialRequirement,
 
-    /*================================
-            FORM SUBMIT
-    =================================*/
+rules.special
 
+);
 
-    form.addEventListener("submit", async (e)=>{
+let width="0%";
 
+let color="#ff647c";
 
-        e.preventDefault();
+let text="Weak";
 
+if(value.length===0){
 
+width="0%";
 
-        if(password.value.length<8){
+text="Weak";
 
+}
 
-            alert("Password must contain at least 8 characters.");
+else if(score===1){
 
+width="25%";
 
-            password.focus();
+text="Weak";
 
+color="#ff647c";
 
-            return;
+}
 
+else if(score===2){
 
-        }
+width="50%";
 
+text="Medium";
 
+color="#f59e0b";
 
-        if(password.value!==confirmPassword.value){
+}
 
+else if(score===3){
 
-            alert("Passwords do not match.");
+width="75%";
 
+text="Good";
 
-            confirmPassword.focus();
+color="#3b82f6";
 
+}
 
-            return;
+else if(score===4){
 
+width="100%";
 
-        }
+text="Strong";
 
+color="#22c55e";
 
+}
 
-        button.disabled = true;
+strengthBar.style.width=width;
 
-button.innerHTML = `
+strengthBar.style.background=color;
+
+strengthText.textContent=text;
+
+strengthText.style.color=color;
+
+return rules;
+
+}
+
+/*==================================
+        LIVE VALIDATION
+==================================*/
+
+password.addEventListener("input",()=>{
+
+passwordError.textContent="";
+
+password.classList.remove(
+
+"invalid",
+
+"valid"
+
+);
+
+const rules=updateStrength();
+
+const allValid=
+
+Object.values(rules)
+
+.every(Boolean);
+
+if(allValid){
+
+password.classList.add("valid");
+
+}
+
+if(confirmPassword.value){
+
+if(
+
+password.value===
+
+confirmPassword.value
+
+){
+
+confirmPassword.classList.remove(
+
+"invalid"
+
+);
+
+confirmPassword.classList.add(
+
+"valid"
+
+);
+
+confirmError.textContent="";
+
+}
+
+else{
+
+confirmPassword.classList.remove(
+
+"valid"
+
+);
+
+confirmPassword.classList.add(
+
+"invalid"
+
+);
+
+confirmError.textContent=
+
+"Passwords do not match.";
+
+}
+
+}
+
+hideMessage();
+
+});
+
+confirmPassword.addEventListener("input",()=>{
+
+confirmError.textContent="";
+
+confirmPassword.classList.remove(
+
+"invalid",
+
+"valid"
+
+);
+
+if(!confirmPassword.value){
+
+return;
+
+}
+
+if(
+
+password.value===
+
+confirmPassword.value
+
+){
+
+confirmPassword.classList.add(
+
+"valid"
+
+);
+
+}
+
+else{
+
+confirmPassword.classList.add(
+
+"invalid"
+
+);
+
+confirmError.textContent=
+
+"Passwords do not match.";
+
+}
+
+hideMessage();
+
+});
+/*==================================
+        RESET SESSION CHECK
+==================================*/
+
+const resetEmail=
+sessionStorage.getItem("resetEmail") ||
+localStorage.getItem("resetEmail");
+
+const resetToken=
+sessionStorage.getItem("resetToken") ||
+localStorage.getItem("resetToken");
+
+const otpVerified=
+sessionStorage.getItem("resetOtpVerified")==="true" ||
+localStorage.getItem("resetOtpVerified")==="true";
+
+if(!resetEmail || !otpVerified){
+
+showMessage(
+
+"Your password reset session is missing or expired. Please request a new verification code.",
+
+"error"
+
+);
+
+form.querySelectorAll(
+
+"input, button"
+
+).forEach(element=>{
+
+element.disabled=true;
+
+});
+
+setTimeout(()=>{
+
+window.location.href="forgot-password.html";
+
+},1800);
+
+return;
+
+}
+
+/*==================================
+        BUTTON LOADING
+==================================*/
+
+function setLoading(loading){
+
+button.disabled=loading;
+
+button.classList.toggle(
+
+"loading",
+
+loading
+
+);
+
+button.innerHTML=
+
+loading
+
+? `
 
 <i class="fa-solid fa-spinner fa-spin"></i>
 
-Updating Password...
+<span>Updating Password...</span>
 
-`;
+`
+
+: originalButton;
+
+}
+
+/*==================================
+        FORM SUBMIT
+==================================*/
+
+form.addEventListener("submit",async(event)=>{
+
+event.preventDefault();
+
+if(button.disabled){
+
+return;
+
+}
+
+clearErrors();
+
+const passwordValue=password.value;
+
+const confirmValue=confirmPassword.value;
+
+const rules=updateStrength();
+
+const allRulesValid=
+
+Object.values(rules)
+
+.every(Boolean);
+
+if(!passwordValue){
+
+password.classList.add("invalid");
+
+passwordError.textContent=
+
+"Please enter your new password.";
+
+showMessage(
+
+"Please enter a new password.",
+
+"error"
+
+);
+
+password.focus();
+
+return;
+
+}
+
+if(!allRulesValid){
+
+password.classList.add("invalid");
+
+passwordError.textContent=
+
+"Your password does not meet all security requirements.";
+
+showMessage(
+
+"Please create a stronger password.",
+
+"error"
+
+);
+
+password.focus();
+
+return;
+
+}
+
+if(!confirmValue){
+
+confirmPassword.classList.add("invalid");
+
+confirmError.textContent=
+
+"Please confirm your new password.";
+
+showMessage(
+
+"Please confirm your new password.",
+
+"error"
+
+);
+
+confirmPassword.focus();
+
+return;
+
+}
+
+if(passwordValue!==confirmValue){
+
+confirmPassword.classList.add("invalid");
+
+confirmError.textContent=
+
+"Passwords do not match.";
+
+showMessage(
+
+"Passwords do not match.",
+
+"error"
+
+);
+
+confirmPassword.focus();
+
+return;
+
+}
+
+password.classList.add("valid");
+
+confirmPassword.classList.add("valid");
+
+setLoading(true);
+
+showMessage(
+
+"Updating your Senku Pay password...",
+
+"info"
+
+);
 
 try{
 
-const email = localStorage.getItem("resetEmail");
+const payload={
 
-const response = await fetch(
+email:resetEmail,
 
-"https://senkustakes-api.onrender.com/api/auth/reset-password",
+password:passwordValue
+
+};
+
+if(resetToken){
+
+payload.resetToken=resetToken;
+
+}
+
+const response=await fetch(
+
+RESET_ENDPOINT,
 
 {
 
@@ -260,143 +689,227 @@ method:"POST",
 
 headers:{
 
-"Content-Type":"application/json"
+"Content-Type":"application/json",
+
+"Accept":"application/json"
 
 },
 
-body:JSON.stringify({
-
-email,
-
-password:password.value
-
-})
+body:JSON.stringify(payload)
 
 }
 
 );
 
-const data = await response.json();
+let data={};
+
+try{
+
+data=await response.json();
+
+}catch{
+
+data={};
+
+}
 
 if(!response.ok){
 
-alert(data.message);
+setLoading(false);
 
-button.disabled = false;
+showMessage(
 
-button.innerHTML = `
+data.message ||
 
-<i class="fa-solid fa-check"></i>
+data.error ||
 
-Update Password
+"Unable to update your password.",
 
-`;
+"error"
+
+);
 
 return;
 
 }
+/*==================================
+        SUCCESS
+==================================*/
 
-button.innerHTML = `
+showMessage(
+
+data.message ||
+
+"Your password has been updated successfully.",
+
+"success"
+
+);
+
+button.classList.remove("loading");
+
+button.classList.add("success");
+
+button.innerHTML=`
 
 <i class="fa-solid fa-circle-check"></i>
 
-Password Updated
+<span>Password Updated</span>
 
 `;
 
-button.style.background =
+/*==================================
+        SUCCESS BOX
+==================================*/
 
-"linear-gradient(135deg,#16a34a,#22c55e)";
+showSuccessBox();
 
-localStorage.removeItem("resetEmail");
+/*==================================
+        CLEAR RESET SESSION
+==================================*/
 
-showSuccess();
+[
+"resetEmail",
+"resetToken",
+"resetOtpVerified"
+].forEach(key=>{
+
+localStorage.removeItem(key);
+
+sessionStorage.removeItem(key);
+
+});
+
+/*==================================
+        REDIRECT
+==================================*/
 
 setTimeout(()=>{
 
 window.location.href="login.html";
 
-},2000);
+},1800);
 
 }
 
-catch(err){
+catch(error){
 
-console.log(err);
+console.error(
 
-alert("Server connection failed.");
+"Password reset failed:",
 
-button.disabled = false;
+error
 
-button.innerHTML = `
+);
 
-<i class="fa-solid fa-check"></i>
+setLoading(false);
 
-Update Password
+showMessage(
+
+"Unable to connect to the Senku Pay server. Please try again.",
+
+"error"
+
+);
+
+}
+
+});
+
+/*==================================
+        SUCCESS CARD
+==================================*/
+
+function showSuccessBox(){
+
+const existing=
+
+document.querySelector(
+
+".success-message"
+
+);
+
+if(existing){
+
+existing.remove();
+
+}
+
+const box=document.createElement("div");
+
+box.className=
+
+"success-message fade-in";
+
+box.innerHTML=`
+
+<i class="fa-solid fa-circle-check"></i>
+
+<div>
+
+<strong>
+
+Password Updated
+
+</strong>
+
+<p>
+
+Your Senku Pay password has been updated successfully.
+
+You will now be redirected to the login page.
+
+</p>
+
+</div>
 
 `;
 
+document
+
+.querySelector(".reset-card")
+
+.appendChild(box);
+
 }
 
+/*==================================
+        ENTER KEY
+==================================*/
 
+document.addEventListener(
 
-    });
+"keydown",
 
+event=>{
 
+if(
 
+event.key==="Enter" &&
 
+document.activeElement!==button
 
-    /*================================
-            SUCCESS BOX
-    =================================*/
+){
 
+form.requestSubmit();
 
-    function showSuccess(){
+}
 
+}
 
-        const box=document.createElement("div");
+);
 
+/*==================================
+        INITIALIZE
+==================================*/
 
-        box.className="success-message";
+updateStrength();
 
+password.focus();
 
-        box.innerHTML=
-
-        `
-
-        <i class="fa-solid fa-shield-check"></i>
-
-
-        <div>
-
-
-        <strong>Password Changed</strong>
-
-
-        <p>
-
-        Your password has been updated successfully.
-        Redirecting to login...
-
-        </p>
-
-
-        </div>
-
-
-        `;
-
-
-
-        document.querySelector(".reset-card")
-
-        .appendChild(box);
-
-
-
-    }
-
-
-
+/*==================================
+        END
+==================================*/
 
 });

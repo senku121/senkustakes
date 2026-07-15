@@ -1,289 +1,388 @@
 /*==================================================
-        SENKU STAKES
-        OTP VERIFY JAVASCRIPT
+                SENKU PAY
+            VERIFY EMAIL OTP
 ==================================================*/
-
 
 document.addEventListener("DOMContentLoaded",()=>{
 
+const API_BASE="https://senkustakes-api.onrender.com";
 
-    const inputs = document.querySelectorAll(".otp-container input");
+const VERIFY_ENDPOINT=`${API_BASE}/api/auth/verify-reset-otp`;
 
-    const form = document.querySelector("form");
+const RESEND_ENDPOINT=`${API_BASE}/api/auth/resend-reset-otp`;
 
-    const verifyBtn = document.querySelector(".verify-btn");
+const inputs=[...document.querySelectorAll(".otp-input")];
 
-    const resendBtn = document.getElementById("resend-btn");
+const form=document.getElementById("verifyForm");
 
-    const timerElement = document.getElementById("timer");
+const verifyBtn=document.getElementById("verifyButton");
 
+const resendBtn=document.getElementById("resend-btn");
 
+const timer=document.getElementById("timer");
 
-    /*================================
-            OTP AUTO MOVE
-    =================================*/
+const formMessage=document.getElementById("formMessage");
 
+const otpError=document.getElementById("otpError");
 
-    inputs.forEach((input,index)=>{
+const originalButton=verifyBtn.innerHTML;
 
+let seconds=120;
 
-        input.addEventListener("input",()=>{
+let interval;
 
+/*==================================
+        MESSAGE
+==================================*/
 
-            input.value=input.value.replace(/[^0-9]/g,"");
+function showMessage(text,type){
 
+formMessage.hidden=false;
 
-            if(input.value && index < inputs.length-1){
+formMessage.className="form-message show "+type;
 
-                inputs[index+1].focus();
+formMessage.innerHTML=text;
 
-            }
+}
 
+function hideMessage(){
 
-        });
+formMessage.hidden=true;
 
+formMessage.className="form-message";
 
+formMessage.innerHTML="";
 
-        input.addEventListener("keydown",(e)=>{
+}
 
+/*==================================
+        OTP ERROR
+==================================*/
 
-            if(e.key==="Backspace" && !input.value && index>0){
+function clearOtpError(){
 
-                inputs[index-1].focus();
+otpError.textContent="";
 
-            }
+inputs.forEach(input=>{
 
+input.classList.remove("invalid");
 
-        });
+});
 
+hideMessage();
 
-    });
+}
 
+function showOtpError(text){
 
+otpError.textContent=text;
 
+inputs.forEach(input=>{
 
-    /*================================
-            PASTE OTP
-    =================================*/
+input.classList.add("invalid");
 
+});
 
-    document.querySelector(".otp-container")
-    .addEventListener("paste",(e)=>{
+showMessage(text,"error");
 
+inputs[0].focus();
 
-        e.preventDefault();
+}
+/*==================================
+        OTP INPUT HANDLING
+==================================*/
 
+inputs.forEach((input,index)=>{
 
-        const pasteData =
-        e.clipboardData
-        .getData("text")
-        .replace(/\D/g,"")
-        .slice(0,6);
+input.addEventListener("input",()=>{
 
+const value=input.value.replace(/\D/g,"");
 
+input.value=value.slice(0,1);
 
-        pasteData.split("")
-        .forEach((digit,index)=>{
+input.classList.toggle(
+"filled",
+Boolean(input.value)
+);
 
+clearOtpError();
 
-            if(inputs[index]){
+if(
+input.value &&
+index<inputs.length-1
+){
 
-                inputs[index].value=digit;
+inputs[index+1].focus();
 
-            }
+inputs[index+1].select();
 
+}
 
-        });
+});
 
+input.addEventListener("keydown",(event)=>{
 
+if(
+event.key==="Backspace" &&
+!input.value &&
+index>0
+){
 
-        if(inputs[pasteData.length]){
+inputs[index-1].focus();
 
-            inputs[pasteData.length].focus();
+inputs[index-1].value="";
 
-        }
+inputs[index-1].classList.remove("filled");
 
+}
 
+if(
+event.key==="ArrowLeft" &&
+index>0
+){
 
-    });
+event.preventDefault();
 
+inputs[index-1].focus();
 
+}
 
+if(
+event.key==="ArrowRight" &&
+index<inputs.length-1
+){
 
+event.preventDefault();
 
-    /*================================
-            COUNTDOWN TIMER
-    =================================*/
+inputs[index+1].focus();
 
+}
 
-    let time = 120;
+if(
+event.key.length===1 &&
+!/\d/.test(event.key)
+){
 
+event.preventDefault();
 
-    function startTimer(){
+}
 
+});
 
-        const countdown=setInterval(()=>{
+input.addEventListener("focus",()=>{
 
+input.select();
 
-            let minutes=Math.floor(time/60);
+});
 
-            let seconds=time%60;
+});
 
+/*==================================
+        PASTE OTP
+==================================*/
 
+document
+.getElementById("otpContainer")
+.addEventListener("paste",(event)=>{
 
-            timerElement.textContent=
+event.preventDefault();
 
-            `${minutes.toString().padStart(2,"0")}:${seconds.toString().padStart(2,"0")}`;
+const pasted=(
 
+event.clipboardData ||
 
+window.clipboardData
 
-            time--;
+).getData("text");
 
+const digits=pasted
 
+.replace(/\D/g,"")
 
-            if(time<0){
+.slice(0,6);
 
+inputs.forEach((input,index)=>{
 
-                clearInterval(countdown);
+input.value=digits[index]||"";
 
+input.classList.toggle(
 
-                timerElement.textContent="Expired";
+"filled",
 
+Boolean(input.value)
 
-                resendBtn.disabled=false;
+);
 
+});
 
-            }
+const nextEmpty=inputs.find(
 
+input=>!input.value
 
+);
 
-        },1000);
+if(nextEmpty){
 
+nextEmpty.focus();
 
-    }
+}else{
 
+inputs[inputs.length-1].focus();
 
-    resendBtn.disabled=true;
+}
 
+clearOtpError();
 
-    startTimer();
+});
 
+/*==================================
+        TIMER
+==================================*/
 
+function formatTime(value){
 
+const minutes=Math.floor(value/60);
 
-    /*================================
-            RESEND OTP
-    =================================*/
+const remaining=value%60;
 
+return `${String(minutes).padStart(2,"0")}:${String(remaining).padStart(2,"0")}`;
 
-    resendBtn.addEventListener("click",()=>{
+}
 
+function stopTimer(){
 
-        time=120;
+if(interval){
 
+clearInterval(interval);
 
-        resendBtn.disabled=true;
+interval=null;
 
+}
 
-        startTimer();
+}
 
+function updateTimer(){
 
+if(seconds<=0){
 
-        resendBtn.innerHTML=
+stopTimer();
 
-        `
+timer.textContent="Expired";
 
-        <i class="fa-solid fa-spinner fa-spin"></i>
+timer.classList.add("expired");
 
-        Sending...
+resendBtn.disabled=false;
 
-        `;
+return;
 
+}
 
+timer.textContent=formatTime(seconds);
 
-        setTimeout(()=>{
+timer.classList.remove("expired");
 
+resendBtn.disabled=true;
 
-            resendBtn.innerHTML=
+seconds--;
 
-            "Resend OTP";
+}
 
+function startTimer(duration=120){
 
-        },1500);
+stopTimer();
 
+seconds=duration;
 
+updateTimer();
 
-    });
+interval=setInterval(updateTimer,1000);
 
+}
+/*==================================
+        VERIFY OTP
+==================================*/
 
+form.addEventListener("submit",async(event)=>{
 
+event.preventDefault();
 
+if(verifyBtn.disabled){
 
-    /*================================
-            VERIFY OTP
-    =================================*/
+return;
 
+}
 
-    form.addEventListener("submit", async (e)=>{
+clearOtpError();
 
+const otp=inputs
 
-        e.preventDefault();
+.map(input=>input.value)
 
+.join("");
 
+if(!/^\d{6}$/.test(otp)){
 
-        let otp="";
+showOtpError(
 
+"Please enter the complete 6-digit verification code."
 
-        inputs.forEach(input=>{
+);
 
+return;
 
-            otp+=input.value;
+}
 
+const resetEmail=
 
-        });
+sessionStorage.getItem("resetEmail") ||
 
+localStorage.getItem("resetEmail");
 
+if(!resetEmail){
 
-        if(otp.length!==6){
+showMessage(
 
+"Your password reset session has expired. Please request a new verification code.",
 
-            alert("Please enter the complete 6-digit code.");
+"error"
 
+);
 
-            inputs[0].focus();
+setTimeout(()=>{
 
+window.location.href="forgot-password.html";
 
-            return;
+},1800);
 
+return;
 
-        }
+}
 
+verifyBtn.disabled=true;
 
+verifyBtn.classList.add("loading");
 
-        verifyBtn.disabled=true;
+verifyBtn.innerHTML=`
 
+<i class="fa-solid fa-spinner fa-spin"></i>
 
+<span>Verifying Code...</span>
 
-        verifyBtn.innerHTML=
+`;
 
-        `
+showMessage(
 
-        <i class="fa-solid fa-spinner fa-spin"></i>
+"Checking your verification code...",
 
-        Verifying...
+"info"
 
-        `;
+);
 
+try{
 
+const response=await fetch(
 
-
-        try{
-
-const email = localStorage.getItem("resetEmail");
-
-const response = await fetch(
-
-"https://senkustakes-api.onrender.com/api/auth/verify-reset-otp",
+VERIFY_ENDPOINT,
 
 {
 
@@ -291,13 +390,15 @@ method:"POST",
 
 headers:{
 
-"Content-Type":"application/json"
+"Content-Type":"application/json",
+
+"Accept":"application/json"
 
 },
 
 body:JSON.stringify({
 
-email,
+email:resetEmail,
 
 otp
 
@@ -307,78 +408,403 @@ otp
 
 );
 
-const data = await response.json();
+let data={};
+
+try{
+
+data=await response.json();
+
+}catch{
+
+data={};
+
+}
 
 if(!response.ok){
 
-alert(data.message);
-
 verifyBtn.disabled=false;
 
-verifyBtn.innerHTML=`
+verifyBtn.classList.remove("loading");
 
-<i class="fa-solid fa-check"></i>
+verifyBtn.innerHTML=originalButton;
 
-Verify Code
+showOtpError(
 
-`;
+data.message ||
+
+data.error ||
+
+"The verification code is invalid or expired."
+
+);
+
+inputs.forEach(input=>{
+
+input.value="";
+
+input.classList.remove("filled","valid");
+
+});
+
+inputs[0].focus();
 
 return;
 
 }
 
+stopTimer();
+
+inputs.forEach(input=>{
+
+input.disabled=true;
+
+input.classList.remove("invalid");
+
+input.classList.add("valid");
+
+});
+
+showMessage(
+
+data.message ||
+
+"Verification code accepted successfully.",
+
+"success"
+
+);
+
+verifyBtn.classList.remove("loading");
+
+verifyBtn.classList.add("success");
+
 verifyBtn.innerHTML=`
 
 <i class="fa-solid fa-circle-check"></i>
 
-Verified
+<span>Code Verified</span>
 
 `;
+/*==================================
+        STORE RESET SESSION
+==================================*/
 
-verifyBtn.style.background=
+const resetToken=
 
-"linear-gradient(135deg,#16a34a,#22c55e)";
+data.resetToken ||
+
+data.token ||
+
+data.passwordResetToken ||
+
+null;
+
+if(resetToken){
+
+sessionStorage.setItem(
+
+"resetToken",
+
+resetToken
+
+);
+
+localStorage.setItem(
+
+"resetToken",
+
+resetToken
+
+);
+
+}
+
+sessionStorage.setItem(
+
+"resetOtpVerified",
+
+"true"
+
+);
+
+localStorage.setItem(
+
+"resetOtpVerified",
+
+"true"
+
+);
+
+/*==================================
+        REDIRECT
+==================================*/
 
 setTimeout(()=>{
 
 window.location.href="reset-password.html";
 
-},1500);
+},1200);
 
 }
 
-catch(err){
+catch(error){
 
-console.log(err);
+console.error(
 
-alert("Server connection failed.");
+"OTP verification failed:",
+
+error
+
+);
 
 verifyBtn.disabled=false;
 
-verifyBtn.innerHTML=`
+verifyBtn.classList.remove("loading");
 
-<i class="fa-solid fa-check"></i>
+verifyBtn.innerHTML=originalButton;
 
-Verify Code
+showMessage(
 
-`;
+"Unable to connect to the Senku Pay server. Please check your connection and try again.",
+
+"error"
+
+);
 
 }
 
+});
 
+/*==================================
+        RESEND OTP
+==================================*/
 
-    });
+resendBtn.addEventListener("click",async()=>{
 
+if(resendBtn.disabled){
 
+return;
 
+}
 
-    /*================================
-            FIRST INPUT FOCUS
-    =================================*/
+const resetEmail=
 
+sessionStorage.getItem("resetEmail") ||
 
-    inputs[0].focus();
+localStorage.getItem("resetEmail");
 
+if(!resetEmail){
 
+showMessage(
+
+"Your password reset session has expired. Please request a new code.",
+
+"error"
+
+);
+
+setTimeout(()=>{
+
+window.location.href="forgot-password.html";
+
+},1800);
+
+return;
+
+}
+
+resendBtn.disabled=true;
+
+resendBtn.innerHTML=`
+
+<i class="fa-solid fa-spinner fa-spin"></i>
+
+Sending...
+
+`;
+
+showMessage(
+
+"Requesting a new verification code...",
+
+"info"
+
+);
+
+try{
+
+const response=await fetch(
+
+RESEND_ENDPOINT,
+
+{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json",
+
+"Accept":"application/json"
+
+},
+
+body:JSON.stringify({
+
+email:resetEmail
+
+})
+
+}
+
+);
+
+let data={};
+
+try{
+
+data=await response.json();
+
+}catch{
+
+data={};
+
+}
+
+if(!response.ok){
+
+resendBtn.disabled=false;
+
+resendBtn.innerHTML="Resend OTP";
+
+showMessage(
+
+data.message ||
+
+data.error ||
+
+"Unable to resend the verification code.",
+
+"error"
+
+);
+
+return;
+
+}
+
+inputs.forEach(input=>{
+
+input.value="";
+
+input.disabled=false;
+
+input.classList.remove(
+
+"filled",
+
+"valid",
+
+"invalid"
+
+);
+
+});
+
+inputs[0].focus();
+
+showMessage(
+
+data.message ||
+
+"A new verification code was sent to your email.",
+
+"success"
+
+);
+
+resendBtn.innerHTML="Resend OTP";
+
+startTimer(120);
+
+}
+
+catch(error){
+
+console.error(
+
+"Resend OTP failed:",
+
+error
+
+);
+
+resendBtn.disabled=false;
+
+resendBtn.innerHTML="Resend OTP";
+
+showMessage(
+
+"Unable to connect to the Senku Pay server. Please try again.",
+
+"error"
+
+);
+
+}
+
+});
+
+/*==================================
+        SESSION CHECK
+==================================*/
+
+const resetEmail=
+
+sessionStorage.getItem("resetEmail") ||
+
+localStorage.getItem("resetEmail");
+
+if(!resetEmail){
+
+showMessage(
+
+"Your password reset session is missing. Please request a new verification code.",
+
+"error"
+
+);
+
+form.querySelectorAll(
+
+"input, button"
+
+).forEach(element=>{
+
+element.disabled=true;
+
+});
+
+setTimeout(()=>{
+
+window.location.href="forgot-password.html";
+
+},1800);
+
+return;
+
+}
+
+/*==================================
+        INITIALIZE
+==================================*/
+
+startTimer(120);
+
+inputs[0]?.focus();
+
+/*==================================
+        END
+==================================*/
 
 });

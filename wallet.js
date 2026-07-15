@@ -1,295 +1,922 @@
 /*==================================================
-        SENKU STAKES
-        WALLET JAVASCRIPT
+                SENKU PAY
+                WALLET PAGE
 ==================================================*/
 
+document.addEventListener("DOMContentLoaded",async()=>{
 
-document.addEventListener("DOMContentLoaded",()=>{
+const API_BASE_URL=
+"https://senkustakes-api.onrender.com";
 
-    const token = localStorage.getItem("token");
+const WALLET_ENDPOINT=
+`${API_BASE_URL}/api/wallet`;
 
-if(!token){
+const TRANSACTIONS_ENDPOINT=
+`${API_BASE_URL}/api/transactions`;
 
-    window.location.href="login.html";
+/*==================================
+        STORAGE
+==================================*/
 
-    return;
+function getToken(){
+
+return(
+
+sessionStorage.getItem("token")||
+
+localStorage.getItem("token")
+
+);
 
 }
 
+function getCurrentUser(){
 
-console.log("Wallet JS loaded");
+const raw=
 
+sessionStorage.getItem("currentUser")||
 
+localStorage.getItem("currentUser");
 
+if(!raw){
 
+return null;
 
-
-
-
-const walletBalance = document.getElementById(
-"walletBalance"
-);
-
-
-const totalDeposited = document.getElementById(
-"totalDeposited"
-);
-
-
-const totalWithdrawn = document.getElementById(
-"totalWithdrawn"
-);
-
-
-
-(async()=>{
+}
 
 try{
 
-const response = await fetch(
+return JSON.parse(raw);
 
-"https://senkustakes-api.onrender.com/api/wallet",
+}
 
-{
+catch{
 
-headers:{
-
-Authorization:`Bearer ${token}`
+return null;
 
 }
 
 }
 
-);
+function logout(){
 
-if(!response.ok){
+[
+"token",
+"currentUser"
+
+].forEach(key=>{
+
+sessionStorage.removeItem(key);
+
+localStorage.removeItem(key);
+
+});
 
 window.location.href="login.html";
+
+}
+
+const token=getToken();
+
+if(!token){
+
+logout();
 
 return;
 
 }
 
-const userData = await response.json();
+/*==================================
+        ELEMENTS
+==================================*/
+
+const walletBalance=
+document.getElementById("walletBalance");
+
+const totalDeposited=
+document.getElementById("totalDeposited");
+
+const totalWithdrawn=
+document.getElementById("totalWithdrawn");
+
+const pendingDeposits=
+document.getElementById("pendingDeposits");
+
+const pendingWithdrawals=
+document.getElementById("pendingWithdrawals");
+
+const walletStatus=
+document.getElementById("walletStatus");
+
+const walletVerification=
+document.getElementById("walletVerification");
+
+const walletSync=
+document.getElementById("walletSync");
+
+const walletHistory=
+document.getElementById("walletHistory");
+
+const walletMessage=
+document.getElementById("walletMessage");
+
+const depositButton=
+document.getElementById("depositButton");
+
+const withdrawButton=
+document.getElementById("withdrawButton");
+
+/*==================================
+        MESSAGE
+==================================*/
+
+function showMessage(text,type="info"){
+
+walletMessage.hidden=false;
+
+walletMessage.className=
+
+`wallet-message show ${type}`;
+
+walletMessage.textContent=text;
+
+}
+
+function hideMessage(){
+
+walletMessage.hidden=true;
+
+walletMessage.className=
+
+"wallet-message";
+
+walletMessage.textContent="";
+
+}
+
+/*==================================
+        FORMAT
+==================================*/
+
+function money(value){
+
+return new Intl.NumberFormat(
+
+"en-US",
+
+{
+
+style:"currency",
+
+currency:"USD"
+
+}
+
+).format(Number(value||0));
+
+}
+
+function formatDate(date){
+
+if(!date){
+
+return "--";
+
+}
+
+return new Date(date)
+
+.toLocaleString();
+
+}
+
+/*==================================
+        API
+==================================*/
+
+async function api(url){
+
+const response=
+
+await fetch(
+
+url,
+
+{
+
+headers:{
+
+Authorization:
+
+`Bearer ${token}`,
+
+Accept:
+
+"application/json"
+
+}
+
+}
+
+);
+
+if(
+
+response.status===401||
+
+response.status===403
+
+){
+
+logout();
+
+throw new Error(
+
+"Session expired."
+
+);
+
+}
+
+const data=
+
+await response.json();
+
+if(!response.ok){
+
+throw new Error(
+
+data.message||
+
+"Unable to load wallet."
+
+);
+
+}
+
+return data;
+
+}
+/*==================================
+        LOAD WALLET
+==================================*/
+
+async function loadWallet(){
+
+hideMessage();
+
+try{
+
+const data=
+await api(WALLET_ENDPOINT);
+
+const currentUser=
+getCurrentUser();
+
+const user=
+
+data.user||
+
+currentUser||
+
+data;
+
+const availableBalance=
+
+data.balance??
+
+data.availableBalance??
+
+0;
+
+const depositedAmount=
+
+data.deposited??
+
+data.totalDeposited??
+
+0;
+
+const withdrawnAmount=
+
+data.withdrawn??
+
+data.totalWithdrawn??
+
+0;
+
+const pendingDepositAmount=
+
+data.pendingDeposits??
+
+data.pendingDeposit??
+
+0;
+
+const pendingWithdrawalAmount=
+
+data.pendingWithdrawals??
+
+data.pendingWithdraw??
+
+data.lockedBalance??
+
+0;
 
 if(walletBalance){
 
-walletBalance.innerText =
-formatMoney(userData.balance);
+walletBalance.textContent=
+
+money(availableBalance);
 
 }
 
 if(totalDeposited){
 
-totalDeposited.innerText =
-formatMoney(userData.deposited);
+totalDeposited.textContent=
+
+money(depositedAmount);
 
 }
 
 if(totalWithdrawn){
 
-totalWithdrawn.innerText =
-formatMoney(userData.withdrawn);
+totalWithdrawn.textContent=
+
+money(withdrawnAmount);
+
+}
+
+if(pendingDeposits){
+
+pendingDeposits.textContent=
+
+money(pendingDepositAmount);
+
+}
+
+if(pendingWithdrawals){
+
+pendingWithdrawals.textContent=
+
+money(pendingWithdrawalAmount);
+
+}
+
+if(walletStatus){
+
+walletStatus.textContent=
+
+"Wallet synchronized with the secure Senku Pay server.";
+
+}
+
+if(walletVerification){
+
+const verified=
+
+user.emailVerified??
+
+data.emailVerified??
+
+false;
+
+walletVerification.textContent=
+
+verified
+
+? "Verified"
+
+: "Pending";
+
+walletVerification.className=
+
+verified
+
+? "status-positive"
+
+: "status-negative";
+
+}
+
+if(walletSync){
+
+walletSync.textContent=
+
+new Date().toLocaleTimeString(
+
+[],
+
+{
+
+hour:"2-digit",
+
+minute:"2-digit"
+
+}
+
+);
+
+}
+
+return data;
+
+}
+
+catch(error){
+
+console.error(
+
+"Wallet load failed:",
+
+error
+
+);
+
+showMessage(
+
+error.message||
+
+"Unable to load wallet information.",
+
+"error"
+
+);
+
+if(walletStatus){
+
+walletStatus.textContent=
+
+"Wallet synchronization failed.";
+
+walletStatus.classList.add(
+
+"status-negative"
+
+);
+
+}
+
+return null;
 
 }
 
 }
 
-catch(err){
+/*==================================
+        TRANSACTION TYPE
+==================================*/
 
-console.log(err);
+function getTransactionDetails(tx){
 
-showPopup({
+const type=
 
-type:"error",
+String(tx.type||"Transaction");
 
-title:"Connection Error",
+const normalized=
 
-message:"Unable to load wallet."
+type.toLowerCase();
+
+const withdrawal=
+
+normalized.includes("withdraw");
+
+const deposit=
+
+normalized.includes("deposit");
+
+if(withdrawal){
+
+return{
+
+icon:"fa-arrow-up",
+
+amountClass:"wallet-negative",
+
+sign:"-"
+
+};
+
+}
+
+if(deposit){
+
+return{
+
+icon:"fa-arrow-down",
+
+amountClass:"wallet-positive",
+
+sign:"+"
+
+};
+
+}
+
+return{
+
+icon:"fa-money-bill-transfer",
+
+amountClass:"",
+
+sign:""
+
+};
+
+}
+
+/*==================================
+        ESCAPE HTML
+==================================*/
+
+function escapeHtml(value){
+
+return String(value??"")
+
+.replaceAll("&","&amp;")
+
+.replaceAll("<","&lt;")
+
+.replaceAll(">","&gt;")
+
+.replaceAll('"',"&quot;")
+
+.replaceAll("'","&#039;");
+
+}
+/*==================================
+        LOAD WALLET HISTORY
+==================================*/
+
+async function loadWalletHistory(){
+
+if(!walletHistory){
+
+return;
+
+}
+
+try{
+
+const response=
+
+await api(
+
+TRANSACTIONS_ENDPOINT
+
+);
+
+const transactions=
+
+Array.isArray(response)
+
+? response
+
+: response.transactions||
+
+response.data||
+
+[];
+
+if(transactions.length===0){
+
+return;
+
+}
+
+walletHistory.innerHTML="";
+
+transactions
+
+.slice(0,8)
+
+.forEach(tx=>{
+
+const ui=
+
+getTransactionDetails(tx);
+
+const amount=
+
+Number(tx.amount||0);
+
+walletHistory.insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<div class="wallet-row">
+
+<div class="wallet-info">
+
+<div class="wallet-icon">
+
+<i class="fa-solid ${ui.icon}"></i>
+
+</div>
+
+<div>
+
+<h4>
+
+${escapeHtml(
+
+tx.type||
+
+"Transaction"
+
+)}
+
+</h4>
+
+<p>
+
+${formatDate(
+
+tx.createdAt
+
+)}
+
+<br>
+
+Status:
+
+${escapeHtml(
+
+tx.status||
+
+"Completed"
+
+)}
+
+</p>
+
+</div>
+
+</div>
+
+<div class="wallet-amount ${ui.amountClass}">
+
+${ui.sign}${money(amount)}
+
+</div>
+
+</div>
+
+`
+
+);
 
 });
 
 }
 
-})();
+catch(error){
 
+console.error(
 
-/*================================
-        DEPOSIT BUTTON
-================================*/
+"History load failed:",
 
-
-const depositBtn=document.querySelector(
-
-".deposit-btn"
+error
 
 );
-
-
-
-if(depositBtn){
-
-
-depositBtn.addEventListener("click",()=>{
-
-
-    depositBtn.innerHTML=`
-
-        <i class="fa-solid fa-spinner fa-spin"></i>
-
-        Opening...
-
-    `;
-
-
-
-    setTimeout(()=>{
-
-
-        window.location.href="deposit.html";
-
-
-    },800);
-
-
-
-});
-
 
 }
 
-
-
-
-
-/*================================
-        WITHDRAW BUTTON
-================================*/
-
-
-const withdrawBtn=document.querySelector(
-
-".withdraw-btn"
-
-);
-
-
-
-if(withdrawBtn){
-
-
-withdrawBtn.addEventListener("click",()=>{
-
-
-    withdrawBtn.innerHTML=`
-
-        <i class="fa-solid fa-spinner fa-spin"></i>
-
-        Opening...
-
-    `;
-
-
-
-    setTimeout(()=>{
-
-
-        window.location.href="withdraw.html";
-
-
-    },800);
-
-
-
-});
-
-
 }
 
+/*==================================
+        BUTTONS
+==================================*/
 
+depositButton?.addEventListener(
 
-/*================================
-        TRANSACTIONS
-================================*/
+"click",
 
-const transactionBtn=document.querySelector(
-".view-transactions"
-);
+()=>{
 
-if(transactionBtn){
+depositButton.disabled=true;
 
-transactionBtn.addEventListener("click",(e)=>{
-
-e.preventDefault();
-
-transactionBtn.innerHTML=`
+depositButton.innerHTML=`
 
 <i class="fa-solid fa-spinner fa-spin"></i>
 
+<span>
+
 Opening...
+
+</span>
 
 `;
 
 setTimeout(()=>{
 
-window.location.href="transactions.html";
+window.location.href=
 
-},700);
+"deposit.html";
 
-});
+},600);
 
 }
 
+);
 
+withdrawButton?.addEventListener(
 
+"click",
 
-/*================================
-        CARD ENTRANCE
-================================*/
+()=>{
 
+withdrawButton.disabled=true;
 
-const elements=document.querySelectorAll(
+withdrawButton.innerHTML=`
 
-".wallet-stat,.history-card,.wallet-actions,.wallet-footer"
+<i class="fa-solid fa-spinner fa-spin"></i>
+
+<span>
+
+Opening...
+
+</span>
+
+`;
+
+setTimeout(()=>{
+
+window.location.href=
+
+"withdraw.html";
+
+},600);
+
+}
 
 );
 
+document
 
+.querySelector(
 
-elements.forEach((element,index)=>{
+".view-transactions"
 
+)
 
-    element.style.opacity="0";
+?.addEventListener(
 
+"click",
 
-    element.style.transform=
+event=>{
 
-    "translateY(25px)";
+event.preventDefault();
 
+window.location.href=
 
+"transactions.html";
 
-    setTimeout(()=>{
+}
 
+);
+/*==================================
+        CARD ENTRANCE
+==================================*/
 
-        element.style.transition=".6s ease";
+document
 
+.querySelectorAll(
 
-        element.style.opacity="1";
+".wallet-main-card,.wallet-stat,.wallet-actions,.summary-card,.history-card,.wallet-footer"
 
+)
 
-        element.style.transform=
+.forEach((element,index)=>{
 
-        "translateY(0)";
+element.style.opacity="0";
 
+element.style.transform=
 
+"translateY(20px)";
 
-    },300+(index*150));
+setTimeout(()=>{
 
+element.style.transition=
 
+".55s ease";
+
+element.style.opacity="1";
+
+element.style.transform=
+
+"translateY(0)";
+
+},100+(index*90));
 
 });
 
+/*==================================
+        AUTO REFRESH
+==================================*/
 
+setInterval(()=>{
 
+if(walletSync){
+
+walletSync.textContent=
+
+new Date()
+
+.toLocaleTimeString(
+
+[],
+
+{
+
+hour:"2-digit",
+
+minute:"2-digit"
+
+}
+
+);
+
+}
+
+},60000);
+
+/*==================================
+        INITIALIZE
+==================================*/
+
+const walletData=
+
+await loadWallet();
+
+if(walletData){
+
+await loadWalletHistory();
+
+showMessage(
+
+"Wallet synchronized successfully.",
+
+"success"
+
+);
+
+setTimeout(
+
+hideMessage,
+
+2500
+
+);
+
+}
+
+/*==================================
+        KEYBOARD SHORTCUTS
+==================================*/
+
+document.addEventListener(
+
+"keydown",
+
+event=>{
+
+if(
+
+event.altKey &&
+
+event.key==="d"
+
+){
+
+window.location.href=
+
+"deposit.html";
+
+}
+
+if(
+
+event.altKey &&
+
+event.key==="w"
+
+){
+
+window.location.href=
+
+"withdraw.html";
+
+}
+
+}
+
+);
+
+/*==================================
+        END
+==================================*/
 
 });

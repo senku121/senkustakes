@@ -1,413 +1,803 @@
 /*==================================================
-        SENKU STAKES
-        TRANSACTIONS JAVASCRIPT
+                SENKU PAY
+            TRANSACTIONS PAGE
 ==================================================*/
 
+document.addEventListener("DOMContentLoaded",async()=>{
 
-document.addEventListener("DOMContentLoaded",()=>{
+const API_BASE_URL=
+"https://senkustakes-api.onrender.com";
 
+const TRANSACTIONS_ENDPOINT=
+`${API_BASE_URL}/api/transactions`;
 
+/*==================================
+        STORAGE
+==================================*/
 
-/*================================
-        LOAD TRANSACTION DATA
-================================*/
+function getToken(){
+
+return(
+
+sessionStorage.getItem("token")||
+
+localStorage.getItem("token")
+
+);
+
+}
+
+function logout(){
+
+[
+"token",
+"currentUser"
+
+].forEach(key=>{
+
+sessionStorage.removeItem(key);
+
+localStorage.removeItem(key);
+
+});
+
+window.location.href="login.html";
+
+}
+
+const token=getToken();
+
+if(!token){
+
+logout();
+
+return;
+
+}
+
+/*==================================
+        ELEMENTS
+==================================*/
+
+const transactionList=
+document.getElementById("transactionList");
+
+const totalTransactions=
+document.getElementById("totalTransactions");
+
+const totalDeposits=
+document.getElementById("totalDeposits");
+
+const totalWithdrawals=
+document.getElementById("totalWithdrawals");
+
+const searchInput=
+document.getElementById("transactionSearch");
+
+const filterButtons=
+document.querySelectorAll(".filter");
+
+const messageBox=
+document.getElementById("transactionsMessage");
+
+let transactions=[];
+
+let currentFilter="all";
+
+/*==================================
+        MESSAGE
+==================================*/
+
+function showMessage(text,type="info"){
+
+messageBox.hidden=false;
+
+messageBox.className=
+
+`transactions-message show ${type}`;
+
+messageBox.textContent=text;
+
+}
+
+function hideMessage(){
+
+messageBox.hidden=true;
+
+messageBox.className=
+
+"transactions-message";
+
+messageBox.textContent="";
+
+}
+
+/*==================================
+        FORMAT
+==================================*/
+
+function money(value){
+
+return new Intl.NumberFormat(
+
+"en-US",
+
+{
+
+style:"currency",
+
+currency:"USD"
+
+}
+
+).format(Number(value||0));
+
+}
+
+function formatDate(value){
+
+if(!value){
+
+return "--";
+
+}
+
+const date=new Date(value);
+
+if(Number.isNaN(date.getTime())){
+
+return "--";
+
+}
+
+return date.toLocaleString();
+
+}
+
+/*==================================
+        ESCAPE HTML
+==================================*/
+
+function escapeHtml(value){
+
+return String(value??"")
+
+.replaceAll("&","&amp;")
+
+.replaceAll("<","&lt;")
+
+.replaceAll(">","&gt;")
+
+.replaceAll('"',"&quot;")
+
+.replaceAll("'","&#039;");
+
+}
+
+/*==================================
+        API
+==================================*/
+
+async function api(url){
+
+const response=
+
+await fetch(
+
+url,
+
+{
+
+headers:{
+
+Accept:"application/json",
+
+Authorization:
+
+`Bearer ${token}`
+
+}
+
+}
+
+);
+
+if(
+
+response.status===401||
+
+response.status===403
+
+){
+
+logout();
+
+throw new Error(
+
+"Session expired."
+
+);
+
+}
+
+let data={};
+
+try{
+
+data=await response.json();
+
+}
+
+catch{
+
+data={};
+
+}
+
+if(!response.ok){
+
+throw new Error(
+
+data.message||
+
+data.error||
+
+"Unable to load transactions."
+
+);
+
+}
+
+return data;
+
+}
+/*==================================
+        LOAD TRANSACTIONS
+==================================*/
+
 async function loadTransactions(){
 
-    try{
+hideMessage();
 
-        const response = await fetch(
-            "https://senkustakes-api.onrender.com/api/transactions",
-            {
-                headers:{
-                    Authorization:`Bearer ${token}`
-                }
-            }
-        );
+try{
 
-        transactions = await response.json();
+const response=
 
-        renderTransactions();
+await api(
 
-    }
+TRANSACTIONS_ENDPOINT
 
-    catch(err){
+);
 
-        console.log(err);
+transactions=
 
-    }
+Array.isArray(response)
+
+? response
+
+: response.transactions||
+
+response.data||
+
+[];
+
+renderTransactions(
+
+transactions
+
+);
+
+}
+
+catch(error){
+
+console.error(error);
+
+showMessage(
+
+error.message||
+
+"Unable to load transactions.",
+
+"error"
+
+);
 
 }
 
-const token = localStorage.getItem("token");
-
-if (!token) {
-    window.location.href = "login.html";
-    return;
 }
 
-let transactions = [];
+/*==================================
+        ANIMATE NUMBERS
+==================================*/
 
-async function loadTransactions() {
+function animateNumber(
 
-    try {
+element,
 
-        const response = await fetch(
-            "https://senkustakes-api.onrender.com/api/transactions",
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }
-        );
+target,
 
-        transactions = await response.json();
+currency=false
 
-        renderTransactions();
+){
 
-    } catch (err) {
+let current=0;
 
-        console.log(err);
+const increment=
 
-    }
+target/30;
 
-}
-function animateNumber(element, target, money){
+const timer=
 
-    let current = 0;
+setInterval(()=>{
 
-    const increment = target / 30;
+current+=increment;
 
-    const timer = setInterval(()=>{
+if(current>=target){
 
-        current += increment;
+current=target;
 
-        if(current >= target){
-
-            current = target;
-
-            clearInterval(timer);
-
-        }
-
-        if(money){
-
-            element.innerText =
-            "$" + current.toFixed(2);
-
-        }
-
-        else{
-
-            element.innerText =
-            Math.floor(current);
-
-        }
-
-    },20);
+clearInterval(timer);
 
 }
-function renderTransactions() {
 
-    const list = document.getElementById("transactionList");
+element.textContent=
 
-    const totalTransactions =
-    document.getElementById("totalTransactions");
+currency
 
-    const totalDeposits =
-    document.getElementById("totalDeposits");
+? money(current)
 
-    const totalWithdrawals =
-    document.getElementById("totalWithdrawals");
+: Math.floor(current);
 
+},20);
 
+}
 
-    let depositTotal = 0;
-    let withdrawTotal = 0;
+/*==================================
+        RENDER
+==================================*/
 
+function renderTransactions(list){
 
+let deposits=0;
 
-    transactions.forEach(tx=>{
+let withdrawals=0;
 
-        if(tx.type==="Deposit"){
+list.forEach(tx=>{
 
-            depositTotal += Number(tx.amount);
+const amount=
 
-        }
+Number(tx.amount||0);
 
-        if(tx.type==="Withdrawal"){
+const type=
 
-            withdrawTotal += Number(tx.amount);
+String(
 
-        }
+tx.type||
 
-        
+""
 
-    });
+).toLowerCase();
 
+if(
+
+type.includes("deposit")
+
+){
+
+deposits+=amount;
+
+}
+
+if(
+
+type.includes("withdraw")
+
+){
+
+withdrawals+=amount;
+
+}
+
+});
 
 animateNumber(
-    totalTransactions,
-    transactions.length,
-    false
+
+totalTransactions,
+
+list.length,
+
+false
+
 );
 
 animateNumber(
-    totalDeposits,
-    depositTotal,
-    true
+
+totalDeposits,
+
+deposits,
+
+true
+
 );
 
 animateNumber(
-    totalWithdrawals,
-    withdrawTotal,
-    true
+
+totalWithdrawals,
+
+withdrawals,
+
+true
+
 );
 
+if(list.length===0){
 
+transactionList.innerHTML=`
 
-    if(transactions.length===0){
+<div class="empty-transactions">
 
-        list.innerHTML=`
+<i class="fa-solid fa-clock-rotate-left"></i>
 
-        <div class="empty-transactions">
+<h3>
 
-            <i class="fa-solid fa-clock-rotate-left"></i>
+No Transactions Found
 
-            <h3>No Transactions Found</h3>
+</h3>
 
-            <p>Your transaction history will appear here after wallet activity.</p>
+<p>
 
-        </div>
-
-        `;
-
-        return;
-
-    }
-
-
-
-    list.innerHTML="";
-
-
-
-    [...transactions].reverse().forEach(tx=>{
-
-        let icon="fa-wallet";
-        let typeClass="";
-
-
-
-        if(tx.type==="Deposit"){
-
-            icon="fa-arrow-down";
-            typeClass="deposit";
-
-        }
-
-        if(tx.type==="Withdrawal"){
-
-            icon="fa-arrow-up";
-            typeClass="withdrawal";
-
-        }
-
-
-
-        list.innerHTML+=`
-
-        <div class="transaction-item ${typeClass}">
-
-            <div class="transaction-left">
-
-                <i class="fa-solid ${icon}"></i>
-
-                <div>
-
-                    <h3>${tx.type}</h3>
-
-                    <p>
-
-    ${new Date(tx.createdAt).toLocaleString()}
+Your deposits and withdrawals will appear here.
 
 </p>
 
-<span class="tx-status ${tx.status.toLowerCase()}">
+</div>
 
-    ${tx.status}
+`;
+
+return;
+
+}
+
+transactionList.innerHTML="";
+
+list
+
+.slice()
+
+.reverse()
+
+.forEach(tx=>{
+
+const type=
+
+String(
+
+tx.type||
+
+"Transaction"
+
+);
+
+const lower=
+
+type.toLowerCase();
+
+const amount=
+
+Number(
+
+tx.amount||0
+
+);
+
+const status=
+
+String(
+
+tx.status||
+
+"Completed"
+
+).toLowerCase();
+
+let icon=
+
+"fa-money-bill-transfer";
+
+let rowClass="";
+
+let sign="";
+
+if(
+
+lower.includes("deposit")
+
+){
+
+icon="fa-arrow-down";
+
+rowClass="deposit";
+
+sign="+";
+
+}
+
+else if(
+
+lower.includes("withdraw")
+
+){
+
+icon="fa-arrow-up";
+
+rowClass="withdrawal";
+
+sign="-";
+
+}
+
+transactionList.insertAdjacentHTML(
+
+"beforeend",
+
+`
+
+<div class="transaction-item ${rowClass}">
+
+<div class="transaction-left">
+
+<div class="transaction-icon">
+
+<i class="fa-solid ${icon}"></i>
+
+</div>
+
+<div>
+
+<h3>
+
+${escapeHtml(type)}
+
+</h3>
+
+<p>
+
+${formatDate(tx.createdAt)}
+
+</p>
+
+<span class="transaction-status ${escapeHtml(status)}">
+
+${escapeHtml(tx.status||"Completed")}
 
 </span>
 
-                </div>
+</div>
 
-            </div>
+</div>
 
-            <strong>
+<div class="transaction-amount">
 
-                ${tx.type==="Deposit" ? "+" : "-"}
+${sign}${money(amount)}
 
-                $${Number(tx.amount).toFixed(2)}
+</div>
 
-            </strong>
+</div>
 
-        </div>
+`
 
-        `;
-
-    });
-
-}
-
-const list = document.getElementById(
-"transactionList"
 );
 
+});
 
+}
+/*==================================
+        SEARCH
+==================================*/
 
-const totalTransactions =
-document.getElementById("totalTransactions");
+function applyFilters(){
 
+const keyword=
 
-const totalDeposits =
-document.getElementById("totalDeposits");
+searchInput.value
 
+.trim()
 
-const totalWithdrawals =
-document.getElementById("totalWithdrawals");
+.toLowerCase();
 
+const filtered=
 
+transactions.filter(tx=>{
 
+const type=
 
+String(
 
-let depositTotal = 0;
+tx.type||
 
-let withdrawTotal = 0;
+""
 
+).toLowerCase();
 
+const status=
 
+String(
 
+tx.status||
 
-transactions.forEach(tx=>{
+""
 
+).toLowerCase();
 
-    if(tx.type==="Deposit"){
+const amount=
 
-        depositTotal += Number(tx.amount);
+String(
 
-    }
+tx.amount??
 
+""
 
-    if(tx.type==="Withdrawal"){
+).toLowerCase();
 
-    withdrawTotal += Math.abs(Number(tx.amount));
+const matchesSearch=
+
+type.includes(keyword)||
+
+status.includes(keyword)||
+
+amount.includes(keyword);
+
+let matchesFilter=true;
+
+if(currentFilter!=="all"){
+
+if(
+
+currentFilter==="deposit"
+
+){
+
+matchesFilter=
+
+type.includes("deposit");
 
 }
 
+else if(
 
-});
+currentFilter==="withdrawal"
 
+){
 
+matchesFilter=
 
-
-
-
-/*================================
-        SEARCH + FILTER SYSTEM
-================================*/
-
-const filters = document.querySelectorAll(".filter");
-
-const search = document.querySelector(".search-box input");
-
-let currentFilter = "all";
-
-function updateFilters(){
-
-    const keyword = search.value.toLowerCase();
-
-    document.querySelectorAll(".transaction-item").forEach(item=>{
-
-        const matchesSearch =
-        item.innerText.toLowerCase().includes(keyword);
-
-        const matchesFilter =
-        currentFilter==="all" ||
-        item.classList.contains(currentFilter);
-
-        item.style.display =
-        (matchesSearch && matchesFilter)
-        ? "flex"
-        : "none";
-
-    });
+type.includes("withdraw");
 
 }
 
-filters.forEach(btn=>{
+else{
 
-    btn.addEventListener("click",()=>{
+matchesFilter=
 
-        filters.forEach(b=>b.classList.remove("active"));
+status===currentFilter;
 
-        btn.classList.add("active");
+}
 
-        currentFilter =
-        btn.innerText.toLowerCase();
+}
 
-        if(currentFilter==="withdraw"){
+return(
 
-            currentFilter="withdrawal";
+matchesSearch&&
 
-        }
+matchesFilter
 
-        updateFilters();
-
-    });
+);
 
 });
 
-search.addEventListener("input",updateFilters);
+renderTransactions(
 
-/*================================
+filtered
+
+);
+
+}
+
+searchInput?.addEventListener(
+
+"input",
+
+applyFilters
+
+);
+
+/*==================================
+        FILTERS
+==================================*/
+
+filterButtons.forEach(button=>{
+
+button.addEventListener(
+
+"click",
+
+()=>{
+
+filterButtons.forEach(item=>{
+
+item.classList.remove(
+
+"active"
+
+);
+
+});
+
+button.classList.add(
+
+"active"
+
+);
+
+currentFilter=
+
+button.dataset.filter||
+
+"all";
+
+applyFilters();
+
+}
+
+);
+
+});
+
+/*==================================
         PAGE ANIMATION
-================================*/
+==================================*/
 
+document
 
-const elements=document.querySelectorAll(
+.querySelectorAll(
 
-".summary-card,.filter-card,.transaction-card"
+".summary-grid,.filter-card,.transactions-card,.transactions-info"
 
-);
+)
 
+.forEach((element,index)=>{
 
+element.style.opacity="0";
 
-elements.forEach((element,index)=>{
+element.style.transform=
 
+"translateY(20px)";
 
-    element.style.opacity="0";
+setTimeout(()=>{
 
-    element.style.transform="translateY(30px)";
+element.style.transition=
 
+".55s ease";
 
+element.style.opacity="1";
 
-    setTimeout(()=>{
+element.style.transform=
 
+"translateY(0)";
 
-        element.style.transition=".6s ease";
-
-
-        element.style.opacity="1";
-
-
-        element.style.transform="translateY(0)";
-
-
-    },300+(index*150));
-
-
+},100+(index*80));
 
 });
-loadTransactions();
 
+/*==================================
+        INITIALIZE
+==================================*/
+
+await loadTransactions();
+
+/*==================================
+                END
+==================================*/
 
 });

@@ -1,310 +1,451 @@
 /*==================================================
-        SENKU STAKES
-        EMAIL VERIFICATION
+    SENKU PAY
+    EMAIL VERIFICATION
 ==================================================*/
 
 document.addEventListener("DOMContentLoaded", () => {
+    const API_BASE_URL = "https://senkustakes-api.onrender.com";
+    const VERIFY_ENDPOINT = `${API_BASE_URL}/api/auth/verify-email`;
+    const RESEND_ENDPOINT = `${API_BASE_URL}/api/auth/resend-otp`;
+    const OTP_LENGTH = 6;
+    const OTP_LIFETIME_SECONDS = 120;
 
-    const inputs = document.querySelectorAll(".otp-container input");
-const form = document.querySelector("form");
-const verifyBtn = document.querySelector(".verify-btn");
+    const form = document.getElementById("verifyForm");
+    const otpContainer = document.getElementById("otpContainer");
+    const inputs = Array.from(document.querySelectorAll(".otp-input"));
+    const verifyBtn = document.getElementById("verifyBtn");
+    const resendBtn = document.getElementById("resend-btn");
+    const timer = document.getElementById("timer");
+    const otpError = document.getElementById("otpError");
+    const formMessage = document.getElementById("formMessage");
+    const maskedEmail = document.getElementById("maskedEmail");
 
-const resendBtn =
-document.getElementById("resend-btn");
+    const originalVerifyButtonHTML = verifyBtn.innerHTML;
+    const originalResendButtonHTML = resendBtn.innerHTML;
 
-const timer =
-document.getElementById("timer");
+    let countdownId = null;
+    let secondsRemaining = OTP_LIFETIME_SECONDS;
+    let verificationComplete = false;
 
-const email = localStorage.getItem("verifyEmail");
+    const storedEmail =
+        sessionStorage.getItem("senkuVerifyEmail") ||
+        localStorage.getItem("verifyEmail");
 
-    if (!email) {
+    const normalizeEmail = (value) =>
+        String(value || "").trim().toLowerCase();
 
-        alert("Verification session expired.");
+    const email = normalizeEmail(storedEmail);
 
-        window.location.href = "register.html";
+    const isValidEmail = (value) =>
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
-        return;
+    const maskEmail = (value) => {
+        const [localPart, domain] = value.split("@");
 
-    }
+        if (!localPart || !domain) {
+            return "your email address";
+        }
 
-    /*==============================
-            OTP INPUT
-    ==============================*/
+        const visibleStart = localPart.slice(0, Math.min(2, localPart.length));
+        const hiddenLength = Math.max(localPart.length - visibleStart.length, 2);
 
-    inputs.forEach((input, index) => {
+        return `${visibleStart}${"*".repeat(hiddenLength)}@${domain}`;
+    };
 
-        input.addEventListener("input", () => {
-
-            input.value = input.value.replace(/\D/g, "");
-
-            if (input.value && index < inputs.length - 1) {
-
-                inputs[index + 1].focus();
-
-            }
-
-        });
-
-        input.addEventListener("keydown", (e) => {
-
-            if (e.key === "Backspace" && !input.value && index > 0) {
-
-                inputs[index - 1].focus();
-
-            }
-
-        });
-
-    });
-
-    /*==============================
-            PASTE OTP
-    ==============================*/
-
-    document.querySelector(".otp-container")
-    .addEventListener("paste", (e) => {
-
-        e.preventDefault();
-
-        const paste = e.clipboardData
-            .getData("text")
-            .replace(/\D/g, "")
-            .slice(0,6);
-
-        paste.split("").forEach((digit,index)=>{
-
-            if(inputs[index]){
-
-                inputs[index].value = digit;
-
-            }
-
-        });
-
-    });
-
-    /*==============================
-            VERIFY EMAIL
-    ==============================*/
-
-    form.addEventListener("submit", async (e)=>{
-
-        e.preventDefault();
-
-        let otp = "";
-
-        inputs.forEach(input=>{
-
-            otp += input.value;
-
-        });
-
-        if(otp.length !== 6){
-
-            alert("Please enter the complete 6-digit code.");
-
+    const setFormMessage = (message = "", type = "error") => {
+        if (!message) {
+            formMessage.hidden = true;
+            formMessage.textContent = "";
+            formMessage.className = "form-message";
             return;
-
         }
 
-        verifyBtn.disabled = true;
+        formMessage.hidden = false;
+        formMessage.textContent = message;
+        formMessage.className = `form-message ${type}`;
+    };
 
-        verifyBtn.innerHTML = `
-        <i class="fa-solid fa-spinner fa-spin"></i>
-        Verifying...
-        `;
+    const setOtpError = (message = "") => {
+        otpError.textContent = message;
 
-        try{
+        inputs.forEach((input) => {
+            input.classList.toggle("invalid", Boolean(message));
+            input.setAttribute("aria-invalid", String(Boolean(message)));
+        });
+    };
 
-            const response = await fetch(
+    const clearOtp = () => {
+        inputs.forEach((input) => {
+            input.value = "";
+            input.classList.remove("filled", "invalid");
+        });
 
-                "https://senkustakes-api.onrender.com/api/auth/verify-email",
+        setOtpError("");
+        inputs[0]?.focus();
+    };
 
-                {
+    const getOtp = () =>
+        inputs.map((input) => input.value).join("");
 
-                    method:"POST",
+    const fillOtp = (value) => {
+        const digits = String(value)
+            .replace(/\D/g, "")
+            .slice(0, OTP_LENGTH);
 
-                    headers:{
-                        "Content-Type":"application/json"
-                    },
+        inputs.forEach((input, index) => {
+            input.value = digits[index] || "";
+            input.classList.toggle("filled", Boolean(input.value));
+        });
 
-                    body:JSON.stringify({
+        const nextEmptyIndex = inputs.findIndex((input) => !input.value);
 
-                        email,
-
-                        otp
-
-                    })
-
-                }
-
-            );
-
-            const data = await response.json();
-
-            if(!response.ok){
-
-                alert(data.message);
-
-                verifyBtn.disabled = false;
-
-                verifyBtn.innerHTML = `
-                <i class="fa-solid fa-check"></i>
-                Verify Code
-                `;
-
-                return;
-
-            }
-
-            verifyBtn.innerHTML = `
-            <i class="fa-solid fa-circle-check"></i>
-            Verified
-            `;
-
-            verifyBtn.style.background =
-            "linear-gradient(135deg,#16a34a,#22c55e)";
-
-            localStorage.removeItem("verifyEmail");
-
-            setTimeout(()=>{
-
-                window.location.href="login.html";
-
-            },1500);
-
+        if (nextEmptyIndex >= 0) {
+            inputs[nextEmptyIndex].focus();
+        } else {
+            inputs[OTP_LENGTH - 1]?.focus();
         }
 
-        catch(err){
+        setOtpError("");
+    };
 
-            console.log(err);
+    const setVerifyLoading = (loading) => {
+        verifyBtn.disabled = loading || verificationComplete;
 
-            alert("Server connection failed.");
+        verifyBtn.innerHTML = loading
+            ? `
+                <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+                <span>Verifying...</span>
+              `
+            : originalVerifyButtonHTML;
+    };
 
-            verifyBtn.disabled = false;
+    const setResendLoading = (loading) => {
+        resendBtn.disabled = loading || secondsRemaining > 0;
 
-            verifyBtn.innerHTML = `
-            <i class="fa-solid fa-check"></i>
-            Verify Code
-            `;
+        resendBtn.innerHTML = loading
+            ? `
+                <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+                Sending...
+              `
+            : originalResendButtonHTML;
+    };
 
+    const formatTime = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const remainder = seconds % 60;
+
+        return `${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`;
+    };
+
+    const stopTimer = () => {
+        if (countdownId) {
+            window.clearInterval(countdownId);
+            countdownId = null;
         }
+    };
 
-    });
-
-
-    /*==============================
-        TIMER
-==============================*/
-
-let seconds = 120;
-
-function startTimer(){
-
-    resendBtn.disabled = true;
-
-    const countdown = setInterval(()=>{
-
-        let min = Math.floor(seconds/60);
-
-        let sec = seconds%60;
-
-        timer.innerText =
-        `${String(min).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
-
-        seconds--;
-
-        if(seconds < 0){
-
-            clearInterval(countdown);
-
-            timer.innerText = "Expired";
-
+    const renderTimer = () => {
+        if (secondsRemaining <= 0) {
+            timer.textContent = "Expired";
+            timer.classList.add("expired");
             resendBtn.disabled = false;
-
+            return;
         }
 
-    },1000);
+        timer.textContent = formatTime(secondsRemaining);
+        timer.classList.remove("expired");
+        resendBtn.disabled = true;
+    };
 
-}
+    const startTimer = (duration = OTP_LIFETIME_SECONDS) => {
+        stopTimer();
 
-startTimer();
+        secondsRemaining = duration;
+        renderTimer();
 
-/*==============================
-        RESEND OTP
-==============================*/
+        countdownId = window.setInterval(() => {
+            secondsRemaining -= 1;
+            renderTimer();
 
-resendBtn.addEventListener("click",async()=>{
-
-    resendBtn.disabled = true;
-
-    resendBtn.innerHTML = `
-    <i class="fa-solid fa-spinner fa-spin"></i>
-    Sending...
-    `;
-
-    try{
-
-        const response = await fetch(
-
-            "https://senkustakes-api.onrender.com/api/auth/resend-otp",
-
-            {
-
-                method:"POST",
-
-                headers:{
-                    "Content-Type":"application/json"
-                },
-
-                body:JSON.stringify({
-
-                    email
-
-                })
-
+            if (secondsRemaining <= 0) {
+                stopTimer();
             }
+        }, 1000);
+    };
 
+    const parseResponseBody = async (response) => {
+        const contentType = response.headers.get("content-type") || "";
+
+        if (contentType.includes("application/json")) {
+            return response.json();
+        }
+
+        const text = await response.text();
+
+        return {
+            message: text || "Unexpected server response."
+        };
+    };
+
+    const getServerMessage = (data, fallback) => {
+        if (!data) return fallback;
+
+        if (typeof data.message === "string" && data.message.trim()) {
+            return data.message;
+        }
+
+        if (typeof data.error === "string" && data.error.trim()) {
+            return data.error;
+        }
+
+        if (Array.isArray(data.errors) && data.errors.length) {
+            return data.errors
+                .map((item) =>
+                    typeof item === "string"
+                        ? item
+                        : item.message || item.msg
+                )
+                .filter(Boolean)
+                .join(" ");
+        }
+
+        return fallback;
+    };
+
+    if (!email || !isValidEmail(email)) {
+        setFormMessage(
+            "Your verification session is missing or expired. Please register again.",
+            "error"
         );
 
-        const data = await response.json();
+        form.querySelectorAll("input, button").forEach((element) => {
+            element.disabled = true;
+        });
 
-        if(!response.ok){
+        window.setTimeout(() => {
+            window.location.replace("register.html");
+        }, 1800);
 
-            alert(data.message);
+        return;
+    }
 
-            resendBtn.disabled = false;
+    maskedEmail.textContent = maskEmail(email);
 
-            resendBtn.innerHTML = "Resend OTP";
+    inputs.forEach((input, index) => {
+        input.addEventListener("input", () => {
+            const digits = input.value.replace(/\D/g, "");
 
+            if (digits.length > 1) {
+                fillOtp(digits);
+                return;
+            }
+
+            input.value = digits.slice(0, 1);
+            input.classList.toggle("filled", Boolean(input.value));
+            setOtpError("");
+
+            if (input.value && index < inputs.length - 1) {
+                inputs[index + 1].focus();
+                inputs[index + 1].select();
+            }
+        });
+
+        input.addEventListener("keydown", (event) => {
+            if (event.key === "Backspace") {
+                if (!input.value && index > 0) {
+                    inputs[index - 1].focus();
+                    inputs[index - 1].value = "";
+                    inputs[index - 1].classList.remove("filled");
+                }
+
+                return;
+            }
+
+            if (event.key === "ArrowLeft" && index > 0) {
+                event.preventDefault();
+                inputs[index - 1].focus();
+            }
+
+            if (event.key === "ArrowRight" && index < inputs.length - 1) {
+                event.preventDefault();
+                inputs[index + 1].focus();
+            }
+
+            if (
+                event.key.length === 1 &&
+                !/^\d$/.test(event.key)
+            ) {
+                event.preventDefault();
+            }
+        });
+
+        input.addEventListener("focus", () => {
+            input.select();
+        });
+    });
+
+    otpContainer.addEventListener("paste", (event) => {
+        event.preventDefault();
+
+        const pastedValue =
+            event.clipboardData?.getData("text") || "";
+
+        fillOtp(pastedValue);
+    });
+
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        if (verificationComplete || verifyBtn.disabled) return;
+
+        const otp = getOtp();
+
+        if (!/^\d{6}$/.test(otp)) {
+            setOtpError("Enter the complete six-digit verification code.");
+            inputs.find((input) => !input.value)?.focus();
             return;
-
         }
 
-        alert("New verification code sent.");
+        setOtpError("");
+        setFormMessage(
+            "Checking your verification code...",
+            "info"
+        );
+        setVerifyLoading(true);
 
-        resendBtn.innerHTML = "Resend OTP";
+        try {
+            const response = await fetch(VERIFY_ENDPOINT, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({
+                    email,
+                    otp
+                })
+            });
 
-        seconds = 120;
+            const data = await parseResponseBody(response);
 
-        startTimer();
+            if (!response.ok) {
+                const message = getServerMessage(
+                    data,
+                    "The verification code is invalid or expired."
+                );
 
-    }
+                setFormMessage(message, "error");
+                setVerifyLoading(false);
+                clearOtp();
+                return;
+            }
 
-    catch(err){
+            verificationComplete = true;
+            stopTimer();
 
-        console.log(err);
+            sessionStorage.removeItem("senkuVerifyEmail");
+            localStorage.removeItem("verifyEmail");
 
-        alert("Unable to resend OTP.");
+            setFormMessage(
+                getServerMessage(
+                    data,
+                    "Your email has been verified successfully."
+                ),
+                "success"
+            );
 
-        resendBtn.disabled = false;
+            verifyBtn.disabled = true;
+            verifyBtn.innerHTML = `
+                <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                <span>Email Verified</span>
+            `;
+            verifyBtn.style.background =
+                "linear-gradient(135deg,#16a34a,#22c55e)";
 
-        resendBtn.innerHTML = "Resend OTP";
+            inputs.forEach((input) => {
+                input.disabled = true;
+            });
 
-    }
+            window.setTimeout(() => {
+                window.location.replace("login.html");
+            }, 1300);
+        } catch (error) {
+            console.error("Email verification request failed:", error);
 
-});
+            setFormMessage(
+                "Unable to connect to the Senku Pay server. Please try again.",
+                "error"
+            );
 
-    inputs[0].focus();
+            setVerifyLoading(false);
+        }
+    });
 
+    resendBtn.addEventListener("click", async () => {
+        if (resendBtn.disabled || verificationComplete) return;
+
+        setOtpError("");
+        setFormMessage(
+            "Requesting a new verification code...",
+            "info"
+        );
+        setResendLoading(true);
+
+        try {
+            const response = await fetch(RESEND_ENDPOINT, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({
+                    email
+                })
+            });
+
+            const data = await parseResponseBody(response);
+
+            if (!response.ok) {
+                setFormMessage(
+                    getServerMessage(
+                        data,
+                        "Unable to resend the verification code."
+                    ),
+                    "error"
+                );
+
+                secondsRemaining = 0;
+                renderTimer();
+                setResendLoading(false);
+                return;
+            }
+
+            clearOtp();
+
+            setFormMessage(
+                getServerMessage(
+                    data,
+                    "A new verification code was sent to your email."
+                ),
+                "success"
+            );
+
+            resendBtn.innerHTML = originalResendButtonHTML;
+            startTimer();
+        } catch (error) {
+            console.error("OTP resend request failed:", error);
+
+            setFormMessage(
+                "Unable to connect to the Senku Pay server. Please try again.",
+                "error"
+            );
+
+            secondsRemaining = 0;
+            renderTimer();
+            setResendLoading(false);
+        }
+    });
+
+    startTimer();
+    inputs[0]?.focus();
 });

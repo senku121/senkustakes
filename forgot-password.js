@@ -1,139 +1,156 @@
 /*==================================================
-        SENKU STAKES
-        FORGOT PASSWORD JS
+                SENKU PAY
+            FORGOT PASSWORD
 ==================================================*/
 
 document.addEventListener("DOMContentLoaded",()=>{
 
+const API_BASE="https://senkustakes-api.onrender.com";
 
-    const form=document.querySelector("form");
+const ENDPOINT=`${API_BASE}/api/auth/forgot-password`;
 
-    const email=document.querySelector('input[type="email"]');
+const form=document.getElementById("forgotPasswordForm");
 
-    const button=document.querySelector(".reset-btn");
+const email=document.getElementById("email");
 
+const button=document.getElementById("resetButton");
 
-    /*================================
-            INPUT ANIMATION
-    =================================*/
+const message=document.getElementById("formMessage");
 
-    email.addEventListener("focus",()=>{
+const emailError=document.getElementById("emailError");
 
-        email.style.transform="translateY(-2px)";
+const originalButton=button.innerHTML;
 
-    });
+/*==================================
+        MESSAGE
+==================================*/
 
+function showMessage(text,type){
 
-    email.addEventListener("blur",()=>{
+message.hidden=false;
 
-        email.style.transform="translateY(0)";
+message.className="form-message show "+type;
 
-    });
+message.innerHTML=text;
 
+}
 
+function hideMessage(){
 
-    /*================================
-            ENTER KEY SUBMIT
-    =================================*/
+message.hidden=true;
 
-    document.addEventListener("keydown",(e)=>{
+message.className="form-message";
 
-        if(e.key==="Enter"){
+message.innerHTML="";
 
-            form.requestSubmit();
+}
 
-        }
+/*==================================
+        VALIDATION
+==================================*/
 
-    });
+function validEmail(value){
 
+return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
+}
 
-    /*================================
-            EMAIL VALIDATION
-    =================================*/
+function clearError(){
 
-    function validEmail(value){
+email.classList.remove("invalid");
 
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+email.classList.remove("valid");
 
-    }
+emailError.textContent="";
 
+hideMessage();
 
+}
 
-    /*================================
-            FORM SUBMIT
-    =================================*/
+function showError(text){
 
-    form.addEventListener("submit", async (e)=>{
+email.classList.remove("valid");
 
+email.classList.add("invalid");
 
-        e.preventDefault();
+emailError.textContent=text;
 
+showMessage(text,"error");
 
+email.focus();
 
-        if(email.value.trim()===""){
+}
 
+email.addEventListener("input",clearError);
 
-            email.style.borderColor="#ff5a5a";
+email.addEventListener("focus",()=>{
 
+email.style.transform="translateY(-2px)";
 
-            alert("Please enter your email address.");
+});
 
+email.addEventListener("blur",()=>{
 
-            email.focus();
+email.style.transform="translateY(0)";
 
+});
+/*==================================
+        FORM SUBMIT
+==================================*/
 
-            return;
+form.addEventListener("submit",async(e)=>{
 
+e.preventDefault();
 
-        }
+clearError();
 
+const emailValue=email.value.trim().toLowerCase();
 
+if(emailValue===""){
 
-        if(!validEmail(email.value)){
+showError("Please enter your email address.");
 
+return;
 
-            email.style.borderColor="#ff5a5a";
+}
 
+if(!validEmail(emailValue)){
 
-            alert("Please enter a valid email address.");
+showError("Please enter a valid email address.");
 
+return;
 
-            email.focus();
+}
 
+email.classList.remove("invalid");
 
-            return;
+email.classList.add("valid");
 
+button.disabled=true;
 
-        }
+button.classList.add("loading");
 
+button.innerHTML=`
 
+<i class="fa-solid fa-spinner fa-spin"></i>
 
-        email.style.borderColor="rgba(255,255,255,.08)";
+<span>Sending Verification Code...</span>
 
+`;
 
+showMessage(
 
-        button.disabled=true;
+"Connecting to Senku Pay server...",
 
+"info"
 
+);
 
-        button.innerHTML=`
+try{
 
-            <i class="fa-solid fa-spinner fa-spin"></i>
+const response=await fetch(
 
-            Sending Link...
-
-        `;
-
-
-
-        /* Simulated API request */
-
-       try{
-
-const response = await fetch(
-
-"https://senkustakes-api.onrender.com/api/auth/forgot-password",
+ENDPOINT,
 
 {
 
@@ -141,13 +158,15 @@ method:"POST",
 
 headers:{
 
-"Content-Type":"application/json"
+"Content-Type":"application/json",
+
+"Accept":"application/json"
 
 },
 
 body:JSON.stringify({
 
-email:email.value.trim()
+email:emailValue
 
 })
 
@@ -155,31 +174,74 @@ email:email.value.trim()
 
 );
 
-const data = await response.json();
+let data={};
+
+try{
+
+data=await response.json();
+
+}catch{
+
+data={};
+
+}
 
 if(!response.ok){
 
-alert(data.message);
-
 button.disabled=false;
 
-button.innerHTML=`
+button.classList.remove("loading");
 
-<i class="fa-solid fa-paper-plane"></i>
+button.innerHTML=originalButton;
 
-Send Reset Link
+showMessage(
 
-`;
+data.message||
+
+"Unable to send verification code.",
+
+"error"
+
+);
+
+email.classList.remove("valid");
+
+email.classList.add("invalid");
 
 return;
 
 }
+/*==================================
+        SUCCESS
+==================================*/
+
+const serverMessage=
+
+data.message||
+
+"Verification code sent successfully.";
+
+showMessage(
+
+serverMessage,
+
+"success"
+
+);
 
 localStorage.setItem(
 
 "resetEmail",
 
-email.value.trim()
+emailValue
+
+);
+
+sessionStorage.setItem(
+
+"resetEmail",
+
+emailValue
 
 );
 
@@ -187,7 +249,7 @@ button.innerHTML=`
 
 <i class="fa-solid fa-circle-check"></i>
 
-Code Sent
+<span>Verification Sent</span>
 
 `;
 
@@ -195,7 +257,17 @@ button.style.background=
 
 "linear-gradient(135deg,#16a34a,#22c55e)";
 
-showSuccess();
+email.disabled=true;
+
+/*==================================
+    SUCCESS CARD
+==================================*/
+
+showSuccessCard();
+
+/*==================================
+    REDIRECT
+==================================*/
 
 setTimeout(()=>{
 
@@ -205,112 +277,175 @@ window.location.href="verify.html";
 
 }
 
-catch(err){
+catch(error){
 
-console.log(err);
+console.error(
 
-alert("Server connection failed.");
+"Forgot password:",
+
+error
+
+);
 
 button.disabled=false;
 
-button.innerHTML=`
+button.classList.remove("loading");
 
-<i class="fa-solid fa-paper-plane"></i>
+button.innerHTML=originalButton;
 
-Send Reset Link
+showMessage(
 
-`;
+"Unable to connect to the Senku Pay server. Please check your connection and try again.",
+
+"error"
+
+);
 
 }
 
+});
+/*==================================
+        SUCCESS CARD
+==================================*/
 
-    });
+function showSuccessCard(){
 
+const existing=document.querySelector(".success-message");
 
+if(existing){
 
-    /*================================
-            SUCCESS MESSAGE
-    =================================*/
+existing.remove();
 
-    function showSuccess(){
+}
 
+const card=document.createElement("div");
 
-        const message=document.createElement("div");
+card.className="success-message fade-in";
 
+card.innerHTML=`
 
-        message.className="success-message";
+<i class="fa-solid fa-envelope-circle-check"></i>
 
+<div>
 
-        message.innerHTML=`
+<h3>Email Sent Successfully</h3>
 
-            <i class="fa-solid fa-envelope-circle-check"></i>
+<p>
 
-            <div>
+We've sent a secure verification code to your email address.
 
-                <strong>Check your email</strong>
+Please check your inbox (and spam folder if necessary) and enter the code on the next page to continue resetting your password.
 
-                <p>
+</p>
 
-                A verification code has been sent to your email.
-                Enter the code on the next page to continue.
+</div>
 
-                </p>
+`;
 
-            </div>
+document
 
-        `;
+.querySelector(".forgot-card")
 
+.appendChild(card);
 
+}
 
-        document.querySelector(".forgot-card")
+/*==================================
+        ENTER KEY SUPPORT
+==================================*/
 
-        .appendChild(message);
+document.addEventListener("keydown",(event)=>{
 
+if(event.key==="Enter"){
 
+if(document.activeElement!==button){
 
-    }
+form.requestSubmit();
 
+}
 
+}
 
-    /*================================
-            CARD LOAD ANIMATION
-    =================================*/
+});
 
-    const card=document.querySelector(".forgot-card");
+/*==================================
+        CARD LOAD ANIMATION
+==================================*/
 
+const card=document.querySelector(".forgot-card");
 
-    card.animate(
+if(card){
 
-        [
+card.animate(
 
-            {
+[
 
-                opacity:0,
+{
 
-                transform:"translateY(40px) scale(.96)"
+opacity:0,
 
-            },
+transform:"translateY(40px) scale(.96)"
 
+},
 
-            {
+{
 
-                opacity:1,
+opacity:1,
 
-                transform:"translateY(0) scale(1)"
+transform:"translateY(0) scale(1)"
 
-            }
+}
 
-        ],
+],
 
-        {
+{
 
-            duration:800,
+duration:800,
 
-            easing:"ease-out"
+easing:"ease-out",
 
-        }
+fill:"forwards"
 
-    );
+}
 
+);
+
+}
+
+/*==================================
+        AUTO HIDE MESSAGE
+==================================*/
+
+const observer=new MutationObserver(()=>{
+
+if(
+
+!message.hidden &&
+
+message.classList.contains("success")
+
+){
+
+setTimeout(()=>{
+
+hideMessage();
+
+},5000);
+
+}
+
+});
+
+observer.observe(message,{
+
+attributes:true,
+
+attributeFilter:["class","hidden"]
+
+});
+
+/*==================================
+        END
+==================================*/
 
 });

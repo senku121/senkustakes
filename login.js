@@ -1,295 +1,395 @@
-/* ==========================================
-        SENKU STAKES
-            LOGIN PAGE
-========================================== */
-
-document.addEventListener("DOMContentLoaded",()=>{
-
-const form=document.querySelector("form");
-
-const password=document.querySelector('input[type="password"]');
-
-const email=document.querySelector('input[type="text"]');
-
-const loginBtn=document.querySelector(".login-btn");
-
-const remember=document.querySelector(".remember input");
-
-
-/* ===================================
-        PASSWORD TOGGLE
-=================================== */
-
-const wrapper=document.createElement("div");
-
-wrapper.style.position="relative";
-
-password.parentNode.insertBefore(wrapper,password);
-
-wrapper.appendChild(password);
-
-const eye=document.createElement("i");
-
-eye.className="fa-solid fa-eye";
-
-eye.style.position="absolute";
-
-eye.style.right="18px";
-
-eye.style.top="50%";
-
-eye.style.transform="translateY(-50%)";
-
-eye.style.cursor="pointer";
-
-eye.style.color="#8f98b5";
-
-wrapper.appendChild(eye);
-
-eye.addEventListener("click",()=>{
-
-if(password.type==="password"){
-
-password.type="text";
-
-eye.className="fa-solid fa-eye-slash";
-
-}else{
-
-password.type="password";
-
-eye.className="fa-solid fa-eye";
-
-}
-
-});
-
-
-/* ===================================
-        INPUT ANIMATION
-=================================== */
-
-document.querySelectorAll("input").forEach(input=>{
-
-input.addEventListener("focus",()=>{
-
-input.parentElement.style.transform="translateY(-2px)";
-
-input.parentElement.style.transition=".3s";
-
-});
-
-input.addEventListener("blur",()=>{
-
-input.parentElement.style.transform="translateY(0)";
-
-});
-
-});
-
-
-/* ===================================
-        ENTER KEY LOGIN
-=================================== */
-
-document.addEventListener("keydown",(e)=>{
-
-if(e.key==="Enter"){
-
-form.requestSubmit();
-
-}
-
-});
-
-
-/* ===================================
-        LOGIN
-=================================== */
-
-form.addEventListener("submit",async(e)=>{
-
-e.preventDefault();
-
-if(email.value.trim()===""){
-
-showPopup({
-
-type:"error",
-
-title:"Email Required",
-
-message:"Please enter your email."
-
-});
-
-email.focus();
-
-return;
-
-}
-
-if(password.value.trim()===""){
-
-showPopup({
-
-type:"error",
-
-title:"Password Required",
-
-message:"Please enter your password."
-
-});
-
-password.focus();
-
-return;
-
-}
-
-loginBtn.disabled=true;
-
-loginBtn.innerHTML=`
-
-<i class="fa-solid fa-spinner fa-spin"></i>
-
-Signing In...
-
-`;
-
-
-try{
-
-    const response = await fetch(
-        "https://senkustakes-api.onrender.com/api/auth/login",
-        {
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify({
-
-                username:email.value.trim(),
-
-                password:password.value
-
-            })
-
+/*==================================================
+    SENKU PAY
+    LOGIN PAGE
+==================================================*/
+
+document.addEventListener("DOMContentLoaded", () => {
+    const API_BASE_URL = "https://senkustakes-api.onrender.com";
+    const LOGIN_ENDPOINT = `${API_BASE_URL}/api/auth/login`;
+
+    const form = document.getElementById("loginForm");
+    const identifier = document.getElementById("loginIdentifier");
+    const password = document.getElementById("password");
+    const remember = document.getElementById("rememberMe");
+    const loginBtn = document.getElementById("loginBtn");
+    const passwordToggle = document.getElementById("passwordToggle");
+    const formMessage = document.getElementById("formMessage");
+    const identifierError = document.getElementById("identifierError");
+    const passwordError = document.getElementById("passwordError");
+
+    const originalButtonHTML = loginBtn.innerHTML;
+
+    const setFormMessage = (message = "", type = "error") => {
+        if (!message) {
+            formMessage.hidden = true;
+            formMessage.textContent = "";
+            formMessage.className = "form-message";
+            return;
         }
 
-    );
+        formMessage.hidden = false;
+        formMessage.textContent = message;
+        formMessage.className = `form-message ${type}`;
+    };
 
-    const data = await response.json();
+    const setFieldError = (field, errorElement, message = "") => {
+        errorElement.textContent = message;
+        field.classList.toggle("invalid", Boolean(message));
+        field.setAttribute("aria-invalid", String(Boolean(message)));
+    };
 
-    if(!response.ok){
+    const clearErrors = () => {
+        setFormMessage("");
+        setFieldError(identifier, identifierError, "");
+        setFieldError(password, passwordError, "");
+    };
 
-        loginBtn.disabled=false;
+    const setLoading = (loading) => {
+        loginBtn.disabled = loading;
 
-        loginBtn.innerHTML="Login";
+        loginBtn.innerHTML = loading
+            ? `
+                <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+                <span>Signing In...</span>
+              `
+            : originalButtonHTML;
+    };
 
-        showPopup({
+    const parseResponseBody = async (response) => {
+        const contentType = response.headers.get("content-type") || "";
 
-            type:"error",
+        if (contentType.includes("application/json")) {
+            return response.json();
+        }
 
-            title:"Login Failed",
+        const text = await response.text();
 
-            message:data.message
+        return {
+            message: text || "Unexpected server response."
+        };
+    };
 
-        });
+    const getServerMessage = (data, fallback) => {
+        if (!data) return fallback;
 
-        return;
+        if (typeof data.message === "string" && data.message.trim()) {
+            return data.message;
+        }
 
-    }
+        if (typeof data.error === "string" && data.error.trim()) {
+            return data.error;
+        }
 
-    localStorage.setItem(
-    "token",
-    data.token
-);
+        if (Array.isArray(data.errors) && data.errors.length) {
+            return data.errors
+                .map((item) =>
+                    typeof item === "string"
+                        ? item
+                        : item.message || item.msg
+                )
+                .filter(Boolean)
+                .join(" ");
+        }
 
+        return fallback;
+    };
 
+    const decodeJwtPayload = (token) => {
+        try {
+            const payload = token.split(".")[1];
 
-    window.location.href="dashboard.html";
+            if (!payload) return null;
 
-}
+            const normalized = payload
+                .replace(/-/g, "+")
+                .replace(/_/g, "/");
 
-catch(error){
+            const decoded = decodeURIComponent(
+                atob(normalized)
+                    .split("")
+                    .map(
+                        (character) =>
+                            `%${character.charCodeAt(0)
+                                .toString(16)
+                                .padStart(2, "0")}`
+                    )
+                    .join("")
+            );
 
-    console.log(error);
+            return JSON.parse(decoded);
+        } catch {
+            return null;
+        }
+    };
 
-    loginBtn.disabled=false;
+    const getUserRole = (data, token) => {
+        const roleFromResponse =
+            data?.user?.role ||
+            data?.account?.role ||
+            data?.role;
 
-    loginBtn.innerHTML="Login";
+        if (roleFromResponse) {
+            return String(roleFromResponse).toUpperCase();
+        }
 
-    showPopup({
+        const payload = decodeJwtPayload(token);
 
-        type:"error",
+        return String(
+            payload?.role ||
+            payload?.userRole ||
+            "USER"
+        ).toUpperCase();
+    };
 
-        title:"Connection Error",
+    const getRedirectForRole = (role) => {
+        switch (role) {
+            case "ADMIN":
+            case "SUPER_ADMIN":
+                return "admin-dashboard.html";
 
-        message:"Cannot connect to the server."
+            case "AGENT":
+                return "admin-dashboard.html";
 
-    });
+            case "SUB_AGENT":
+                return "sub-agent-dashboard.html";
 
-}
+            case "USER":
+            default:
+                return "dashboard.html";
+        }
+    };
 
-});
+    const storeSession = (data, token, shouldRemember) => {
+        const storage = shouldRemember
+            ? localStorage
+            : sessionStorage;
 
+        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
+        localStorage.removeItem("currentUser");
+        sessionStorage.removeItem("currentUser");
 
-/* ===================================
-    REMEMBER ME
-=================================== */
+        storage.setItem("token", token);
 
-if(remember){ 
+        const user =
+            data?.user ||
+            data?.account ||
+            null;
 
-
-    if(localStorage.getItem("rememberLogin")==="true"){
-
-        remember.checked=true;
-
-    }
-
-
-    remember.addEventListener("change",()=>{
+        if (user) {
+            storage.setItem(
+                "currentUser",
+                JSON.stringify(user)
+            );
+        }
 
         localStorage.setItem(
             "rememberLogin",
-            remember.checked
+            String(shouldRemember)
         );
 
+        if (shouldRemember) {
+            localStorage.setItem(
+                "rememberedIdentifier",
+                identifier.value.trim()
+            );
+        } else {
+            localStorage.removeItem("rememberedIdentifier");
+        }
+    };
+
+    passwordToggle.addEventListener("click", () => {
+        const showPassword = password.type === "password";
+        const icon = passwordToggle.querySelector("i");
+
+        password.type = showPassword ? "text" : "password";
+
+        icon.classList.toggle("fa-eye", !showPassword);
+        icon.classList.toggle("fa-eye-slash", showPassword);
+
+        passwordToggle.setAttribute(
+            "aria-label",
+            showPassword ? "Hide password" : "Show password"
+        );
     });
 
+    identifier.addEventListener("input", () => {
+        setFieldError(identifier, identifierError, "");
+        setFormMessage("");
+    });
 
-}
+    password.addEventListener("input", () => {
+        setFieldError(password, passwordError, "");
+        setFormMessage("");
+    });
 
-    /* ===================================
-        CARD ANIMATION
-    =================================== */
+    const rememberEnabled =
+        localStorage.getItem("rememberLogin") === "true";
 
-    const card = document.querySelector(".login-card");
+    if (rememberEnabled) {
+        remember.checked = true;
 
-card.animate(
+        const rememberedIdentifier =
+            localStorage.getItem("rememberedIdentifier");
 
-    [
-
-        {
-            opacity:0,
-            transform:"translateY(40px)"
-        },
-
-        {
-            opacity:1,
-            transform:"translateY(0)"
+        if (rememberedIdentifier) {
+            identifier.value = rememberedIdentifier;
         }
-
-    ],
-
-    {
-
-        duration:700,
-        easing:"ease-out"
-
     }
 
-);
+    remember.addEventListener("change", () => {
+        localStorage.setItem(
+            "rememberLogin",
+            String(remember.checked)
+        );
 
+        if (!remember.checked) {
+            localStorage.removeItem("rememberedIdentifier");
+        }
+    });
+
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        if (loginBtn.disabled) return;
+
+        clearErrors();
+
+        const identifierValue = identifier.value.trim();
+        const passwordValue = password.value;
+
+        let isValid = true;
+
+        if (!identifierValue) {
+            setFieldError(
+                identifier,
+                identifierError,
+                "Enter your username or email address."
+            );
+            isValid = false;
+        }
+
+        if (!passwordValue) {
+            setFieldError(
+                password,
+                passwordError,
+                "Enter your password."
+            );
+            isValid = false;
+        }
+
+        if (!isValid) {
+            setFormMessage(
+                "Enter your login details and try again.",
+                "error"
+            );
+
+            if (!identifierValue) {
+                identifier.focus();
+            } else {
+                password.focus();
+            }
+
+            return;
+        }
+
+        setLoading(true);
+        setFormMessage(
+            "Signing in to your Senku Pay account...",
+            "info"
+        );
+
+        try {
+            const response = await fetch(LOGIN_ENDPOINT, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({
+                    username: identifierValue,
+                    password: passwordValue
+                })
+            });
+
+            const data = await parseResponseBody(response);
+
+            if (!response.ok) {
+                setFormMessage(
+                    getServerMessage(
+                        data,
+                        "The username, email or password is incorrect."
+                    ),
+                    "error"
+                );
+
+                setLoading(false);
+                password.focus();
+                password.select();
+                return;
+            }
+
+            const token =
+                data?.token ||
+                data?.accessToken ||
+                data?.access_token;
+
+            if (!token) {
+                setFormMessage(
+                    "Login succeeded, but the server did not return an authentication token.",
+                    "error"
+                );
+
+                setLoading(false);
+                return;
+            }
+
+            const role = getUserRole(data, token);
+            const redirectUrl = getRedirectForRole(role);
+
+            storeSession(data, token, remember.checked);
+
+            setFormMessage(
+                getServerMessage(
+                    data,
+                    "Login successful. Redirecting to your dashboard..."
+                ),
+                "success"
+            );
+
+            loginBtn.innerHTML = `
+                <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                <span>Login Successful</span>
+            `;
+
+            window.setTimeout(() => {
+                window.location.replace(redirectUrl);
+            }, 900);
+        } catch (error) {
+            console.error("Login request failed:", error);
+
+            setFormMessage(
+                "Unable to connect to the Senku Pay server. Please check your connection and try again.",
+                "error"
+            );
+
+            setLoading(false);
+        }
+    });
+
+    const existingToken =
+        localStorage.getItem("token") ||
+        sessionStorage.getItem("token");
+
+    if (existingToken) {
+        const payload = decodeJwtPayload(existingToken);
+        const expiry = Number(payload?.exp || 0) * 1000;
+
+        if (expiry && expiry <= Date.now()) {
+            localStorage.removeItem("token");
+            sessionStorage.removeItem("token");
+            localStorage.removeItem("currentUser");
+            sessionStorage.removeItem("currentUser");
+        }
+    }
 });

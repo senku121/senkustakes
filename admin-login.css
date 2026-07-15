@@ -1,27 +1,21 @@
 /*==================================================
-        SENKU STAKES
-        ADMIN LOGIN CSS
-        PART 1
+                SENKU PAY
+                ADMIN LOGIN
 ==================================================*/
 
-
 *{
-
     margin:0;
-
     padding:0;
-
     box-sizing:border-box;
-
 }
-
-
 
 :root{
 
     --bg:#050816;
 
     --card:#111827;
+
+    --card2:#171f33;
 
     --primary:#7b2cff;
 
@@ -31,2253 +25,1437 @@
 
     --muted:#9ca3af;
 
-    --border:rgba(255,255,255,.1);
+    --border:rgba(255,255,255,.08);
+
+    --success:#22c55e;
+
+    --danger:#ef4444;
 
 }
 
+html{
 
+    scroll-behavior:smooth;
 
-
-
+}
 
 body{
 
-
-    font-family:"Inter",sans-serif;
-
-
-    background:var(--bg);
-
-
-    color:var(--text);
-
-
     min-height:100vh;
-
 
     overflow:hidden;
 
+    font-family:"Inter",sans-serif;
+
+    background:var(--bg);
+
+    color:var(--text);
 
 }
 
+button,
+input{
 
-
-
-
-
-
-/*==================================================
-            BACKGROUND EFFECT
-==================================================*/
-
-
-body::before{
-
-
-    content:"";
-
-
-    position:fixed;
-
-
-    inset:0;
-
-
-
-    background:
-
-
-    radial-gradient(
-
-        circle at top left,
-
-        rgba(123,44,255,.25),
-
-        transparent 35%
-
-    ),
-
-
-    radial-gradient(
-
-        circle at bottom right,
-
-        rgba(0,212,255,.18),
-
-        transparent 35%
-
-    );
-
-
-
-    z-index:-2;
-
+    font:inherit;
 
 }
 
+button{
 
+    border:none;
 
+}
 
+a{
 
-body::after{
+    color:inherit;
 
+    text-decoration:none;
 
-    content:"";
+}
 
+/*==================================
+        BACKGROUND
+==================================*/
+
+.admin-bg-grid{
 
     position:fixed;
 
-
     inset:0;
 
+    z-index:-5;
 
+    pointer-events:none;
 
     background-image:
 
-
     linear-gradient(
-
         rgba(255,255,255,.03) 1px,
-
         transparent 1px
-
     ),
 
-
     linear-gradient(
-
         90deg,
-
         rgba(255,255,255,.03) 1px,
-
         transparent 1px
-
     );
-
-
 
     background-size:55px 55px;
 
+}
 
-    z-index:-1;
+.admin-glow{
 
+    position:fixed;
+
+    width:420px;
+
+    height:420px;
+
+    border-radius:50%;
+
+    filter:blur(80px);
+
+    opacity:.28;
+
+    pointer-events:none;
+
+    z-index:-4;
 
 }
 
+.admin-glow-one{
 
+    top:-180px;
 
+    left:-120px;
 
+    background:#7b2cff;
 
+}
 
+.admin-glow-two{
 
-/*==================================================
-            MAIN WRAPPER
-==================================================*/
+    right:-160px;
 
+    bottom:-160px;
+
+    background:#00d4ff;
+
+}
+
+/*==================================
+        PAGE
+==================================*/
 
 .admin-login-page{
-
 
     min-height:100vh;
 
-
     display:flex;
-
 
     justify-content:center;
 
-
     align-items:center;
 
-
-    padding:20px;
-
+    padding:30px;
 
 }
 
-
-
-
-
-
-
-
-/*==================================================
-            ADMIN CARD
-==================================================*/
-
+/*==================================
+        CARD
+==================================*/
 
 .admin-card{
 
+    width:100%;
 
-    width:430px;
+    max-width:520px;
 
-
-    padding:45px;
-
+    padding:42px;
 
     border-radius:30px;
 
-
     background:
 
+    rgba(17,24,39,.90);
 
-    rgba(17,24,39,.85);
-
-
+    border:1px solid rgba(255,255,255,.10);
 
     backdrop-filter:blur(25px);
 
-
-
-    border:
-
-
-    1px solid var(--border);
-
-
-
     box-shadow:
 
+    0 35px 80px rgba(0,0,0,.45);
 
-    0 30px 80px rgba(0,0,0,.45);
+    position:relative;
 
-
-
-    animation:
-
-
-    adminShow .8s ease;
-
+    overflow:hidden;
 
 }
 
+.admin-card::before{
 
+    content:"";
 
+    position:absolute;
 
+    width:300px;
 
+    height:300px;
 
+    right:-130px;
 
-/*==================================================
-            LOGO
-==================================================*/
+    top:-130px;
 
+    border-radius:50%;
+
+    background:
+
+    rgba(123,44,255,.12);
+
+}
+
+.admin-card>*{
+
+    position:relative;
+
+    z-index:2;
+
+}
+
+/*==================================
+        LOGO
+==================================*/
 
 .admin-logo{
 
-
     display:flex;
-
 
     align-items:center;
 
+    gap:16px;
 
-    justify-content:center;
-
-
-    gap:15px;
-
-
-    margin-bottom:25px;
-
+    margin-bottom:28px;
 
 }
 
-
-
 .logo-box{
 
+    width:64px;
 
-    width:60px;
-
-
-    height:60px;
-
+    height:64px;
 
     border-radius:20px;
 
-
     display:flex;
-
-
-    align-items:center;
-
 
     justify-content:center;
 
+    align-items:center;
 
-    font-size:28px;
-
+    font-size:30px;
 
     font-weight:900;
 
+    color:#fff;
 
     background:
 
-
     linear-gradient(
 
-        135deg,
+    135deg,
 
-        var(--primary),
+    var(--primary),
 
-        var(--secondary)
+    var(--secondary)
 
     );
 
+    box-shadow:
+
+    0 18px 45px rgba(123,44,255,.35);
 
 }
-
-
 
 .admin-logo h1{
 
-
-    font-size:26px;
-
-
-}
-
-
-
-
-
-
-
-/*==================================================
-            SECURITY BADGE
-==================================================*/
-
-
-.security-badge{
-
-
-    width:max-content;
-
-
-    margin:0 auto 25px;
-
-
-    padding:10px 20px;
-
-
-    border-radius:50px;
-
-
-    display:flex;
-
-
-    align-items:center;
-
-
-    gap:10px;
-
-
-    color:#fff;
-
-
-    font-size:13px;
-
-
-    font-weight:800;
-
-
-    background:
-
-
-    rgba(123,44,255,.2);
-
-
-
-    border:
-
-
-    1px solid rgba(123,44,255,.4);
-
-
-}
-
-
-
-.security-badge i{
-
-
-    color:#b794ff;
-
-
-}
-/*==================================================
-            HEADINGS
-==================================================*/
-
-
-.admin-card h2{
-
-
-    text-align:center;
-
-
     font-size:28px;
 
-
-    margin-bottom:8px;
-
+    font-weight:900;
 
 }
 
-
-
-.subtitle{
-
-
-    text-align:center;
-
+.admin-logo p{
 
     color:var(--muted);
 
-
-    margin-bottom:30px;
-
-
-}
-
-
-
-
-
-
-
-/*==================================================
-            INPUT BOX
-==================================================*/
-
-
-.input-box{
-
-
-    height:60px;
-
-
-    display:flex;
-
-
-    align-items:center;
-
-
-    gap:12px;
-
-
-    padding:0 18px;
-
-
-    margin-bottom:18px;
-
-
-    border-radius:18px;
-
-
-    background:
-
-
-    rgba(255,255,255,.05);
-
-
-
-    border:
-
-
-    1px solid var(--border);
-
-
-
-    transition:.35s;
-
-
-}
-
-
-
-.input-box:focus-within{
-
-
-    border-color:
-
-
-    var(--primary);
-
-
-
-    box-shadow:
-
-
-    0 0 0 4px rgba(123,44,255,.15);
-
-
-}
-
-
-
-.input-box i{
-
-
-    color:#b794ff;
-
-
-}
-
-
-
-.input-box input{
-
-
-    width:100%;
-
-
-    height:100%;
-
-
-    border:none;
-
-
-    outline:none;
-
-
-    background:none;
-
-
-    color:#fff;
-
-
-    font-size:16px;
-
-
-}
-
-
-
-.input-box input::placeholder{
-
-
-    color:#718096;
-
-
-}
-
-
-
-.toggle-password{
-
-
-    cursor:pointer;
-
-
-    transition:.3s;
-
-
-}
-
-
-
-.toggle-password:hover{
-
-
-    color:#fff;
-
-
-}
-
-
-
-
-
-
-
-/*==================================================
-            REMEMBER ROW
-==================================================*/
-
-
-.remember-row{
-
-
-    display:flex;
-
-
-    justify-content:space-between;
-
-
-    align-items:center;
-
-
-    margin:20px 0;
-
-
-    color:#cbd5e1;
-
+    margin-top:4px;
 
     font-size:14px;
 
-
 }
 
+/*==================================
+        BADGE
+==================================*/
 
+.security-badge{
 
-.remember-row label{
-
+    width:max-content;
 
     display:flex;
 
-
     align-items:center;
-
-
-    gap:8px;
-
-
-}
-
-
-
-.remember-row input{
-
-
-    accent-color:var(--primary);
-
-
-}
-
-
-
-.remember-row a{
-
-
-    color:#b794ff;
-
-
-    text-decoration:none;
-
-
-}
-
-
-
-
-
-
-
-
-/*==================================================
-            LOGIN BUTTON
-==================================================*/
-
-
-.admin-login-btn{
-
-
-    width:100%;
-
-
-    height:65px;
-
-
-    border:none;
-
-
-    border-radius:20px;
-
-
-    cursor:pointer;
-
-
-    color:#fff;
-
-
-    font-size:17px;
-
-
-    font-weight:800;
-
-
-    display:flex;
-
-
-    align-items:center;
-
-
-    justify-content:center;
-
-
-    gap:12px;
-
-
-    background:
-
-
-    linear-gradient(
-
-        135deg,
-
-        var(--primary),
-
-        var(--secondary)
-
-    );
-
-
-    box-shadow:
-
-
-    0 20px 45px rgba(123,44,255,.3);
-
-
-    transition:.35s;
-
-
-}
-
-
-
-.admin-login-btn:hover{
-
-
-    transform:translateY(-5px);
-
-
-}
-
-
-
-
-
-
-
-/*==================================================
-            USER LOGIN LINK
-==================================================*/
-
-
-.user-login{
-
-
-    margin-top:25px;
-
-
-    height:55px;
-
-
-    border-radius:18px;
-
-
-    display:flex;
-
-
-    justify-content:center;
-
-
-    align-items:center;
-
 
     gap:10px;
 
+    padding:10px 20px;
 
-    text-decoration:none;
+    border-radius:40px;
 
-
-    color:#cbd5e1;
-
-
-    border:
-
-
-    1px solid var(--border);
-
-
-    transition:.35s;
-
-
-}
-
-
-
-.user-login:hover{
-
+    margin-bottom:28px;
 
     color:#fff;
 
+    font-size:13px;
 
-    border-color:
+    font-weight:800;
 
+    background:
 
-    var(--primary);
+    rgba(123,44,255,.15);
 
-
-}
-
-
-
-
-
-
-
-/*==================================================
-            ANIMATION
-==================================================*/
-
-
-@keyframes adminShow{
-
-
-    from{
-
-
-        opacity:0;
-
-
-        transform:translateY(40px) scale(.95);
-
-
-    }
-
-
-
-    to{
-
-
-        opacity:1;
-
-
-        transform:translateY(0) scale(1);
-
-
-    }
-
+    border:1px solid rgba(123,44,255,.35);
 
 }
 
+.security-badge i{
 
-
-
-
-
-
-/*==================================================
-            RESPONSIVE
-==================================================*/
-
-/* Tablet */
-@media (max-width:768px){
-
-body{
-
-overflow-y:auto;
-
-overflow-x:hidden;
+    color:#b794ff;
 
 }
 
-.admin-login-page{
+/*==================================
+        HEADINGS
+==================================*/
 
-padding:40px 20px;
+.admin-heading{
 
-min-height:100vh;
-
-align-items:center;
+    margin-bottom:28px;
 
 }
+
+.admin-heading h2{
+
+    font-size:30px;
+
+    font-weight:900;
+
+    margin-bottom:10px;
+
+}
+
+.admin-heading p{
+
+    color:var(--muted);
+
+    line-height:1.7;
+
+}
+
+/*==================================
+        MESSAGE
+==================================*/
+
+.admin-login-message{
+
+    display:none;
+
+    margin-bottom:22px;
+
+    padding:16px 18px;
+
+    border-radius:16px;
+
+    border:1px solid transparent;
+
+    font-size:14px;
+
+}
+
+.admin-login-message.show{
+
+    display:block;
+
+}
+
+.admin-login-message.success{
+
+    color:#b8f6cb;
+
+    background:rgba(34,197,94,.12);
+
+    border-color:rgba(34,197,94,.30);
+
+}
+
+.admin-login-message.error{
+
+    color:#ffc2cb;
+
+    background:rgba(239,68,68,.12);
+
+    border-color:rgba(239,68,68,.30);
+
+}
+
+.admin-login-message.info{
+
+    color:#d9f7ff;
+
+    background:rgba(0,212,255,.12);
+
+    border-color:rgba(0,212,255,.30);
+
+}
+/*==================================
+        INPUT GROUPS
+==================================*/
+
+.input-group{
+
+    margin-bottom:20px;
+
+}
+
+.input-group label{
+
+    display:block;
+
+    margin-bottom:10px;
+
+    color:#d1d5db;
+
+    font-size:14px;
+
+    font-weight:700;
+
+}
+
+.input-box{
+
+    min-height:62px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:13px;
+
+    padding:0 16px;
+
+    border-radius:19px;
+
+    border:1px solid var(--border);
+
+    background:rgba(255,255,255,.045);
+
+    transition:.35s ease;
+
+}
+
+.input-box:hover{
+
+    border-color:rgba(123,44,255,.35);
+
+}
+
+.input-box:focus-within{
+
+    border-color:var(--primary);
+
+    box-shadow:
+
+    0 0 0 4px rgba(123,44,255,.15);
+
+}
+
+.input-box > i{
+
+    flex-shrink:0;
+
+    color:#b794ff;
+
+    font-size:17px;
+
+}
+
+.input-box input{
+
+    width:100%;
+
+    height:60px;
+
+    min-width:0;
+
+    border:none;
+
+    outline:none;
+
+    color:#fff;
+
+    background:none;
+
+    font-size:15px;
+
+}
+
+.input-box input::placeholder{
+
+    color:#718096;
+
+}
+
+.input-box input.invalid{
+
+    color:#ffd1d1;
+
+}
+
+.input-box:has(input.invalid){
+
+    border-color:rgba(239,68,68,.75);
+
+    box-shadow:
+
+    0 0 0 4px rgba(239,68,68,.10);
+
+}
+
+.input-box:has(input.valid){
+
+    border-color:rgba(34,197,94,.65);
+
+    box-shadow:
+
+    0 0 0 4px rgba(34,197,94,.10);
+
+}
+
+/*==================================
+        PASSWORD TOGGLE
+==================================*/
+
+.toggle-password{
+
+    width:42px;
+
+    height:42px;
+
+    flex-shrink:0;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    border-radius:13px;
+
+    color:#9ca3af;
+
+    background:transparent;
+
+    cursor:pointer;
+
+    transition:.3s ease;
+
+}
+
+.toggle-password:hover{
+
+    color:#fff;
+
+    background:rgba(255,255,255,.06);
+
+}
+
+.toggle-password i{
+
+    pointer-events:none;
+
+}
+
+/*==================================
+        FIELD ERROR
+==================================*/
+
+.field-error{
+
+    display:block;
+
+    min-height:18px;
+
+    margin-top:7px;
+
+    color:#ff9ca8;
+
+    font-size:12px;
+
+    line-height:1.5;
+
+}
+
+/*==================================
+        ADMIN OPTIONS
+==================================*/
+
+.admin-options{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:18px;
+
+    margin:4px 0 24px;
+
+}
+
+.remember-device{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:9px;
+
+    color:#cbd5e1;
+
+    font-size:14px;
+
+    cursor:pointer;
+
+}
+
+.remember-device input{
+
+    width:17px;
+
+    height:17px;
+
+    accent-color:var(--primary);
+
+    cursor:pointer;
+
+}
+
+.admin-options a{
+
+    color:#b794ff;
+
+    font-size:14px;
+
+    font-weight:700;
+
+    transition:.3s ease;
+
+}
+
+.admin-options a:hover{
+
+    color:var(--secondary);
+
+}
+
+/*==================================
+        LOGIN BUTTON
+==================================*/
+
+.admin-login-btn{
+
+    position:relative;
+
+    overflow:hidden;
+
+    width:100%;
+
+    min-height:64px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:12px;
+
+    border-radius:20px;
+
+    color:#fff;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+    font-weight:800;
+
+    background:
+
+    linear-gradient(
+
+    135deg,
+
+    var(--primary),
+
+    var(--secondary)
+
+    );
+
+    box-shadow:
+
+    0 20px 45px rgba(123,44,255,.30);
+
+    transition:.35s ease;
+
+}
+
+.admin-login-btn::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+
+    left:-100%;
+
+    width:55%;
+
+    height:100%;
+
+    background:
+
+    linear-gradient(
+
+    120deg,
+
+    transparent,
+
+    rgba(255,255,255,.34),
+
+    transparent
+
+    );
+
+    transition:.65s ease;
+
+}
+
+.admin-login-btn:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:
+
+    0 26px 55px rgba(123,44,255,.38);
+
+}
+
+.admin-login-btn:hover::before{
+
+    left:125%;
+
+}
+
+.admin-login-btn:active{
+
+    transform:scale(.98);
+
+}
+
+.admin-login-btn:disabled{
+
+    opacity:.72;
+
+    cursor:not-allowed;
+
+    transform:none;
+
+}
+
+.admin-login-btn i,
+.admin-login-btn span{
+
+    position:relative;
+
+    z-index:2;
+
+}
+/*==================================
+        SECURITY PANEL
+==================================*/
+
+.security-panel{
+
+    display:grid;
+
+    grid-template-columns:1fr;
+
+    gap:14px;
+
+    margin-top:26px;
+
+}
+
+.security-item{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:14px;
+
+    padding:16px;
+
+    border-radius:18px;
+
+    border:1px solid rgba(255,255,255,.07);
+
+    background:rgba(255,255,255,.035);
+
+    transition:.35s ease;
+
+}
+
+.security-item:hover{
+
+    transform:translateY(-3px);
+
+    border-color:rgba(123,44,255,.28);
+
+    background:rgba(123,44,255,.05);
+
+}
+
+.security-item > i{
+
+    width:44px;
+
+    height:44px;
+
+    flex-shrink:0;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:14px;
+
+    color:#b794ff;
+
+    background:rgba(123,44,255,.15);
+
+}
+
+.security-item h4{
+
+    margin-bottom:5px;
+
+    font-size:15px;
+
+    font-weight:800;
+
+}
+
+.security-item p{
+
+    color:var(--muted);
+
+    font-size:13px;
+
+    line-height:1.65;
+
+}
+
+/*==================================
+        USER LOGIN LINK
+==================================*/
+
+.user-login{
+
+    min-height:56px;
+
+    margin-top:24px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:10px;
+
+    border:1px solid var(--border);
+
+    border-radius:18px;
+
+    color:#cbd5e1;
+
+    font-size:14px;
+
+    font-weight:700;
+
+    transition:.35s ease;
+
+}
+
+.user-login:hover{
+
+    color:#fff;
+
+    border-color:rgba(123,44,255,.45);
+
+    background:rgba(123,44,255,.06);
+
+    transform:translateY(-3px);
+
+}
+
+/*==================================
+        CARD POLISH
+==================================*/
 
 .admin-card{
 
-width:100%;
-max-width:500px;
+    animation:
 
-padding:35px 28px;
-
-}
+    adminCardEnter .75s ease both;
 
 }
 
-/* Mobile */
-@media (max-width:500px){
+.admin-logo,
+.security-badge,
+.admin-heading,
+#adminLoginForm,
+.security-panel,
+.user-login{
 
-.admin-login-page{
+    opacity:0;
 
-padding:25px 15px;
+    animation:
 
-}
-
-.admin-card{
-
-width:100%;
-
-padding:28px 20px;
-
-border-radius:22px;
+    adminContentEnter .65s ease forwards;
 
 }
 
 .admin-logo{
 
-flex-direction:column;
-
-gap:12px;
-
-text-align:center;
-
-}
-
-.logo-box{
-
-width:55px;
-height:55px;
-font-size:24px;
-
-}
-
-.admin-logo h1{
-
-font-size:22px;
-
-}
-
-.admin-card h2{
-
-font-size:24px;
-
-}
-
-.subtitle{
-
-font-size:14px;
-
-margin-bottom:25px;
-
-}
-
-.input-box{
-
-height:56px;
-
-}
-
-.input-box input{
-
-font-size:15px;
-
-}
-
-.remember-row{
-
-flex-direction:column;
-
-align-items:flex-start;
-
-gap:12px;
-
-}
-
-.admin-login-btn{
-
-height:58px;
-
-font-size:16px;
-
-}
-
-.user-login{
-
-height:52px;
-
-font-size:14px;
-
-}
-
-}
-
-/* Small Phones */
-@media (max-width:360px){
-
-.admin-card{
-
-padding:22px 16px;
+    animation-delay:.08s;
 
 }
 
 .security-badge{
 
-padding:8px 14px;
-
-font-size:12px;
+    animation-delay:.16s;
 
 }
 
-.admin-card h2{
+.admin-heading{
 
-font-size:22px;
+    animation-delay:.24s;
 
 }
+
+#adminLoginForm{
+
+    animation-delay:.32s;
+
+}
+
+.security-panel{
+
+    animation-delay:.40s;
+
+}
+
+.user-login{
+
+    animation-delay:.48s;
+
+}
+
+@keyframes adminCardEnter{
+
+    from{
+
+        opacity:0;
+
+        transform:
+
+        translateY(34px)
+
+        scale(.96);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:
+
+        translateY(0)
+
+        scale(1);
+
+    }
+
+}
+
+@keyframes adminContentEnter{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(18px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+/*==================================
+        FLOATING GLOW
+==================================*/
 
 .logo-box{
 
-width:50px;
-height:50px;
+    animation:
+
+    logoFloat 4s ease-in-out infinite;
 
 }
 
-}
-/*================================
-        RESPONSIVE
-================================*/
+@keyframes logoFloat{
 
-@media(max-width:1100px){
+    0%,
+    100%{
 
-.platform-balance-card{
+        transform:translateY(0);
 
-flex-direction:column;
+    }
 
-align-items:flex-start;
+    50%{
 
-gap:25px;
+        transform:translateY(-6px);
 
-}
-
-.balance-right{
-
-width:100%;
-
-display:grid;
-
-grid-template-columns:1fr 1fr;
+    }
 
 }
 
-}
+/*==================================
+        LOADING STATE
+==================================*/
 
-@media(max-width:850px){
+.admin-login-btn.loading{
 
-.withdraw-grid{
+    pointer-events:none;
 
-grid-template-columns:1fr;
-
-}
-
-.history-header{
-
-flex-direction:column;
-
-align-items:flex-start;
+    user-select:none;
 
 }
 
-.history-search{
+.admin-login-btn.success{
 
-width:100%;
+    background:
 
-}
+    linear-gradient(
 
-.platform-main{
+    135deg,
 
-padding:20px;
+    #16a34a,
 
-}
+    #22c55e
 
-.admin-sidebar{
+    );
 
-width:230px;
+    box-shadow:
 
-}
-
-}
-
-@media(max-width:650px){
-
-.balance-right{
-
-grid-template-columns:1fr;
+    0 20px 45px rgba(34,197,94,.28);
 
 }
 
-.page-header{
+/*==================================
+        INPUT AUTOFILL
+==================================*/
 
-flex-direction:column;
+input:-webkit-autofill{
 
-align-items:flex-start;
+    -webkit-text-fill-color:#fff;
 
-gap:20px;
+    transition:background-color 9999s;
+
+}
+/*==================================
+        TABLET
+==================================*/
+
+@media(max-width:768px){
+
+    body{
+
+        overflow-y:auto;
+
+    }
+
+    .admin-login-page{
+
+        padding:40px 20px;
+
+        align-items:center;
+
+    }
+
+    .admin-card{
+
+        max-width:560px;
+
+        padding:36px 30px;
+
+    }
 
 }
 
-.admin-profile{
+/*==================================
+        MOBILE
+==================================*/
 
-width:100%;
+@media(max-width:520px){
+
+    .admin-login-page{
+
+        padding:24px 14px;
+
+    }
+
+    .admin-card{
+
+        padding:28px 20px;
+
+        border-radius:24px;
+
+    }
+
+    .admin-logo{
+
+        align-items:center;
+
+    }
+
+    .logo-box{
+
+        width:56px;
+
+        height:56px;
+
+        border-radius:18px;
+
+        font-size:25px;
+
+    }
+
+    .admin-logo h1{
+
+        font-size:23px;
+
+    }
+
+    .admin-logo p{
+
+        font-size:12px;
+
+    }
+
+    .security-badge{
+
+        padding:9px 15px;
+
+        font-size:11px;
+
+    }
+
+    .admin-heading h2{
+
+        font-size:25px;
+
+    }
+
+    .admin-heading p{
+
+        font-size:14px;
+
+    }
+
+    .input-box{
+
+        min-height:58px;
+
+        border-radius:17px;
+
+    }
+
+    .input-box input{
+
+        height:56px;
+
+        font-size:14px;
+
+    }
+
+    .admin-options{
+
+        align-items:flex-start;
+
+        flex-direction:column;
+
+        gap:12px;
+
+    }
+
+    .admin-login-btn{
+
+        min-height:58px;
+
+        border-radius:18px;
+
+        font-size:15px;
+
+    }
+
+    .security-item{
+
+        padding:14px;
+
+    }
+
+    .user-login{
+
+        min-height:52px;
+
+        border-radius:16px;
+
+    }
 
 }
 
-}
-/*================================
-        PAGE ANIMATION
-================================*/
+/*==================================
+        SMALL PHONES
+==================================*/
 
-.platform-main > section,
-.page-header{
+@media(max-width:380px){
 
-opacity:0;
+    .admin-card{
 
-animation:pageEnter .7s ease forwards;
+        padding:24px 16px;
 
-}
+    }
 
+    .admin-logo{
 
-.page-header{
+        gap:12px;
 
-animation-delay:.1s;
+    }
 
-}
+    .logo-box{
 
+        width:52px;
 
-.platform-balance-card{
+        height:52px;
 
-animation-delay:.2s;
+        font-size:23px;
 
-}
+    }
 
+    .admin-logo h1{
 
-.platform-withdraw-card{
+        font-size:21px;
 
-animation-delay:.35s;
+    }
 
-}
+    .admin-heading h2{
 
+        font-size:23px;
 
-.withdraw-history-card{
+    }
 
-animation-delay:.5s;
+    .security-panel{
 
-}
+        gap:11px;
 
+    }
 
-@keyframes pageEnter{
+    .security-item > i{
 
+        width:40px;
 
-from{
+        height:40px;
 
-opacity:0;
-
-transform:translateY(25px);
-
-}
-
-
-to{
-
-opacity:1;
-
-transform:translateY(0);
+    }
 
 }
 
+/*==================================
+        ACCESSIBILITY
+==================================*/
+
+button:focus-visible,
+input:focus-visible,
+a:focus-visible{
+
+    outline:2px solid var(--secondary);
+
+    outline-offset:3px;
 
 }
 
-
-
-/*================================
-        BALANCE GLOW EFFECT
-================================*/
-
-
-.platform-balance-card{
-
-position:relative;
-
-overflow:hidden;
-
-}
-
-
-.platform-balance-card::before{
-
-content:"";
-
-position:absolute;
-
-width:300px;
-
-height:300px;
-
-right:-120px;
-
-top:-120px;
-
-background:
-
-radial-gradient(
-
-circle,
-
-rgba(123,44,255,.35),
-
-transparent 70%
-
-);
-
-pointer-events:none;
-
-}
-
-
-
-.balance-icon{
-
-animation:
-
-balanceFloat 4s ease-in-out infinite;
-
-}
-
-
-
-@keyframes balanceFloat{
-
-
-0%,
-100%{
-
-transform:translateY(0);
-
-}
-
-
-50%{
-
-transform:translateY(-8px);
-
-}
-
-
-}
-
-
-
-/*================================
-        FORM CARD EFFECT
-================================*/
-
-
-.platform-withdraw-card{
-
-position:relative;
-
-overflow:hidden;
-
-}
-
-
-
-.platform-withdraw-card::after{
-
-content:"";
-
-position:absolute;
-
-width:250px;
-
-height:250px;
-
-bottom:-120px;
-
-right:-100px;
-
-background:
-
-radial-gradient(
-
-circle,
-
-rgba(0,212,255,.25),
-
-transparent 70%
-
-);
-
-}
-
-
-
-/*================================
-        INPUT HOVER
-================================*/
-
-
-.form-group input:hover,
-
-.form-group select:hover{
-
-
-border-color:rgba(123,44,255,.6);
-
-}
-
-
-
-.form-group input,
-
-.form-group select{
-
-transform:translateY(0);
-
-}
-
-
-.form-group input:focus,
-
-.form-group select:focus{
-
-
-transform:translateY(-2px);
-
-
-}
-
-
-
-/*================================
-        BUTTON SHINE EFFECT
-================================*/
-
-
-#platformWithdrawBtn{
-
-position:relative;
-
-overflow:hidden;
-
-}
-
-
-
-#platformWithdrawBtn::before{
-
-
-content:"";
-
-
-position:absolute;
-
-
-top:0;
-
-
-left:-100%;
-
-
-width:60%;
-
-
-height:100%;
-
-
-background:
-
-linear-gradient(
-
-120deg,
-
-transparent,
-
-rgba(255,255,255,.35),
-
-transparent
-
-);
-
-
-transition:.6s;
-
-
-}
-
-
-
-#platformWithdrawBtn:hover::before{
-
-
-left:120%;
-
-
-}
-
-
-
-/*================================
-        HISTORY TABLE ANIMATION
-================================*/
-
-
-.withdraw-history-card{
-
-
-animation:
-
-historyReveal .8s ease forwards;
-
-
-}
-
-
-@keyframes historyReveal{
-
-
-from{
-
-opacity:0;
-
-transform:translateY(40px);
-
-}
-
-
-to{
-
-opacity:1;
-
-transform:translateY(0);
-
-}
-
-
-}
-
-
-
-tbody tr{
-
-
-animation:
-
-rowEnter .4s ease forwards;
-
-
-}
-
-
-
-@keyframes rowEnter{
-
-
-from{
-
-opacity:0;
-
-transform:translateX(-20px);
-
-}
-
-
-to{
-
-opacity:1;
-
-transform:translateX(0);
-
-}
-
-
-}
-
-
-
-/*================================
-        SEARCH PREMIUM EFFECT
-================================*/
-
-
-.history-search{
-
-transition:.3s;
-
-}
-
-
-.history-search:hover{
-
-
-transform:translateY(-2px);
-
-
-}
-
-
-
-.history-search input{
-
-
-background:
-
-linear-gradient(
-
-135deg,
-
-#111b2e,
-
-#16233c
-
-);
-
-
-}
-
-
-
-/*================================
-        TABLE HEADER STYLE
-================================*/
-
-
-thead th:first-child{
-
-border-radius:14px 0 0 14px;
-
-}
-
-
-thead th:last-child{
-
-border-radius:0 14px 14px 0;
-
-}
-
-
-
-/*================================
-        CUSTOM SCROLLBAR
-================================*/
-
+/*==================================
+        SCROLLBAR
+==================================*/
 
 ::-webkit-scrollbar{
 
-width:8px;
+    width:9px;
 
-height:8px;
+    height:9px;
 
 }
-
 
 ::-webkit-scrollbar-track{
 
-background:#08101d;
+    background:#070b16;
 
 }
-
 
 ::-webkit-scrollbar-thumb{
 
-background:
+    border-radius:20px;
 
-linear-gradient(
+    background:
 
-180deg,
+    linear-gradient(
 
-#7b2cff,
+    180deg,
 
-#00d4ff
+    var(--primary),
 
-);
+    var(--secondary)
 
-
-border-radius:20px;
-
-}
-/*================================
-        WITHDRAW HISTORY PANEL
-================================*/
-
-
-.withdraw-history-card{
-
-padding:30px;
-
-border-radius:24px;
-
-background:rgba(255,255,255,.05);
-
-border:1px solid rgba(255,255,255,.08);
-
-backdrop-filter:blur(20px);
-
-box-shadow:
-
-0 20px 45px rgba(0,0,0,.25);
-
-overflow:hidden;
+    );
 
 }
 
+::-webkit-scrollbar-thumb:hover{
 
+    background:
 
-.history-header{
+    linear-gradient(
 
-display:flex;
+    180deg,
 
-justify-content:space-between;
+    var(--secondary),
 
-align-items:center;
+    var(--primary)
 
-margin-bottom:25px;
-
-}
-
-
-
-.history-header h2{
-
-font-size:26px;
-
-font-weight:800;
-
-color:#fff;
-
-margin-bottom:6px;
+    );
 
 }
 
+*{
 
+    scrollbar-width:thin;
 
-.history-header p{
+    scrollbar-color:
 
-font-size:14px;
+    var(--primary)
 
-color:#8f98b5;
-
-}
-
-
-
-/*================================
-        SEARCH BOX
-================================*/
-
-
-.history-search{
-
-position:relative;
-
-width:300px;
+    #070b16;
 
 }
 
+/*==================================
+        REDUCED MOTION
+==================================*/
 
+@media(prefers-reduced-motion:reduce){
 
-.history-search i{
+    *,
 
-position:absolute;
+    *::before,
 
-left:18px;
+    *::after{
 
-top:50%;
+        animation:none !important;
 
-transform:translateY(-50%);
+        transition:none !important;
 
-color:#7b2cff;
+        scroll-behavior:auto !important;
 
-font-size:15px;
-
-}
-
-
-
-.history-search input{
-
-height:50px;
-
-width:100%;
-
-padding-left:48px;
-
-padding-right:18px;
-
-border-radius:15px;
-
-border:1px solid rgba(255,255,255,.08);
-
-background:#111b2e;
-
-color:white;
-
-outline:none;
-
-transition:.3s;
+    }
 
 }
 
+/*==================================
+        PRINT
+==================================*/
 
+@media print{
 
-.history-search input::placeholder{
+    body{
 
-color:#68738f;
+        color:#000;
 
-}
+        background:#fff;
 
+    }
 
+    .admin-bg-grid,
+    .admin-glow,
+    .security-panel,
+    .user-login{
 
-.history-search input:focus{
+        display:none !important;
 
-border-color:#7b2cff;
+    }
 
-box-shadow:
+    .admin-card{
 
-0 0 0 4px rgba(123,44,255,.15);
+        color:#000;
 
-transform:translateY(-2px);
+        background:#fff;
 
-}
+        border:1px solid #ddd;
 
+        box-shadow:none;
 
-
-/*================================
-        TABLE CONTAINER
-================================*/
-
-
-.withdraw-history-card .table-container{
-
-overflow-x:auto;
-
-border-radius:18px;
-
-}
-
-
-
-/*================================
-        TABLE
-================================*/
-
-
-.withdraw-history-card table{
-
-width:100%;
-
-border-collapse:collapse;
-
-min-width:850px;
+    }
 
 }
 
-
-
-.withdraw-history-card thead{
-
-background:#111b2e;
-
-}
-
-
-
-.withdraw-history-card th{
-
-padding:18px;
-
-text-align:left;
-
-font-size:13px;
-
-text-transform:uppercase;
-
-letter-spacing:.5px;
-
-color:#94a3b8;
-
-}
-
-
-
-.withdraw-history-card td{
-
-padding:18px;
-
-border-bottom:
-
-1px solid rgba(255,255,255,.06);
-
-font-size:14px;
-
-color:#e5e7eb;
-
-}
-
-
-
-.withdraw-history-card tbody tr{
-
-transition:.3s;
-
-}
-
-
-
-.withdraw-history-card tbody tr:hover{
-
-background:
-
-rgba(123,44,255,.08);
-
-transform:translateX(4px);
-
-}
-
-
-
-/*================================
-        STATUS BADGES
-================================*/
-
-
-.status{
-
-padding:7px 14px;
-
-border-radius:50px;
-
-font-size:12px;
-
-font-weight:700;
-
-display:inline-flex;
-
-align-items:center;
-
-gap:6px;
-
-}
-
-
-
-.status.completed{
-
-background:
-
-rgba(34,197,94,.15);
-
-color:#22c55e;
-
-}
-
-
-
-.status.pending{
-
-background:
-
-rgba(245,158,11,.15);
-
-color:#f59e0b;
-
-}
-
-
-
-.status.failed{
-
-background:
-
-rgba(239,68,68,.15);
-
-color:#ef4444;
-
-}
-
-
-
-/*================================
-        EMPTY HISTORY
-================================*/
-
-
-.empty-history{
-
-display:flex;
-
-flex-direction:column;
-
-align-items:center;
-
-justify-content:center;
-
-padding:70px 20px;
-
-}
-
-
-
-.empty-history i{
-
-font-size:55px;
-
-color:#7b2cff;
-
-margin-bottom:20px;
-
-animation:
-
-emptyFloat 3s ease-in-out infinite;
-
-}
-
-
-
-@keyframes emptyFloat{
-
-
-0%,
-100%{
-
-transform:translateY(0);
-
-}
-
-
-50%{
-
-transform:translateY(-10px);
-
-}
-
-
-}
-
-
-
-.empty-history h3{
-
-font-size:22px;
-
-font-weight:700;
-
-margin-bottom:10px;
-
-}
-
-
-
-.empty-history p{
-
-color:#8f98b5;
-
-font-size:14px;
-
-}
-
-
-
-/*================================
-        HISTORY RESPONSIVE
-================================*/
-
-
-@media(max-width:900px){
-
-
-.history-header{
-
-flex-direction:column;
-
-align-items:flex-start;
-
-gap:20px;
-
-}
-
-
-.history-search{
-
-width:100%;
-
-}
-
-
-}
-#addCardBtn{
-
-height:55px;
-
-padding:0 25px;
-
-border:none;
-
-border-radius:15px;
-
-background:
-linear-gradient(
-135deg,
-#7b2cff,
-#00d4ff
-);
-
-color:white;
-
-font-weight:700;
-
-cursor:pointer;
-
-align-items:center;
-
-justify-content:center;
-
-gap:10px;
-
-margin-top:15px;
-display:flex;
-
-}
-
-
-#addCardBtn:hover{
-
-transform:translateY(-2px);
-
-box-shadow:
-0 15px 35px rgba(123,44,255,.35);
-
-}
- /*================================
-        MOBILE SIDEBAR TOP FIX
-================================*/
-
-
-@media(max-width:850px){
-
-
-.platform-layout{
-
-flex-direction:column;
-
-}
-
-
-/* Sidebar stays on top */
-
-.admin-sidebar{
-
-width:100%;
-
-min-height:auto;
-
-padding:18px;
-
-border-right:none;
-
-border-bottom:1px solid rgba(255,255,255,.08);
-
-}
-
-
-
-/* Brand center */
-
-.admin-brand{
-
-justify-content:center;
-
-margin-bottom:25px;
-
-}
-
-
-
-/* Navigation becomes horizontal */
-
-.admin-sidebar nav{
-
-flex-direction:row;
-
-overflow-x:auto;
-
-gap:8px;
-
-}
-
-
-
-.admin-sidebar nav a{
-
-white-space:nowrap;
-
-padding:12px 15px;
-
-}
-
-
-
-/* Logout stays below menu */
-
-.admin-logout{
-
-margin-top:20px;
-
-}
-
-
-
-.platform-main{
-
-padding:20px;
-
-width:100%;
-
-}
-
-}
-
-
-
-/*================================
-        SMALL MOBILE
-================================*/
-
-
-@media(max-width:600px){
-
-
-.page-header{
-
-flex-direction:column;
-
-align-items:flex-start;
-
-gap:18px;
-
-}
-
-
-
-.platform-balance-card{
-
-padding:22px;
-
-}
-
-
-
-.balance-left h2{
-
-font-size:30px;
-
-}
-
-
-
-.balance-icon{
-
-width:65px;
-
-height:65px;
-
-font-size:24px;
-
-}
-
-
-
-.balance-right{
-
-width:100%;
-
-grid-template-columns:1fr;
-
-}
-
-
-
-.balance-mini{
-
-width:100%;
-
-}
-
-
-
-.platform-withdraw-card,
-
-.withdraw-history-card{
-
-padding:20px;
-
-border-radius:20px;
-
-}
-
-
-
-.withdraw-grid{
-
-grid-template-columns:1fr;
-
-}
-
-
-
-#platformWithdrawBtn{
-
-height:55px;
-
-font-size:15px;
-
-}
-
-
-
-.history-search{
-
-width:100%;
-
-}
-
-
-}
-
-
-
-/*================================
-        EXTRA SMALL PHONE
-================================*/
-
-
-@media(max-width:400px){
-
-
-.admin-sidebar nav a{
-
-font-size:13px;
-
-padding:10px 12px;
-
-}
-
-
-
-.logo-box{
-
-width:48px;
-
-height:48px;
-
-}
-
-
-
-.admin-brand h2{
-
-font-size:18px;
-
-}
-
-
-
-.platform-main{
-
-padding:15px;
-
-}
-
-
-}
+/*==================================
+                END
+==================================*/
